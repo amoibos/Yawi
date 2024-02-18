@@ -21,7 +21,18 @@ void clear_screen(void)
 }
 #endif
 
-
+#ifdef PLATFORM_SG
+void clear_screen(void)
+{
+    for(int y=0; y < 192 / 8; ++y)
+        for(int x=0; x < 256 / 8; ++x)
+        {
+            SG_setNextTileatXY(x, y);
+            SG_setTile(' ');    
+        }    
+    SG_setNextTileatXY(0, 0);
+}
+#endif
 
 void load_ascii_tiles(void)
 {
@@ -31,6 +42,6 @@ void load_ascii_tiles(void)
     //SMS_loadBGPalette(font_palette_bin);
 #elif PLATFORM_SG
     SG_loadTilePatterns(font__tiles__bin, 0, font__tiles__bin_size);
-    SG_loadTileColours(font_palette_bin, 0, font_palette_bin_size); 
+    SG_loadTileColours(font__palette__bin, 0, font__palette__bin_size); 
 #endif
 }

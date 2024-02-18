@@ -189,11 +189,13 @@ int SG_GetKeycode (int *keys, unsigned char key_no) {
 
         status=ppi_port_a << 8 | ppi_port_b;
         if (status) {
-            if (ret < key_no) 
-                keys[ret]=status;
-            else
-                break;
-            ++ret;
+            for(unsigned int i=32768; i != 0; i=i>>1)
+                if (status & i)
+                    if (ret < key_no) 
+                        keys[ret++]=i;
+                    else
+                        return ret;
+                    
         }    
     }
     return ret;
