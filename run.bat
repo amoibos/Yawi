@@ -1,4 +1,4 @@
-echo params %0 %1 %2
+REM echo all args %*
 if %2 == "SG"	goto sg
 if %2 == "SMS" 	goto SMS
 

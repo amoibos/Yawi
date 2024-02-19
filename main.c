@@ -23,21 +23,22 @@ void print_str(char x, char y, char* str) {
 
 
 void main(void) {
-    unsigned char no;
+    unsigned char no=1;
     unsigned int keys[KEY_AMOUNT];
     char keycode[4];
 
     load_ascii_tiles();
     clear_screen();
-    SG_displayOn();   
+    SG_displayOn(); 
+    //print_str(0, 0, "Hello World!"); 
     while(1) {
-        
-        
         SG_waitForVBlank();
-        no=SG_GetKeycode(keys, KEY_AMOUNT);
+        if (no != 0)
+            no=SG_GetKeycode(keys, KEY_AMOUNT);
         if (no) {
             SEGA_itoa(keys[0], keycode, 0);
             print_str(0, 0, keycode);    
+            no=0;
         }
     }
 
