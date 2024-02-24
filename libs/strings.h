@@ -3,7 +3,7 @@
 
 #define PREFIX SEGA_
 
-void SEGA_itoa(int value, char *sp, int radix);
+void SEGA_itoa(long value, char *sp);
 /*int atoi(char* str);
 float atof(char* arr);
 char* ftoa(float value, int decimals, char* buf);

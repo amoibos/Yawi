@@ -11,7 +11,7 @@ void SG_init (void);
 void SG_VDPturnOnFeature (unsigned int feature);
 void SG_VDPturnOffFeature (unsigned int feature);
 //testing code
-int SG_GetKeycode (int *keys, unsigned char key_no);
+unsigned char SG_GetKeycode (unsigned int *keys, unsigned char max_keys);
 //testing end
 
 /* turns on/off a VDP feature */

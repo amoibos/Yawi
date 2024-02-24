@@ -32,38 +32,41 @@ char strpos(char* search, char* content, char start)
 	return result;
 }
 
-//radix unused, always 10
-void SEGA_itoa(int value, char *sp, char radix)
+void SEGA_itoa(long value, char *sp)
 {
-	char tmp[16];// be careful with the length of the buffer
-	char *tp = tmp;
-	int i;
-	unsigned v;
+    long q, r;
+    char *start;
+    char t, sign = value < 0;
 
-	int sign = value < 0;    
-	if (sign)
-		v = -value;
-	else
-		v = (unsigned)value;
-
-	while (v || tp == tmp)
-	{
-		i = v % 10;
-		v /= 10; 
-		if (i < 10)
-			*tp++ = i+'0';
-		else
-			*tp++ = i + 'a' - 10;
-	}
-
-   
-
-	if (sign) 
-	*sp++ = '-';
+    start = sp;
     
+    if (sign) 
+        value *= -1;
+    
+    do
+    {
+        q = value / 10;
+        r = value % 10;
+        
+        if (q)
+            value /= 10;
+        else
+            value -= r;
 
-	while (tp > tmp)
-		*sp++ = *--tp;
+        *sp++ = '0' + r;
+    } while(value);
+    if (sign)
+        *sp++ = '-';
+
+    *sp-- = '\0';
+
+
+    while(start < sp)
+    {
+        t = *start;
+        *start++ = *sp;
+        *sp-- = t;
+    }
 }
 
 int atoi(char* str) 
