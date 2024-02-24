@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+#license: ISC
+#copyright: darktrym
+
 import os
 from os import path
 import sys
@@ -9,7 +12,7 @@ from PIL import Image, ImageOps
 from collections import defaultdict 
 
 # 32 x 24 tiles filling a screen where a tile 8x8 tile dimension
-# for the SG the color depth is 1bit = 2 colors per tile
+# for the SG the color depth is 1bit = 2 colors per tile line
 PAL_COLORS = 1  # in bits
 MAX_X = 256
 MAX_Y = 192
@@ -56,35 +59,30 @@ def convert(output_name):
             color_index[color[-1]] = SG_COLOR_PALETTE.index(nearest_color(SG_COLOR_PALETTE, color[-1]))
 
         filename = path.splitext(output_name)[0]
-        #cnt = 0
         # write tiles data
         with open(filename + ".bin", "wb") as tile_writer, open(filename + ".pal", "wb") as palette_writer:
             for tile_y in range(height // TILE_HEIGHT):
                 for tile_x in range(width // TILE_WIDTH):
-                    #cnt += 1
-                    #if cnt == 4:
-                    #    return
                     region = img.crop((tile_x * TILE_WIDTH, tile_y * TILE_HEIGHT, (tile_x + 1) * TILE_WIDTH,
                                        (tile_y + 1) * TILE_HEIGHT))
                     # no idea why I have to mirror the tile
                     region = ImageOps.mirror(region)
                     data = [color_index[item] for item in region.getdata()]
-                    #line = 0
                     for pos in range(0, len(data), TILE_HEIGHT):                        
-                        #line += 1
                         colors_in_line = defaultdict(int)
                         # get color distribution in line of the current tile
                         for column in range(TILE_WIDTH):
                             colors_in_line[data[pos + column]] += 1
-                        #if cnt == 2:# and line == 2:
-                        #    import pdb; pdb.set_trace()
                         # color with the highest amount in line is background color, 
                         # second place is foreground color 
                         # if there is no second place then use transparent color    
-                        colors = sorted(colors_in_line.items(), key=lambda x: x[-1])
+                        #colors = sorted(colors_in_line.items(), key=lambda x: x[-1])
+                        
+                        # use color index for ordering
+                        colors = sorted(colors_in_line.items(), key=lambda x: x)
                         colors.insert(0, (0, 0))    
-                        background = colors[-1][0]
-                        foreground = colors[-2][0]
+                        foreground = colors[-1][0]
+                        background = colors[-2][0]
                         
                         val = 0
                         for column in range(TILE_WIDTH):
@@ -92,12 +90,7 @@ def convert(output_name):
                             
                         tile_writer.write(struct.pack('B', val)) 
                         palette_writer.write(struct.pack('B', (background << 4) + foreground))
-                        #print(hex(background << 4 + foreground))
-                        #if cnt == 3: 
-                        #    return
-                    #print("next")
-                    #import pdb; pdb.set_trace()
-
+        
 
 def process(args):
     if os.path.exists(args[1]):
