@@ -25,9 +25,11 @@ void print_str(unsigned char x, unsigned char y, char *str) {
 void main(void) {
     unsigned char no;
     unsigned int keys[KEY_AMOUNT];
-    unsigned char keycode[6];
+    unsigned char keycode[KEY_AMOUNT];
     
-    keycode[0] = 0;
+    for(unsigned char n=0; n < KEY_AMOUNT; n++)
+        keycode[n] = 0;
+
     load_ascii_tiles(0);
     load_ascii_tiles(256);
     load_ascii_tiles(512);
@@ -35,15 +37,19 @@ void main(void) {
     clear_screen();
     SG_displayOn(); 
     
-    SEGA_itoa(-295, keycode);  
-    print_str(0, 10, keycode);
+    //SEGA_itoa(-295, keycode);  
+    //print_str(0, 10, keycode);
     
     /*
     for(char y=0; y < 24; y++)
         for(char x=0; x < 32; x++)
-            print_str(x, y, "Q");       
+        {
+            print_str(x, y, "Q");  
+            for(no=0; no < 10; no++)
+                SG_waitForVBlank();      
+        }*/
     clear_screen();
-    */
+    
     while(1) 
     {
         clear_line(0);
@@ -58,15 +64,14 @@ void main(void) {
             SEGA_itoa(keys[0], keycode);  
             print_str(10, 0, keycode);
 
-            if (keys[0] < 0)
-                print_str(1, 0, "-");
-            else if (keys[0] > 0)
-               print_str(1, 0, "+");
-            else      
-               print_str(1, 0, "0");
-
             SEGA_itoa(keys[1], keycode);  
             print_str(15, 0, keycode);
+
+            SEGA_itoa(keys[2], keycode);  
+            print_str(20, 0, keycode);
+
+            SEGA_itoa(keys[3], keycode);  
+            print_str(25, 0, keycode);
         }
         else 
         {
@@ -74,9 +79,8 @@ void main(void) {
             SEGA_itoa(no, keycode);
             print_str(5, 0, keycode);          
         }
-        SG_waitForVBlank(); 
-        SG_waitForVBlank();
-        SG_waitForVBlank();  
+        for(no=0; no < 4; no++)
+            SG_waitForVBlank();  
     }
 
 }

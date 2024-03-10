@@ -96,6 +96,10 @@ volatile bool VDPSpriteOverflow=false;
 volatile unsigned int KeysStatus, PreviousKeysStatus;
 volatile unsigned int KBDKeysStatus, KBDPreviousKeysStatus;
 
+volatile unsigned int KeysStatus, PreviousKeysStatus;
+volatile unsigned int KBDKeysStatus, KBDPreviousKeysStatus;
+
+
 /* variables for sprite windowing and clipping */
 unsigned int  spritesHeight=8, spritesWidth=8;
 unsigned char clipWin_x0, clipWin_y0, clipWin_x1, clipWin_y1;
@@ -178,23 +182,24 @@ void SG_VDPturnOffFeature (unsigned int feature) {
 
 /*testing code for accessing all keys of the keyboard*/
 unsigned char SG_GetKeycode (unsigned int *keys, unsigned char max_keys) {
-    unsigned char ret=0, ppi_port_a, ppi_port_b;
+    unsigned char ret=0;
     unsigned int status;
     
-    for(int row = 0; row < 8; ++row) {
-
+    for(unsigned char row = 0; row < 8; ++row) {
         SC_PPI_C=row;
-        ppi_port_a=(unsigned char)SC_PPI_A; 
-        ppi_port_b=(unsigned char)SC_PPI_B & 0x0F;
-
-        status=(ppi_port_a << 8) | ppi_port_b;
-        if (status) {
-            if (ret < max_keys) 
-                keys[ret]=status;
-            else
-                break;
-            ++ret;
-        }    
+       
+        status=~((SC_PPI_A << 8) | SC_PPI_B);           
+        for(unsigned int bit=0x8000; bit || !status; bit >>= 1) {
+            if (status & bit) {
+                if (ret < max_keys) {
+                    keys[ret]=bit;
+                    status -= bit;
+                }
+                else
+                    return ret;
+                ++ret;
+            } 
+        }   
     } 
     return ret;
 }
