@@ -182,26 +182,25 @@ void SG_VDPturnOffFeature (unsigned int feature) {
 
 /*testing code for accessing all keys of the keyboard*/
 unsigned char SG_GetKeycode (unsigned int *keys, unsigned char max_keys) {
-    unsigned char ret=0;
-    unsigned int status;
+    unsigned char count=0;
+    unsigned int keyb_stat, row_no;
     
-    for(unsigned char row = 0; row < 8; ++row) {
-        SC_PPI_C=row;
+    for(unsigned char keyb_row=0; keyb_row < 8; keyb_row++) {
+        SC_PPI_C = keyb_row;
+        row_no = keyb_row << 12;
        
-        status=~((SC_PPI_A << 8) | SC_PPI_B);           
-        for(unsigned int bit=0x8000; bit || !status; bit >>= 1) {
-            if (status & bit) {
-                if (ret < max_keys) {
-                    keys[ret]=bit;
-                    status -= bit;
-                }
+        keyb_stat=(~((SC_PPI_B << 8) | SC_PPI_A)) & 0x0FFF;           
+        for(unsigned int bit_mask=0x800; keyb_stat; bit_mask >>= 1) {
+            if ((keyb_stat & bit_mask)) { 
+                if (count < max_keys) 
+                        keys[count++] = row_no + bit_mask;
                 else
-                    return ret;
-                ++ret;
+                    return count;
+                keyb_stat -= bit_mask;
             } 
         }   
     } 
-    return ret;
+    return count;
 }
 /*test testing*/
 

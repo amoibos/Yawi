@@ -3,7 +3,9 @@
 #include "libs/console.h"
 #include "libs/strings.h"
 
-#define KEY_AMOUNT ((8))
+#define KEY_AMOUNT ((4))
+
+#define INFOLINE ((10))
 
 
 void print_assets(unsigned char x, unsigned char y, unsigned char tileno)
@@ -21,15 +23,26 @@ void print_str(unsigned char x, unsigned char y, char *str) {
     }
 }
 
+void print_num(unsigned char x, unsigned char y, long num) {
+    char buffer[10+1]; 
+    char *str; 
+
+    str = buffer;
+    SEGA_itoa(num, buffer);
+    
+    for(; *str; ++str) {
+        if (x >= 32)
+            ++y, x=0;
+        print_assets(x, y, *str);
+        ++x;
+    }
+}
 
 void main(void) {
-    unsigned char no;
+    unsigned char no, row;
     unsigned int keys[KEY_AMOUNT];
-    unsigned char keycode[KEY_AMOUNT];
+    unsigned char keycode[5+1];
     
-    for(unsigned char n=0; n < KEY_AMOUNT; n++)
-        keycode[n] = 0;
-
     load_ascii_tiles(0);
     load_ascii_tiles(256);
     load_ascii_tiles(512);
@@ -49,35 +62,45 @@ void main(void) {
                 SG_waitForVBlank();      
         }*/
     clear_screen();
-    
+    //print_str(0,10, "Hello World!");
     while(1) 
     {
-        clear_line(0);
+        clear_line(INFOLINE);
+        for(unsigned char n=0; n < KEY_AMOUNT; n++)
+            keys[n] = 0;
         no=SG_GetKeycode(keys, KEY_AMOUNT);
         if (no) 
         {
-            print_str(0, 0, "R");  
+            print_str(0, INFOLINE, "R");  
 
-            SEGA_itoa(no, keycode);
-            print_str(5, 0, keycode);
-            
-            SEGA_itoa(keys[0], keycode);  
-            print_str(10, 0, keycode);
+            //number of detected keys
+            print_num(1, INFOLINE, no);
+            //print_num(1, INFOLINE, keys[0]);
 
-            SEGA_itoa(keys[1], keycode);  
-            print_str(15, 0, keycode);
+            row=keys[0] >> 12; keys[0] &= 0x0FFF;  
+            print_num(4-1, INFOLINE, row);
+            print_num(4, INFOLINE, keys[0]);
 
-            SEGA_itoa(keys[2], keycode);  
-            print_str(20, 0, keycode);
+            row=keys[1] >> 12; keys[1] &= 0x0FFF;  
+            print_num(11-1, INFOLINE, row);
+            print_num(11, INFOLINE, keys[1]);
 
-            SEGA_itoa(keys[3], keycode);  
-            print_str(25, 0, keycode);
+            row=keys[2] >> 12; keys[2] &= 0x0FFF;  
+            print_num(18-1, INFOLINE, row);
+            print_num(18, INFOLINE, keys[2]);
+
+            row=keys[3] >> 12; keys[3] &= 0x0FFF;
+            print_num(25-1, INFOLINE, row);
+            print_num(25, INFOLINE, keys[2]);
+
+            print_str(0, 15, "keypressed");
         }
         else 
         {
-            print_str(0, 0, "N");  
+            print_str(0, INFOLINE, "N");  
             SEGA_itoa(no, keycode);
-            print_str(5, 0, keycode);          
+            print_str(5, INFOLINE, keycode);     
+            print_str(0, 15, "no keys");     
         }
         for(no=0; no < 4; no++)
             SG_waitForVBlank();  
