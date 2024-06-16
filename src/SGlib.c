@@ -96,10 +96,6 @@ volatile bool VDPSpriteOverflow=false;
 volatile unsigned int KeysStatus, PreviousKeysStatus;
 volatile unsigned int KBDKeysStatus, KBDPreviousKeysStatus;
 
-volatile unsigned int KeysStatus, PreviousKeysStatus;
-volatile unsigned int KBDKeysStatus, KBDPreviousKeysStatus;
-
-
 /* variables for sprite windowing and clipping */
 unsigned int  spritesHeight=8, spritesWidth=8;
 unsigned char clipWin_x0, clipWin_y0, clipWin_x1, clipWin_y1;
@@ -179,30 +175,6 @@ void SG_VDPturnOffFeature (unsigned int feature) {
   VDPReg[HI(feature)]&=~LO(feature);
   SG_write_to_VDPRegister(HI(feature), VDPReg[HI(feature)]);
 }
-
-/*testing code for accessing all keys of the keyboard*/
-unsigned char SG_GetKeycode (unsigned int *keys, unsigned char max_keys) {
-    unsigned char count=0;
-    unsigned int keyb_stat, row_no;
-    
-    for(unsigned char keyb_row=0; keyb_row < 8; keyb_row++) {
-        SC_PPI_C = keyb_row;
-        row_no = keyb_row << 12;
-       
-        keyb_stat=(~((SC_PPI_B << 8) | SC_PPI_A)) & 0x0FFF;           
-        for(unsigned int bit_mask=0x800; keyb_stat; bit_mask >>= 1) {
-            if ((keyb_stat & bit_mask)) { 
-                if (count < max_keys) 
-                        keys[count++] = row_no + bit_mask;
-                else
-                    return count;
-                keyb_stat -= bit_mask;
-            } 
-        }   
-    } 
-    return count;
-}
-/*test testing*/
 
 void SG_init (void) {
   unsigned char i;
@@ -472,6 +444,28 @@ unsigned int SG_getKeyboardJoypadHeld (void) {
 
 unsigned int SG_getKeyboardJoypadReleased (void) {
   return ((~KBDKeysStatus) & KBDPreviousKeysStatus);
+}
+
+unsigned char SG_getKeycodes (unsigned int *keys, unsigned char max_keys) {
+    unsigned char count=0;
+    
+    for(unsigned char keyb_row=0; keyb_row < 8; keyb_row++) {
+        unsigned int keyb_stat, row_no;
+        SC_PPI_C = keyb_row;
+        row_no = keyb_row << 12;
+       
+        keyb_stat=(~((SC_PPI_B << 8) | SC_PPI_A)) & 0x0FFF;           
+        for(unsigned int bit_mask=0x800; keyb_stat; bit_mask >>= 1) {
+            if (keyb_stat & bit_mask) { 
+                if (count < max_keys) 
+                        keys[count++] = row_no + bit_mask;
+                else
+                    return count;
+                keyb_stat -= bit_mask;
+            } 
+        }   
+    } 
+    return count;
 }
 
 /* low level functions, just to be used for dirty tricks ;) */

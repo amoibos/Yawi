@@ -10,10 +10,6 @@ void SG_init (void);
 /* VDP operative mode handling functions */
 void SG_VDPturnOnFeature (unsigned int feature);
 void SG_VDPturnOffFeature (unsigned int feature);
-//testing code
-unsigned char SG_GetKeycode (unsigned int *keys, unsigned char max_keys);
-//testing end
-
 /* turns on/off a VDP feature */
 /* feature can be one of the following: */
 #define SG_VDPFEATURE_SHOWDISPLAY      0x0140
@@ -52,38 +48,6 @@ void SG_setBackdropColor (unsigned char entry);
 
 /* wait until next VBlank starts */
 void SG_waitForVBlank (void);
-
-
-/* ***************************************************************** */
-/* Cartridge mapper handling                                         */
-/* ***************************************************************** */
-
-/* macro for ROM bankswitching */
-volatile __at (0xffff) unsigned char ROM_bank_to_be_mapped_on_slot2;
-#define SMS_mapROMBank(n)       ROM_bank_to_be_mapped_on_slot2=(n)
-
-/* macros to preserve and restore the currently mapped ROM bank */
-
-/* Typical use: In functions using SMS_mapROMBank(), to make sure the mapped bank */
-/* when entering the function is unchanged upon return. */
-/* Use only one SMS_saveROMBank() before the first SMS_mapROMBank() in the function, */
-/* and at least one SMS_restoreROMBank() per following return statement. */
-/* SMS_restoreROMBank() may be used several times, for instance to access data in the original bank. */
-#define SMS_saveROMBank()       unsigned char _saved_slot2_ROM_bank = ROM_bank_to_be_mapped_on_slot2
-#define SMS_restoreROMBank()    SMS_mapROMBank(_saved_slot2_ROM_bank)
-
-/* additional symbols to control other mapper slots - use with care! */
-volatile __at (0xfffe) unsigned char ROM_bank_to_be_mapped_on_slot1;
-volatile __at (0xfffd) unsigned char ROM_bank_to_be_mapped_on_slot0;
-
-/* macro for SRAM access */
-volatile __at (0xfffc) unsigned char SRAM_bank_to_be_mapped_on_slot2;
-#define SMS_enableSRAM()        SRAM_bank_to_be_mapped_on_slot2=0x08
-#define SMS_enableSRAMBank(n)   SRAM_bank_to_be_mapped_on_slot2=((((n)<<2)|0x08)&0x0C)
-#define SMS_disableSRAM()       SRAM_bank_to_be_mapped_on_slot2=0x00
-
-/* SRAM access is as easy as accessing an array of char */
-__at (0x8000) unsigned char SMS_SRAM[];
 
 /* functions to load tiles into VRAM */
 void SG_loadTilePatterns (void *src, unsigned int tilefrom, unsigned int size);
@@ -147,6 +111,10 @@ unsigned int SG_getKeyboardJoypadStatus (void);
 unsigned int SG_getKeyboardJoypadPressed (void);
 unsigned int SG_getKeyboardJoypadHeld (void);
 unsigned int SG_getKeyboardJoypadReleased (void);
+
+/* read from keyboard max keys and return the keycodes and amount */
+unsigned char SG_getKeycodes (unsigned int *keys, unsigned char max_keys);
+
 
 /* low level functions */
 void SG_VRAMmemcpy (unsigned int dst, void *src, unsigned int size);

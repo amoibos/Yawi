@@ -3,107 +3,122 @@
 #include "libs/console.h"
 #include "libs/strings.h"
 
-#define KEY_AMOUNT ((4))
+#include "assets/levels.h"
 
-#define INFOLINE ((10))
+#define MAX_LEVEL ((2))
+#define LEVEL_HEIGHT ((20))
 
 
-void print_assets(unsigned char x, unsigned char y, unsigned char tileno)
-{
-    SG_setNextTileatXY(x, y);
-    SG_setTile(tileno+256);   
-}
+char load_leveldata(char no, unsigned char *start_x, unsigned char *start_y) {
+    char *data;
+    if ( (no < 1) || (no > MAX_LEVEL))
+        return 0;
 
-void print_str(unsigned char x, unsigned char y, char *str) {
-    for(; *str; ++str) {
-        if (x >= 32)
-            ++y, x=0;
-        print_assets(x, y, *str);
-        ++x;
+    //mapROMBank(no);
+
+    switch (no) {
+        case 1: {
+            data = level1_dat;
+            break;
+        }
+        case 2: {
+            //data = level2_dat;
+            break;
+        }  
+              
     }
-}
+ 
+    for(char y=0; y < LEVEL_HEIGHT; ++y) {
+        for(char x=0; x < SCREEN_MAX_X; ++x) {
+            // skip control characters, 
+            while (*data < 32) data++;
+            if (*data == '@') {
+                *start_x = x;
+                *start_y = y;    
+            }
 
-void print_num(unsigned char x, unsigned char y, long num) {
-    char buffer[10+1]; 
-    char *str; 
-
-    str = buffer;
-    SEGA_itoa(num, buffer);
+            //todo: checks if data is too short or too long 
+            print_tile(x, y, *data);
+            ++data;
+        }
+    }
     
-    for(; *str; ++str) {
-        if (x >= 32)
-            ++y, x=0;
-        print_assets(x, y, *str);
-        ++x;
+    return 1;
+}
+
+
+char check_border(unsigned char x, unsigned y) {
+   
+    if ((x < 0) ||
+        (y < 0) ||
+        (x >= SCREEN_MAX_X) ||
+        (y >= SCREEN_MAX_Y))
+    return 0;    
+
+    //TODO: collision checks within
+    //requires SG_GetTile(x, y)
+}
+
+void gameloop() {
+    unsigned char curr_level = 1;
+    unsigned char x, x_diff, y, y_diff;
+    unsigned int  key;
+
+
+    if (load_leveldata(curr_level, &x, &y)) {
+        while (1) 
+        {
+            key = 0;
+            x_diff = 0;
+            y_diff = 0;
+
+            if (SG_getKeysPressed) {
+                key = SG_getKeysStatus();
+                switch (key) {
+                    case PORT_A_KEY_LEFT: {
+                        x_diff = -1;
+                        break;
+                    }
+                    case PORT_A_KEY_RIGHT: {
+                        x_diff = 1;
+                        break;
+                    }
+                    case PORT_A_KEY_UP: {
+                        y_diff = -1;
+                        break;
+                    }
+                    case PORT_A_KEY_DOWN: {
+                        y_diff = 1;
+                        break;
+                    }    
+
+                }
+            }
+
+
+            if ((y_diff != 0) || (x_diff != 0))
+                if (check_border(x + x_diff, y + y_diff)) 
+                    continue;
+
+            waitForVBlank();        
+        }
     }
+}
+
+void init_screen() {
+    clear_screen();
+    displayOn(); 
+}
+
+void load_font() {
+    load_ascii_tiles(0);
+    load_ascii_tiles(256);
+    load_ascii_tiles(512);    
 }
 
 void main(void) {
-    unsigned char no, row;
-    unsigned int keys[KEY_AMOUNT];
-    unsigned char keycode[5+1];
-    
-    load_ascii_tiles(0);
-    load_ascii_tiles(256);
-    load_ascii_tiles(512);
 
-    clear_screen();
-    SG_displayOn(); 
-    
-    //SEGA_itoa(-295, keycode);  
-    //print_str(0, 10, keycode);
-    
-    /*
-    for(char y=0; y < 24; y++)
-        for(char x=0; x < 32; x++)
-        {
-            print_str(x, y, "Q");  
-            for(no=0; no < 10; no++)
-                SG_waitForVBlank();      
-        }*/
-    clear_screen();
-    //print_str(0,10, "Hello World!");
-    while(1) 
-    {
-        clear_line(INFOLINE);
-        for(unsigned char n=0; n < KEY_AMOUNT; n++)
-            keys[n] = 0;
-        no=SG_GetKeycode(keys, KEY_AMOUNT);
-        if (no) 
-        {
-            print_str(0, INFOLINE, "R");  
-
-            //number of detected keys
-            print_num(1, INFOLINE, no);
-            //print_num(1, INFOLINE, keys[0]);
-
-            row=keys[0] >> 12; keys[0] &= 0x0FFF;  
-            print_num(4-1, INFOLINE, row);
-            print_num(4, INFOLINE, keys[0]);
-
-            row=keys[1] >> 12; keys[1] &= 0x0FFF;  
-            print_num(11-1, INFOLINE, row);
-            print_num(11, INFOLINE, keys[1]);
-
-            row=keys[2] >> 12; keys[2] &= 0x0FFF;  
-            print_num(18-1, INFOLINE, row);
-            print_num(18, INFOLINE, keys[2]);
-
-            row=keys[3] >> 12; keys[3] &= 0x0FFF;
-            print_num(25-1, INFOLINE, row);
-            print_num(25, INFOLINE, keys[2]);
-
-            print_str(0, 15, "keypressed");
-        }
-        else 
-        {
-            print_str(0, INFOLINE, "N");  
-            SEGA_itoa(no, keycode);
-            print_str(5, INFOLINE, keycode);     
-            print_str(0, 15, "no keys");     
-        }
-        for(no=0; no < 4; no++)
-            SG_waitForVBlank();  
-    }
-
+    init_screen();
+    load_font();    
+    gameloop();
 }

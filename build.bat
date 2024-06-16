@@ -1,20 +1,20 @@
 @echo off
 setlocal
 call :setESC
-set output=sg3keys
+set output=enigma
 
 
 set TARGET_PLATFORM="SC" 
 REM set TARGET_PLATFORM="WINDOWS" 
 
 if %TARGET_PLATFORM% == "WINDOWS" 	set compiler=gcc
-if %TARGET_PLATFORM% == "SMS" 		set compiler=sdcc
-if %TARGET_PLATFORM% == "SG" 		set compiler=sdcc
-if %TARGET_PLATFORM% == "SC" 		set compiler=sdcc
-if %TARGET_PLATFORM% == "SMS" 		set FLAGS=-D PLATFORM_SMS 
-if %TARGET_PLATFORM% == "SG"  		set FLAGS=-D PLATFORM_SG
-if %TARGET_PLATFORM% == "SC"  		set FLAGS=-D PLATFORM_SG  
+if %TARGET_PLATFORM% == "SMS" 		  set compiler=sdcc
+if %TARGET_PLATFORM% == "SG" 		    set compiler=sdcc
+if %TARGET_PLATFORM% == "SC" 		    set compiler=sdcc
 
+if %TARGET_PLATFORM% == "SMS" 		  set FLAGS=-D PLATFORM_SMS 
+if %TARGET_PLATFORM% == "SG"  		  set FLAGS=-D PLATFORM_SG
+if %TARGET_PLATFORM% == "SC"  		  set FLAGS=-D PLATFORM_SG  
 if %TARGET_PLATFORM% == "WINDOWS" 	set FLAGS=-g -D PLATFORM_WINDOWS -fno-builtin -Wno-implicit-function-declaration
 
 set mainentry=main
@@ -30,6 +30,13 @@ set command=echo.
 if %TARGET_PLATFORM% == "SMS" set command=folder2c assets/font_SMS assets/assets
 if %TARGET_PLATFORM% == "SG"  set command=folder2c assets/font_SG assets/assets
 if %TARGET_PLATFORM% == "SC"  set command=folder2c assets/font_SG assets/assets
+
+call print_exec %command%
+if not %ERRORLEVEL% == 0 goto error
+
+if %TARGET_PLATFORM% == "SMS" set command=folder2c assets/levels assets/levels
+if %TARGET_PLATFORM% == "SG"  set command=folder2c assets/levels assets/levels
+if %TARGET_PLATFORM% == "SC"  set command=folder2c assets/levels assets/levels
 
 call print_exec %command%
 if not %ERRORLEVEL% == 0 goto error
@@ -64,6 +71,9 @@ call print_exec %compiler% %FLAGS% -c -mz80 libs/strings.c
 if not %ERRORLEVEL% == 0 goto error
 
 call print_exec %compiler% %FLAGS% -c -mz80 assets/assets.c
+
+call print_exec %compiler% %FLAGS% -c -mz80 assets/levels.c
+
 if not %ERRORLEVEL% == 0 goto error
 
 goto COMPILE_MAIN
@@ -76,6 +86,9 @@ call print_exec %compiler% %FLAGS% -c libs/strings.c
 if not %ERRORLEVEL% == 0 goto error
 
 set command=%compiler% %FLAGS% -c assets/assets.c
+
+set command=%compiler% %FLAGS% -c assets/levels.c
+
 call print_exec %command%
 if not %ERRORLEVEL% == 0 goto error
 
@@ -88,9 +101,9 @@ call print_phase Compiling %mainentry%..
 
 set command=echo.
 if %TARGET_PLATFORM% == "SMS" 		set command=%compiler% %FLAGS% -c -mz80 --peep-file peep-rules.txt -Ilibs -Isrc %mainentry%.c
-if %TARGET_PLATFORM% == "SG" 		set command=%compiler% %FLAGS% -c -mz80 --peep-file peep-rules.txt -Ilibs -Isrc %mainentry%.c
-if %TARGET_PLATFORM% == "SC" 		set command=%compiler% %FLAGS% -c -mz80 --peep-file peep-rules.txt -Ilibs -Isrc %mainentry%.c
-if %TARGET_PLATFORM% == "WINDOWS" 	set command=%compiler% %FLAGS% -c %mainentry%.c
+if %TARGET_PLATFORM% == "SG" 		  set command=%compiler% %FLAGS% -c -mz80 --peep-file peep-rules.txt -Ilibs -Isrc %mainentry%.c
+if %TARGET_PLATFORM% == "SC" 		  set command=%compiler% %FLAGS% -c -mz80 --peep-file peep-rules.txt -Ilibs -Isrc %mainentry%.c
+if %TARGET_PLATFORM% == "WINDOWS"	set command=%compiler% %FLAGS% -c %mainentry%.c
 
 call print_exec %command%
 if not %ERRORLEVEL% == 0 goto error
@@ -98,12 +111,12 @@ if not %ERRORLEVEL% == 0 goto error
 call print_phase Linking..
 
 set command=echo.
-if %TARGET_PLATFORM% == "SMS" 		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sms.rel %mainentry%.rel assets.rel console.rel strings.rel src/SMSlib.rel
-if %TARGET_PLATFORM% == "SG"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel %mainentry%.rel assets.rel console.rel strings.rel  src/SGlib.rel
-if %TARGET_PLATFORM% == "SC"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel %mainentry%.rel assets.rel console.rel strings.rel  src/SGlib.rel    
+if %TARGET_PLATFORM% == "SMS" 		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sms.rel assets.rel levels.rel console.rel strings.rel %mainentry%.rel src/SMSlib.rel
+if %TARGET_PLATFORM% == "SG"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel  assets.rel levels.rel console.rel strings.rel %mainentry%.rel src/SGlib.rel
+if %TARGET_PLATFORM% == "SC"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel  assets.rel levels.rel console.rel strings.rel %mainentry%.rel src/SGlib.rel    
 REM --print-search-dirs
 REM if %TARGET_PLATFORM% == "WINDOWS" %compiler% %FLAGS% -LC:\PDCurses\wincon -lcurses -o %output% %mainentry%.o assets.o SMScompat.o strings.o 
-if %TARGET_PLATFORM% == "WINDOWS" 	set command=%compiler% %FLAGS% -o %output% %mainentry%.o assets.o SMScompat.o strings.o -lncurses 
+if %TARGET_PLATFORM% == "WINDOWS"	set command=%compiler% %FLAGS% -o %output% %mainentry%.o assets.o SMScompat.o strings.o -lncurses 
 
 call print_exec %command%
 if not %ERRORLEVEL% == 0 goto error
@@ -111,9 +124,9 @@ if not %ERRORLEVEL% == 0 goto error
 call print_phase Creating ROM..
 
 set command=echo.
-if %TARGET_PLATFORM% == "SMS" 	set command=ihx2sms %output%.ihx %output%.sms
-if %TARGET_PLATFORM% == "SG" 	set command=ihx2sms %output%.ihx %output%.sc
-if %TARGET_PLATFORM% == "SC" 	set command=ihx2sms %output%.ihx %output%.sc
+if %TARGET_PLATFORM% == "SMS"	  set command=ihx2sms %output%.ihx %output%.sms
+if %TARGET_PLATFORM% == "SG" 	  set command=ihx2sms %output%.ihx %output%.sc
+if %TARGET_PLATFORM% == "SC" 	  set command=ihx2sms %output%.ihx %output%.sc
 
 call print_exec %command%
 if not %ERRORLEVEL% == 0 goto error
@@ -121,10 +134,10 @@ if not %ERRORLEVEL% == 0 goto error
 call print_phase Starting binary..
 
 set command=echo.
-if %TARGET_PLATFORM% == "SMS" 		set command=call run %output% %TARGET_PLATFORM%
-if %TARGET_PLATFORM% == "SG"  		set command=call run %output% %TARGET_PLATFORM%
-if %TARGET_PLATFORM% == "SC"  		set command=call run %output% %TARGET_PLATFORM%
-if %TARGET_PLATFORM% == "WINDOWS"  	set command=call run %output% %TARGET_PLATFORM%  
+if %TARGET_PLATFORM% == "SMS" 	  set command=call run %output% %TARGET_PLATFORM%
+if %TARGET_PLATFORM% == "SG"  	  set command=call run %output% %TARGET_PLATFORM%
+if %TARGET_PLATFORM% == "SC"  	  set command=call run %output% %TARGET_PLATFORM%
+if %TARGET_PLATFORM% == "WINDOWS"	set command=call run %output% %TARGET_PLATFORM%  
 
 call print_exec %command%
 REM if not %ERRORLEVEL% == 0 goto error
