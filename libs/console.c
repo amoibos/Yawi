@@ -1,14 +1,4 @@
-#ifdef PLATFORM_SMS
-#include "../src/SMSlib.h"
-#endif
-
-#ifdef PLATFORM_SG
-#include "../src/SGlib.h"
-#endif
-
-#include "../assets/assets.h"
 #include "console.h"
-
 
 #ifdef PLATFORM_SMS
 void clear_screen(void)
@@ -37,10 +27,10 @@ void clear_screen(void)
 #ifdef PLATFORM_SG
 void clear_line(unsigned char line)
 {
-    for(int x=0; x < SCREEN_MAX_X; ++x)
+    for(unsigned char x = 0; x < SCREEN_MAX_X; ++x)
     {
         SG_setNextTileatXY(x, line);
-        SG_setTile(' ');    
+        SG_setTile(EMPTY_SYMBOL);    
     }    
     SG_setNextTileatXY(0, line);
 }
@@ -59,7 +49,7 @@ void load_ascii_tiles(int position)
 #endif
 }
 
-void displayOn() {
+void displayOn(void) {
 #ifdef PLATFORM_SMS
     SMS_displayOn();
 #elif PLATFORM_SG
@@ -67,7 +57,7 @@ void displayOn() {
 #endif    
 }
 
-void displayOff() {
+void displayOff(void) {
 #ifdef PLATFORM_SMS
     SMS_displayOff();
 #elif PLATFORM_SG
@@ -76,7 +66,7 @@ void displayOff() {
 }
 
 
-void waitForVBlank() {
+void waitForVBlank(void) {
 #ifdef PLATFORM_SMS
     SMS_waitForVBlank();
 #elif PLATFORM_SG
@@ -92,5 +82,28 @@ void print_tile(unsigned char x, unsigned char y, unsigned char tileno)
     SG_setNextTileatXY(x, y);
     SG_setTile(tileno);
 #endif 
+}
 
+void print_str(unsigned char x, unsigned char y, char *str) {
+    for(; *str; ++str) {
+        if (x >= SCREEN_MAX_Y)
+            ++y, x=0;
+        print_tile(x, y, *str);
+        ++x;
+    }
+}
+
+void print_num(unsigned char x, unsigned char y, long num) {
+    char buffer[10+1]; 
+    char *str; 
+
+    str = buffer;
+    SEGA_itoa(num, buffer);
+    
+    for(; *str; ++str) {
+        if (x >= SCREEN_MAX_X)
+            ++y, x=0;
+        print_tile(x, y, *str);
+        ++x;
+    }
 }

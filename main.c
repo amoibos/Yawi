@@ -1,123 +1,112 @@
-#include "src/SGlib.h"
+#include "engine.h"
 
-#include "libs/console.h"
-#include "libs/strings.h"
+#ifdef PLATFORM_SMS
+SMS_EMBED_SDSC_HEADER_AUTO_DATE_16KB(1,0,Darktrym,Yawen,"puzzle game")
+#elif PLATFORM_SG
 
-#include "assets/levels.h"
+#endif
 
-#define MAX_LEVEL ((2))
-#define LEVEL_HEIGHT ((20))
+void gameloop(void);
+void init_screen(void);
+void load_font(void);
 
-
-char load_leveldata(char no, unsigned char *start_x, unsigned char *start_y) {
-    char *data;
-    if ( (no < 1) || (no > MAX_LEVEL))
-        return 0;
-
-    //mapROMBank(no);
-
-    switch (no) {
-        case 1: {
-            data = level1_dat;
-            break;
-        }
-        case 2: {
-            //data = level2_dat;
-            break;
-        }  
-              
-    }
- 
-    for(char y=0; y < LEVEL_HEIGHT; ++y) {
-        for(char x=0; x < SCREEN_MAX_X; ++x) {
-            // skip control characters, 
-            while (*data < 32) data++;
-            if (*data == '@') {
-                *start_x = x;
-                *start_y = y;    
-            }
-
-            //todo: checks if data is too short or too long 
-            print_tile(x, y, *data);
-            ++data;
-        }
-    }
-    
-    return 1;
-}
-
-
-char check_border(unsigned char x, unsigned y) {
-   
-    if ((x < 0) ||
-        (y < 0) ||
-        (x >= SCREEN_MAX_X) ||
-        (y >= SCREEN_MAX_Y))
-    return 0;    
-
-    //TODO: collision checks within
-    //requires SG_GetTile(x, y)
-}
-
-void gameloop() {
+void gameloop(void) {
     unsigned char curr_level = 1;
-    unsigned char x, x_diff, y, y_diff;
-    unsigned int  key;
+    signed char new_x, x_diff, new_y, y_diff;
+    unsigned int key;
+    char moved;
+    Leveldata level;
 
-
-    if (load_leveldata(curr_level, &x, &y)) {
-        while (1) 
+    if (load_leveldata(curr_level, &level)) {
+        setup_level(&level); 
+        while ( (level.status != DIED) &&  (level.status != COMPLETED)) 
         {
             key = 0;
             x_diff = 0;
             y_diff = 0;
+            moved = 0;
 
-            if (SG_getKeysPressed) {
-                key = SG_getKeysStatus();
+            if ( (level.status == ALIVE) && (keypressed()) ) {
+                key = readkey();
                 switch (key) {
                     case PORT_A_KEY_LEFT: {
-                        x_diff = -1;
+                        x_diff = -1, moved = 1;
                         break;
                     }
                     case PORT_A_KEY_RIGHT: {
-                        x_diff = 1;
+                        x_diff = 1, moved = 1;
                         break;
                     }
                     case PORT_A_KEY_UP: {
-                        y_diff = -1;
+                        y_diff = -1, moved = 1;
                         break;
                     }
                     case PORT_A_KEY_DOWN: {
-                        y_diff = 1;
+                        y_diff = 1, moved = 1;
                         break;
                     }    
-
                 }
             }
 
-
-            if ((y_diff != 0) || (x_diff != 0))
-                if (check_border(x + x_diff, y + y_diff)) 
+            
+            
+            //check if player move is valid
+            if (moved)
+            {   
+                new_x = level.x + x_diff;
+                new_y = level.y + y_diff;  
+                if (is_border(new_x, new_y)) 
                     continue;
+            }
 
+            //reached all requirements
+            if ( (level.x == level.exit_x) &&  
+                 (level.x == level.exit_x) &&
+                 (level.gold == level.max_gold)
+                ) {
+                
+                if (curr_level == MAX_LEVEL) {
+                    level.status = COMPLETED;
+                } else {
+                    load_leveldata(++curr_level, &level);
+                    setup_level(&level); 
+                }
+            }
+
+            if (moved) {
+                print_tile(level.x, level.y + OFFSET_MAP, EMPTY_SYMBOL);
+                if (get_tile(new_x, new_y + OFFSET_MAP) == GOLD_SYMBOL)
+                    ++level.gold;
+
+                level.x = new_x;
+                level.y = new_y;
+                print_tile(level.x, level.y + OFFSET_MAP, PLAYER_SYMBOL);
+
+                update_statusline(&level);
+            }
             waitForVBlank();        
         }
     }
+    if (level.status == COMPLETED)
+        endscreen();
+    else if (level.status == COMPLETED)
+        deathscreen();
+
+    while(1); 
 }
 
-void init_screen() {
+void init_screen(void) {
     clear_screen();
     displayOn(); 
 }
 
-void load_font() {
+void load_font(void) {
     load_ascii_tiles(0);
     load_ascii_tiles(256);
     load_ascii_tiles(512);    
 }
 
 void main(void) {
-
     init_screen();
     load_font();    
     gameloop();

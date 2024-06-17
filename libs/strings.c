@@ -13,7 +13,12 @@ char strpos(char* search, char* content, char start)
 	int len_search = strlen(search);
 	int len_content = strlen(content);  
 	i = start;
-	if (len_search>len_content || *search == '\0' || i>(len_content - 1)) return result;
+	if (
+        (len_search > len_content) || 
+        (*search == '\0') || 
+        (i > (len_content - 1))
+        ) 
+        return result;
 
 	for(; i < len_content; ++i)
 	{
@@ -106,9 +111,9 @@ void strncpy(char* dst, const char* src, char n )
 	while(i++ != n && (*dst++ = *src++));
 }
 
-char* strcpy(char* dst, const char* src)
+const char* strcpy(char* dst, const char* src)
 {
-	char *start = src;
+	const char *start = src;
 	while(*dst++ = *src++);
 	return start;
 }
@@ -119,7 +124,7 @@ char upcase(char c)
 }	
 
 
-char *strchr(const char *s, const char ch)
+const char *strchr(const char *s, const char ch)
 {
 	for (; *s != '\0'; ++s)
   		if (*s == ch)

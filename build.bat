@@ -1,10 +1,10 @@
 @echo off
 setlocal
 call :setESC
-set output=enigma
+set output=yawen
 
 
-set TARGET_PLATFORM="SC" 
+set TARGET_PLATFORM="SG" 
 REM set TARGET_PLATFORM="WINDOWS" 
 
 if %TARGET_PLATFORM% == "WINDOWS" 	set compiler=gcc
@@ -48,7 +48,6 @@ if %TARGET_PLATFORM% == "SG"  goto COMPILE_HELPERS_SMS
 if %TARGET_PLATFORM% == "SC"  goto COMPILE_HELPERS_SMS
 
 REM fallback when platform is not SG or SMS
-echo DEBUG %compiler% %FLAGS% -c libs/SMScompat.c 
 
 call print_exec %compiler% %FLAGS% -c libs/SMScompat.c
 if not %ERRORLEVEL% == 0 goto error
@@ -57,6 +56,10 @@ goto COMPILE_ASSETS
 
 :COMPILE_HELPERS_SMS
 call print_exec %compiler% %FLAGS% -c -mz80 libs/console.c
+if not %ERRORLEVEL% == 0 goto error
+
+:COMPILE_MISC
+call print_exec %compiler% %FLAGS% -c -mz80 engine.c
 if not %ERRORLEVEL% == 0 goto error
 
 :COMPILE_ASSETS
@@ -71,9 +74,9 @@ call print_exec %compiler% %FLAGS% -c -mz80 libs/strings.c
 if not %ERRORLEVEL% == 0 goto error
 
 call print_exec %compiler% %FLAGS% -c -mz80 assets/assets.c
-
+if not %ERRORLEVEL% == 0 goto error
+ 
 call print_exec %compiler% %FLAGS% -c -mz80 assets/levels.c
-
 if not %ERRORLEVEL% == 0 goto error
 
 goto COMPILE_MAIN
@@ -86,6 +89,7 @@ call print_exec %compiler% %FLAGS% -c libs/strings.c
 if not %ERRORLEVEL% == 0 goto error
 
 set command=%compiler% %FLAGS% -c assets/assets.c
+call print_exec %command%
 
 set command=%compiler% %FLAGS% -c assets/levels.c
 
@@ -111,9 +115,9 @@ if not %ERRORLEVEL% == 0 goto error
 call print_phase Linking..
 
 set command=echo.
-if %TARGET_PLATFORM% == "SMS" 		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sms.rel assets.rel levels.rel console.rel strings.rel %mainentry%.rel src/SMSlib.rel
-if %TARGET_PLATFORM% == "SG"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel  assets.rel levels.rel console.rel strings.rel %mainentry%.rel src/SGlib.rel
-if %TARGET_PLATFORM% == "SC"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel  assets.rel levels.rel console.rel strings.rel %mainentry%.rel src/SGlib.rel    
+if %TARGET_PLATFORM% == "SMS" 		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sms.rel assets.rel levels.rel console.rel strings.rel engine.rel %mainentry%.rel src/SMSlib.rel
+if %TARGET_PLATFORM% == "SG"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel  assets.rel levels.rel console.rel strings.rel engine.rel %mainentry%.rel src/SGlib.rel
+if %TARGET_PLATFORM% == "SC"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel  assets.rel levels.rel console.rel strings.rel engine.rel %mainentry%.rel src/SGlib.rel    
 REM --print-search-dirs
 REM if %TARGET_PLATFORM% == "WINDOWS" %compiler% %FLAGS% -LC:\PDCurses\wincon -lcurses -o %output% %mainentry%.o assets.o SMScompat.o strings.o 
 if %TARGET_PLATFORM% == "WINDOWS"	set command=%compiler% %FLAGS% -o %output% %mainentry%.o assets.o SMScompat.o strings.o -lncurses 
@@ -125,7 +129,7 @@ call print_phase Creating ROM..
 
 set command=echo.
 if %TARGET_PLATFORM% == "SMS"	  set command=ihx2sms %output%.ihx %output%.sms
-if %TARGET_PLATFORM% == "SG" 	  set command=ihx2sms %output%.ihx %output%.sc
+if %TARGET_PLATFORM% == "SG" 	  set command=ihx2sms %output%.ihx %output%.sg
 if %TARGET_PLATFORM% == "SC" 	  set command=ihx2sms %output%.ihx %output%.sc
 
 call print_exec %command%
