@@ -12,23 +12,20 @@ void load_font(void);
 
 void gameloop(void) {
     unsigned char curr_level = 1;
-    signed char new_x, x_diff, new_y, y_diff;
-    unsigned int key;
-    char moved;
+    signed char new_x=0, x_diff, new_y=0, y_diff;
+    _Bool moved;
     Leveldata level;
 
     if (load_leveldata(curr_level, &level)) {
         setup_level(&level); 
         while ( (level.status != DIED) &&  (level.status != COMPLETED)) 
         {
-            key = 0;
             x_diff = 0;
             y_diff = 0;
             moved = 0;
 
-            if ( (level.status == ALIVE) && (keypressed()) ) {
-                key = readkey();
-                switch (key) {
+            if (keypressed()) {
+                switch (readkey()) {
                     case PORT_A_KEY_LEFT: {
                         x_diff = -1, moved = 1;
                         break;
@@ -48,7 +45,6 @@ void gameloop(void) {
                 }
             }
 
-            
             
             //check if player move is valid
             if (moved)

@@ -86,7 +86,7 @@ void print_tile(unsigned char x, unsigned char y, unsigned char tileno)
 
 void print_str(unsigned char x, unsigned char y, char *str) {
     for(; *str; ++str) {
-        if (x >= SCREEN_MAX_Y)
+        if (x >= SCREEN_MAX_X)
             ++y, x=0;
         print_tile(x, y, *str);
         ++x;

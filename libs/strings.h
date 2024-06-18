@@ -11,11 +11,11 @@ void SEGA_itoa(long value, char *sp);
 
 void strcat(char* str1, char* str2);
 
-//char strcmp(char* str1, char* str2);
+char strcmp(char* str1, char* str2);
 //void strncpy(char* dest, char* src, int n); 
-//char strlen(char* str);
+char strlen(char* str);
 //char strpos(char* search, char* content, char start);
-char* strcpy(char* dst, char* src);
+void strcpy(char* dst, char* src);
 
 char* strchr(const char *s, char ch);
 

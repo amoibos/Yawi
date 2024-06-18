@@ -23,7 +23,7 @@ char load_leveldata(const char no, Leveldata * level) {
     for(char y=0; y < LEVEL_HEIGHT; ++y) {
         for(char x=0; x < SCREEN_MAX_X; ++x) {
             // skip control characters, 
-            while (*data < 32) data++;
+            while (*data < ' ') data++;
             if (*data == PLAYER_SYMBOL) {
                 level->start_x = x;
                 level->start_y = y;    
@@ -66,7 +66,7 @@ void update_statusline(Leveldata * level) {
     output[0] = 0;
     numstr[0] = 0;
     
-    strcat(output, "Gold: "); 
+    strcat(output, "Gold:    "); 
     SEGA_itoa(level->gold, numstr); 
     strcat(output, numstr);
     strcat(output, " / ");
@@ -75,6 +75,12 @@ void update_statusline(Leveldata * level) {
     
     clear_line(INFO_LINE);
     print_str(0, INFO_LINE, output);
+}
+
+void print_title(void) {
+
+    print_str(13, 0, GAME_NAME);
+    clear_line(STATUS_LINE);
 }
 
 void setup_level(Leveldata * level) {
@@ -89,11 +95,10 @@ void setup_level(Leveldata * level) {
     level->gold = 0;
     level->status = ALIVE;
 
-    strcat(output, "Level: "); 
+    print_title();
+
+    strcat(output, "Chapter: "); 
     strcat(output, level->name);
-    
-    print_str(10, 0, GAME_NAME);
-    clear_line(STATUS_LINE);
     print_str(0, STATUS_LINE, output);
     update_statusline(level);
 }
