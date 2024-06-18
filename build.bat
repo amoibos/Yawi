@@ -62,6 +62,9 @@ if not %ERRORLEVEL% == 0 goto error
 call print_exec %compiler% %FLAGS% -c -mz80 engine.c
 if not %ERRORLEVEL% == 0 goto error
 
+call print_exec %compiler% %FLAGS% -c -mz80 views.c
+if not %ERRORLEVEL% == 0 goto error
+
 :COMPILE_ASSETS
 call print_phase Compiling assets and string functions..
 
@@ -115,9 +118,9 @@ if not %ERRORLEVEL% == 0 goto error
 call print_phase Linking..
 
 set command=echo.
-if %TARGET_PLATFORM% == "SMS" 		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sms.rel assets.rel levels.rel console.rel strings.rel engine.rel %mainentry%.rel src/SMSlib.rel
-if %TARGET_PLATFORM% == "SG"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel  assets.rel levels.rel console.rel strings.rel engine.rel %mainentry%.rel src/SGlib.rel
-if %TARGET_PLATFORM% == "SC"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel  assets.rel levels.rel console.rel strings.rel engine.rel %mainentry%.rel src/SGlib.rel    
+if %TARGET_PLATFORM% == "SMS" 		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sms.rel assets.rel levels.rel console.rel strings.rel engine.rel views.rel %mainentry%.rel src/SMSlib.rel
+if %TARGET_PLATFORM% == "SG"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel  assets.rel levels.rel console.rel strings.rel engine.rel views.rel %mainentry%.rel src/SGlib.rel
+if %TARGET_PLATFORM% == "SC"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel  assets.rel levels.rel console.rel strings.rel engine.rel views.rel %mainentry%.rel src/SGlib.rel    
 REM --print-search-dirs
 REM if %TARGET_PLATFORM% == "WINDOWS" %compiler% %FLAGS% -LC:\PDCurses\wincon -lcurses -o %output% %mainentry%.o assets.o SMScompat.o strings.o 
 if %TARGET_PLATFORM% == "WINDOWS"	set command=%compiler% %FLAGS% -o %output% %mainentry%.o assets.o SMScompat.o strings.o -lncurses 
