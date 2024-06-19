@@ -28,7 +28,6 @@ void next_level(char * menu_name, char level) {
     strcpy(output, menu_name);
     print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
 
-
     strcpy(output, "Password code: ");
     
     num[0] = 0;
@@ -43,7 +42,7 @@ void next_level(char * menu_name, char level) {
     while(!keypressed()) waitForVBlank();
 }
 
-char menu(char **items, char amount, char start_line, MenuMode mode, _Bool numbers) {
+char menu(char **items, char amount, char start_line, char offset, MenuMode mode, _Bool numbers) {
     char output[SCREEN_MAX_X+1];
     char num[3+1];
     char option = 0;
@@ -51,26 +50,35 @@ char menu(char **items, char amount, char start_line, MenuMode mode, _Bool numbe
     while(1) {
         char line = start_line; 
         for (char n=0; n < amount; ++n) {
-            output[0] = 0;
-            strcat(output, "  ");
-            if (numbers) {
-                SEGA_itoa(n+1, num);
-                if (n+1 < 10)
-                    strcat(output, "0");    
-                
-                strcat(output, num);
-                strcat(output, ". ");
-            }
-            strcat(output, items[n]);
-            if (option == n) 
+            
+            
+            strcpy(output, "  ");
+            if (option == n) {
                 output[0] = '>';
+                
+            }
+            if (numbers)
+                    strcat(output, "   ");
+            strcat(output, items[n]);
+            if (option == n)
+                to_upper(output);
 
-            char offset = 0;
             if (mode == MenuModeCenter)
                 offset =  SCREEN_MAX_X / 2 - strlen(output) / 2;
             else if (mode == MenuModeLeft)
-                offset = 3;          
-            print_str(offset, line++, output, 128);    
+                ;      
+
+            print_str(offset, line++, output, 128);
+            if (numbers) {
+                output[0] = 0;
+                if (n + 1 < 10)
+                    strcat(output, "0");
+                SEGA_itoa(n + 1, num);        
+                
+                strcat(output, num);
+                strcat(output, ".");
+                print_str(offset + strlen("> "), line-1, output, 0);
+            }   
         }
 
         _Bool selected = 0;
@@ -109,7 +117,7 @@ void level_select(char * menu_name) {
     strcpy(output, menu_name);
     print_str(SCREEN_MAX_X / 2 - strlen(output) / 2 , 1, output, 128);
 
-    char option = menu(level_names, MAX_LEVEL, 10, MenuModeLeft, 1);
+    char option = menu(level_names, MAX_LEVEL, 10, 4, MenuModeLeft, 1);
     gameloop(option);
 }
 
@@ -143,7 +151,7 @@ void intro(char * menu_name) {
     strcpy(output, VERSION);
     print_str(SCREEN_MAX_X - strlen(output), SCREEN_MAX_Y - 1, output, 128);
 
-    char option = menu(intro_items, MAX_INTRO_ITEMS, 21, MenuModeCenter, 0);
+    char option = menu(intro_items, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0);
     if (option == 2)
         level_select("Level Select");
     else

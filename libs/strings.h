@@ -19,9 +19,9 @@ void strcpy(char* dst, char* src);
 
 char* strchr(const char *s, char ch);
 
-//char upcase(char c);
+char upcase(char c);
 //char isalpha(const char mark);
-//char* to_upper(char* string);
+char* to_upper(char* string);
 //char isdigit(const char ch);
 
 #endif

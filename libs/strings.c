@@ -104,7 +104,18 @@ void strcpy(char* dst, const char* src) {
 }
 
 char upcase(char c) {
-	return 'A' + (c - 'a');	
+	
+    if ((c >= 'A') && (c <='Z'))
+        return c;
+    else if ((c >= 'a') && (c <='z'))
+        return c - 32;
+    else if ((c >= 'A' + 128) && (c <='Z' + 128))    
+        return c;
+    else if ((c >= 'a') && (c <='z'))
+        return c - 32;
+    else
+        return c;
+
 }	
 
 
