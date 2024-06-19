@@ -321,7 +321,3 @@ void gameloop(unsigned char curr_level) {
     else if (level.status == COMPLETED)
         deathscreen("Mission failed"); 
 }
-
-
-
-

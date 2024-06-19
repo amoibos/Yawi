@@ -1,32 +1,32 @@
 #include "views.h"
 
 void endscreen(char * menu_name) {
-    char output[30+1];
+    char output[SCREEN_MAX_X+1];
 
     clear_screen();
     strcpy(output, menu_name);
-    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, 1, output, 128);
+    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
 
     print_str(0, 0, "Congrats", 128);
 }
 
 void deathscreen(char * menu_name) {
-    char output[30+1];
+    char output[SCREEN_MAX_X+1];
 
     clear_screen();
     strcpy(output, menu_name);
-    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, 1, output, 128);
+    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
 
     print_str(0, 0, "Try it again", 128);
 }
 
 void next_level(char * menu_name, char level) {
-    char output[30+1];
+    char output[SCREEN_MAX_X+1];
     char num[10+1];
 
     clear_screen();
     strcpy(output, menu_name);
-    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, 1, output, 128);
+    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
 
 
     strcpy(output, "Password code: ");
@@ -35,19 +35,18 @@ void next_level(char * menu_name, char level) {
     SEGA_itoa(levelcode(level), num);
 
     strcat(output, num);
-    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, 1, output, 128);
+    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
 
     strcpy(output, "Press a key to continue");
-    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, 1, output, 128);
+    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
 
-    while(!keypressed());
+    while(!keypressed()) waitForVBlank();
 }
 
 char menu(char **items, char amount, char start_line, MenuMode mode, _Bool numbers) {
     char output[SCREEN_MAX_X+1];
     char num[3+1];
     char option = 0;
-    unsigned char color = 0;
     
     while(1) {
         char line = start_line; 
@@ -68,14 +67,14 @@ char menu(char **items, char amount, char start_line, MenuMode mode, _Bool numbe
 
             char offset = 0;
             if (mode == MenuModeCenter)
-                offset = -strlen(output) / 2 + SCREEN_MAX_X / 2;
+                offset =  SCREEN_MAX_X / 2 - strlen(output) / 2;
             else if (mode == MenuModeLeft)
                 offset = 3;          
             print_str(offset, line++, output, 128);    
         }
 
         _Bool selected = 0;
-        while(!keypressed());
+        while(!keypressed()) waitForVBlank();
         unsigned int key = readkey();
         switch (key) {
             case PORT_A_KEY_START: {
@@ -83,12 +82,12 @@ char menu(char **items, char amount, char start_line, MenuMode mode, _Bool numbe
                 break;
             }
             case PORT_A_KEY_UP: {
-                //print_num(0, STATUS_LINE, option, 128);
+                waitForVBlank();
                 option = (option <= 0) ? amount - 1 : option - 1;
                 break;
             }
             case PORT_A_KEY_DOWN: {
-                //print_num(0, STATUS_LINE, option, 128);
+                waitForVBlank();
                 option = (option + 1) >= amount ? 0 : option + 1;
                 break;
             }
@@ -96,7 +95,6 @@ char menu(char **items, char amount, char start_line, MenuMode mode, _Bool numbe
                 break;
             }
         }
-        waitForVBlank();
         if (selected)
             break;
     }
@@ -104,18 +102,19 @@ char menu(char **items, char amount, char start_line, MenuMode mode, _Bool numbe
 }
 
 void level_select(char * menu_name) {
-    char output[30+1];
+    char output[SCREEN_MAX_X+1];
     
+    load_font();
     clear_screen();
     strcpy(output, menu_name);
-    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, 1, output, 128);
+    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2 , 1, output, 128);
 
     char option = menu(level_names, MAX_LEVEL, 10, MenuModeLeft, 1);
     gameloop(option);
 }
 
 void intro(char * menu_name) {
-    char output[30+1];
+    char output[SCREEN_MAX_X+1];
     char line=1;
     long time = 3000;
     unsigned char color=0; 
