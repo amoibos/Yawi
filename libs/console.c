@@ -84,16 +84,16 @@ void print_tile(unsigned char x, unsigned char y, unsigned char tileno)
 #endif 
 }
 
-void print_str(unsigned char x, unsigned char y, char *str) {
+void print_str(unsigned char x, unsigned char y, char *str, int offset) {
     for(; *str; ++str) {
         if (x >= SCREEN_MAX_X)
             ++y, x=0;
-        print_tile(x, y, *str);
+        print_tile(x, y, *str + offset);
         ++x;
     }
 }
 
-void print_num(unsigned char x, unsigned char y, long num) {
+void print_num(unsigned char x, unsigned char y, long num, int offset) {
     char buffer[10+1]; 
     char *str; 
 
@@ -103,7 +103,7 @@ void print_num(unsigned char x, unsigned char y, long num) {
     for(; *str; ++str) {
         if (x >= SCREEN_MAX_X)
             ++y, x=0;
-        print_tile(x, y, *str);
+        print_tile(x, y, *str + offset);
         ++x;
     }
 }

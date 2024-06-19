@@ -5,9 +5,9 @@ void endscreen(char * menu_name) {
 
     clear_screen();
     strcpy(output, menu_name);
-    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, 0, output);
+    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, 0, output, 128);
 
-    print_str(0, 0, "Congrats");
+    print_str(0, 0, "Congrats", 128);
 }
 
 void deathscreen(char * menu_name) {
@@ -15,41 +15,48 @@ void deathscreen(char * menu_name) {
 
     clear_screen();
     strcpy(output, menu_name);
-    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, 0, output);
+    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, 0, output, 128);
 
-    print_str(0, 0, "Try it again");
+    print_str(0, 0, "Try it again", 128);
 }
 
-
-void level_select(char * menu_name) {
-    char output[30+1];
+char menu(char **items, char amount, char start_line, MenuMode mode, _Bool numbers, signed char textcolor) {
+    char output[SCREEN_MAX_X+1];
     char num[3+1];
     char option = 0;
-    _Bool selected = 0;
-
-    clear_screen();
-    strcpy(output, menu_name);
-    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, 0, output);
-
-    //char menu_options = 2;
+    unsigned char color = 0;
+    
     while(1) {
-        char line = 3; 
-        for (char n=0; n < MAX_LEVEL; ++n) {
+        if (textcolor != -1) {
+            color = (color + 1) % 16;
+            if ((textcolor != color))
+                SG_setBackdropColor(color);
+        }
+        char line = start_line; 
+        for (char n=0; n < amount; ++n) {
             output[0] = 0;
             strcat(output, "  ");
-            SEGA_itoa(n+1, num);
-            if (n+1 < 10)
-                strcat(output, "0");    
-            
-            strcat(output, num);
-            strcat(output, ". ");
-            strcat(output, level_names[n]);
+            if (numbers) {
+                SEGA_itoa(n+1, num);
+                if (n+1 < 10)
+                    strcat(output, "0");    
+                
+                strcat(output, num);
+                strcat(output, ". ");
+            }
+            strcat(output, items[n]);
             if (option == n) 
                 output[0] = '>';
-          
-            print_str(3, line++, output);    
+
+            char offset = 0;
+            if (mode == MenuModeCenter)
+                offset = -strlen(output) / 2 + SCREEN_MAX_X / 2;
+            else if (mode == MenuModeLeft)
+                offset = 3;          
+            print_str(offset, line++, output, 128);    
         }
 
+        _Bool selected = 0;
         while(!keypressed());
         switch (readkey()) {
             case PORT_A_KEY_START: {
@@ -57,21 +64,32 @@ void level_select(char * menu_name) {
                 break;
             }
             case PORT_A_KEY_UP: {
-                option = (option == 0) ? MAX_LEVEL - 1 : option - 1;    
+                option = (option <= 0) ? amount - 1 : option - 1;
                 break;
             }
             case PORT_A_KEY_DOWN: {
-                option = (option + 1) % MAX_LEVEL;
+                option = (option+1 >= amount) ? 0 : option + 1;
                 break;
             }
-            default:    {
+            default: {
                 break;
             }
         }
         if (selected)
             break;
     }
-    gameloop(option + 1);
+    return option + 1;
+}
+
+void level_select(char * menu_name) {
+    char output[30+1];
+    
+    clear_screen();
+    strcpy(output, menu_name);
+    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, 0, output, 128);
+
+    char option = menu(level_names, MAX_LEVEL, 3, MenuModeLeft, 1, -1);
+    gameloop(option);
 }
 
 void intro(const char * menu_name) {
@@ -80,57 +98,18 @@ void intro(const char * menu_name) {
     
     clear_screen();
     strcpy(output, menu_name);
-    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, 2, output);
+    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, 2, output, 128);
 
     line+=2;
     strcpy(output, "Written by Darktrym");
-    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, line++, output);
+    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, line++, output, 128);
     strcpy(output, "in 2024");
-    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2,  line++, output);
-    strcpy(output, "game design based on Enigma");
-    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2,  line++, output);
+    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2,  line++, output, 128);
     strcpy(output, VERSION);
-    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, line++, output);
+    print_str(-strlen(output) / 2 + SCREEN_MAX_X / 2, line++, output, 128);
 
-    char menu_options = 2;
-    char option = 0;
-    _Bool selected = 0;
-    while(1) {
-
-        strcpy(output, "  1 New Game");
-        if (option == 0) {
-            output[0] = '>';
-        }  
-        print_str(SCREEN_MAX_X / 4, 18, output);
-        
-        strcpy(output, "  2 Level Select");
-        if (option == 1) {
-            output[0] = '>';
-        }
-        print_str(SCREEN_MAX_X / 4, 19, output);
-        
-        while(!keypressed());
-        switch (readkey()) {
-            case PORT_A_KEY_START: {
-                selected = 1;
-                break;
-            }
-            case PORT_A_KEY_UP: {
-                option = (option == 0) ? menu_options - 1 : 0;    
-                break;
-            }
-            case PORT_A_KEY_DOWN: {
-                option = (option + 1) % menu_options;
-                break;
-            }
-            default:    {
-                break;
-            }
-        }
-        if (selected)
-            break;
-    }
-    if (option == 1)
+    char option = menu(intro_items, MAX_INTRO_ITEMS, 18, MenuModeCenter, 0, -1);
+    if (option == 2)
         level_select("Level Select");
     else
         gameloop(1);

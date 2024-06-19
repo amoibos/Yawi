@@ -28,7 +28,7 @@ char load_leveldata(const char no, Leveldata * level) {
         }   
        default: {
             data = level1_dat;
-            strcpy(level->name, level_names[no - 1]);
+            strcpy(level->name, level_names[1]);
             break;
         }         
     }
@@ -99,13 +99,14 @@ void update_statusline(Leveldata * level) {
     strcat(output, numstr);
     
     clear_line(INFO_LINE);
-    print_str(0, INFO_LINE, output);
+    print_str(0, INFO_LINE, output, 128);
 }
 
 void print_title(void) {
 
-    clear_line(13);
-    print_str(13, 0, GAME_NAME);
+
+    clear_line(TITLE_LINE);
+    print_str(13, TITLE_LINE, GAME_NAME, 128);
 }
 
 void setup_level(Leveldata * level) {
@@ -125,7 +126,7 @@ void setup_level(Leveldata * level) {
     strcat(output, "Chapter: "); 
     strcat(output, level->name);
     clear_line(STATUS_LINE);
-    print_str(0, STATUS_LINE, output);
+    print_str(0, STATUS_LINE, output, 128);
     update_statusline(level);
 }
 
@@ -179,10 +180,10 @@ _Bool is_pushing_object(Leveldata * level, Direction dir) {
     item = get_tile(new.x, new.y + OFFSET_MAP); 
 
     _Bool precondition = 
-        (item == ROCK_LEFT_SYMBOL) && ((dir == UP) || dir == DOWN) ||
-        (item == ROCK_RIGHT_SYMBOL) && ((dir == UP) || dir == DOWN) ||
-        (item == ROCK_UP_SYMBOL) && ((dir == LEFT) || dir == RIGHT) ||
-        (item == ROCK_DOWN_SYMBOL) && ((dir == LEFT) || dir == RIGHT) ||
+        (item == ROCK_LEFT_SYMBOL)  && (dir != RIGHT) ||
+        (item == ROCK_RIGHT_SYMBOL) && (dir != LEFT) ||
+        (item == ROCK_UP_SYMBOL)    && (dir != DOWN) ||
+        (item == ROCK_DOWN_SYMBOL)  && (dir != UP)   ||
         0;
 
     //check if is space behind the movable object
@@ -195,7 +196,7 @@ _Bool is_pushing_object(Leveldata * level, Direction dir) {
     _Bool postcondition = (item == PEBBLE_SYMBOL) || 
                           (item == EMPTY_SYMBOL)  ||
                           0;
-
+   
     return precondition && postcondition;
 }
 

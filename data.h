@@ -5,8 +5,11 @@
 #define VERSION "version 0.6"
 
 #define MAX_TELEPORTER ((5))
+
+#define TITLE_LINE ((0))
 #define STATUS_LINE ((22))
 #define INFO_LINE ((23))
+
 #define LEVEL_HEIGHT ((20))
 #define OFFSET_MAP ((1))
 
@@ -89,10 +92,17 @@ static char *level_names[] = {
     "Shrouded Glory"
 };
 
+#define MAX_INTRO_ITEMS ((2))
 static char *intro_items[] = {
     "New Game",
     "Level Select"
 };
 
+
+typedef enum eMenuMode {
+    MenuModeCenter,
+    MenuModeLeft,
+    MenuModeUndefined
+} MenuMode;
 
 #endif

@@ -50,7 +50,7 @@ void waitForVBlank(void);
 #endif 
 
 void print_tile(unsigned char x, unsigned char y, unsigned char tileno);
-void print_str(unsigned char x, unsigned char y, char *str);
-void print_num(unsigned char x, unsigned char y, long num);
+void print_str(unsigned char x, unsigned char y, char *str, int offset);
+void print_num(unsigned char x, unsigned char y, long num, int offset);
 
 #endif
