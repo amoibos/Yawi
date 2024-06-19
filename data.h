@@ -2,7 +2,7 @@
 #define DATA_H
 
 #define GAME_NAME (("Yawen"))
-#define VERSION "version 0.6"
+#define VERSION "v0.6"
 
 #define MAX_TELEPORTER ((5))
 

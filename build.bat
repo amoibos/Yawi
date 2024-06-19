@@ -27,9 +27,9 @@ call clean %output%
 call print_phase Creating source files for %TARGET_PLATFORM% from binary..
 
 set command=echo.
-if %TARGET_PLATFORM% == "SMS" set command=folder2c assets/font_SMS assets/assets
-if %TARGET_PLATFORM% == "SG"  set command=folder2c assets/font_SG assets/assets
-if %TARGET_PLATFORM% == "SC"  set command=folder2c assets/font_SG assets/assets
+if %TARGET_PLATFORM% == "SMS" set command=folder2c assets/font_SMS assets/font
+if %TARGET_PLATFORM% == "SG"  set command=folder2c assets/font_SG assets/font
+if %TARGET_PLATFORM% == "SC"  set command=folder2c assets/font_SG assets/font
 
 call print_exec %command%
 if not %ERRORLEVEL% == 0 goto error
@@ -37,6 +37,13 @@ if not %ERRORLEVEL% == 0 goto error
 if %TARGET_PLATFORM% == "SMS" set command=folder2c assets/levels assets/levels
 if %TARGET_PLATFORM% == "SG"  set command=folder2c assets/levels assets/levels
 if %TARGET_PLATFORM% == "SC"  set command=folder2c assets/levels assets/levels
+
+call print_exec %command%
+if not %ERRORLEVEL% == 0 goto error
+
+if %TARGET_PLATFORM% == "SMS" set command=folder2c assets/city assets/city
+if %TARGET_PLATFORM% == "SG"  set command=folder2c assets/city assets/city
+if %TARGET_PLATFORM% == "SC"  set command=folder2c assets/city assets/city
 
 call print_exec %command%
 if not %ERRORLEVEL% == 0 goto error
@@ -76,10 +83,13 @@ if not %ERRORLEVEL% == 0 goto error
 call print_exec %compiler% %FLAGS% -c -mz80 libs/strings.c
 if not %ERRORLEVEL% == 0 goto error
 
-call print_exec %compiler% %FLAGS% -c -mz80 assets/assets.c
+call print_exec %compiler% %FLAGS% -c -mz80 assets/font.c
 if not %ERRORLEVEL% == 0 goto error
  
 call print_exec %compiler% %FLAGS% -c -mz80 assets/levels.c
+if not %ERRORLEVEL% == 0 goto error
+
+call print_exec %compiler% %FLAGS% -c -mz80 assets/city.c
 if not %ERRORLEVEL% == 0 goto error
 
 goto COMPILE_MAIN
@@ -91,7 +101,7 @@ call print_phase Compiling helpers for Windows..
 call print_exec %compiler% %FLAGS% -c libs/strings.c
 if not %ERRORLEVEL% == 0 goto error
 
-set command=%compiler% %FLAGS% -c assets/assets.c
+set command=%compiler% %FLAGS% -c assets/font.c
 call print_exec %command%
 
 set command=%compiler% %FLAGS% -c assets/levels.c
@@ -118,9 +128,9 @@ if not %ERRORLEVEL% == 0 goto error
 call print_phase Linking..
 
 set command=echo.
-if %TARGET_PLATFORM% == "SMS" 		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sms.rel assets.rel levels.rel console.rel strings.rel engine.rel views.rel %mainentry%.rel src/SMSlib.rel
-if %TARGET_PLATFORM% == "SG"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel  assets.rel levels.rel console.rel strings.rel engine.rel views.rel %mainentry%.rel src/SGlib.rel
-if %TARGET_PLATFORM% == "SC"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel  assets.rel levels.rel console.rel strings.rel engine.rel views.rel %mainentry%.rel src/SGlib.rel    
+if %TARGET_PLATFORM% == "SMS" 		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sms.rel city.rel font.rel levels.rel console.rel strings.rel engine.rel views.rel %mainentry%.rel src/SMSlib.rel
+if %TARGET_PLATFORM% == "SG"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel  city.rel font.rel levels.rel console.rel strings.rel engine.rel views.rel %mainentry%.rel src/SGlib.rel
+if %TARGET_PLATFORM% == "SC"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel  city.rel font.rel levels.rel console.rel strings.rel engine.rel views.rel %mainentry%.rel src/SGlib.rel    
 REM --print-search-dirs
 REM if %TARGET_PLATFORM% == "WINDOWS" %compiler% %FLAGS% -LC:\PDCurses\wincon -lcurses -o %output% %mainentry%.o assets.o SMScompat.o strings.o 
 if %TARGET_PLATFORM% == "WINDOWS"	set command=%compiler% %FLAGS% -o %output% %mainentry%.o assets.o SMScompat.o strings.o -lncurses 

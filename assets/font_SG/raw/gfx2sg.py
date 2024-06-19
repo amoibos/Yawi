@@ -34,8 +34,9 @@ def nearest_color(subjects, query):
 def convert(output_name):
     with Image.open(output_name) as img:
         width, height = img.size
-        color_cnt = len(img.getcolors())
-
+        #import pdb; pdb.set_trace()
+        color_cnt = len(img.getcolors(img.size[0]*img.size[1]))
+        
         # do not use transparency color
         if color_cnt > 15:
             print("too many colors", file=sys.stderr)
@@ -60,7 +61,7 @@ def convert(output_name):
 
         filename = path.splitext(output_name)[0]
         # write tiles data
-        with open(filename + ".bin", "wb") as tile_writer, open(filename + ".pal", "wb") as palette_writer:
+        with open(filename + " (tiles).bin", "wb") as tile_writer, open(filename + " (palette).bin", "wb") as palette_writer:
             for tile_y in range(height // TILE_HEIGHT):
                 for tile_x in range(width // TILE_WIDTH):
                     region = img.crop((tile_x * TILE_WIDTH, tile_y * TILE_HEIGHT, (tile_x + 1) * TILE_WIDTH,

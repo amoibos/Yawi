@@ -10,7 +10,7 @@ void main(void) {
     displayOn(); 
     load_font();
     intro(GAME_NAME);
-    //gameloop(1);
+    
     //never terminate app
     while(1); 
 }

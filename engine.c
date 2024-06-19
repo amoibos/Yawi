@@ -84,6 +84,10 @@ _Bool is_border(const signed char x, const signed char y) {
     return 0;
 }
 
+long levelcode(char level) {
+    return level + 0;
+}
+
 void update_statusline(Leveldata * level) {
     char output[30+1];
     char numstr[10+1];
@@ -210,7 +214,8 @@ void gameloop(unsigned char curr_level) {
     char found;
     _Bool moved_stone = 0;
 
-    load_font();  
+    load_font();
+    clear_screen();  
     if (load_leveldata(curr_level, &level)) {
         setup_level(&level); 
         while ( (level.status != DIED) &&  (level.status != COMPLETED)) 

@@ -7,7 +7,7 @@
 
 #ifdef PLATFORM_SG
 #include "../src/SGlib.h"
-#include "../assets/assets.h"
+#include "../assets/font.h"
 #endif
 
 #include "../data.h"
@@ -23,33 +23,82 @@ void load_ascii_tiles(int position);
 
 void displayOn(void);
 void displayOff(void);
-void waitForVBlank(void);
+
+#ifdef PLATFORM_SMS
+#define loadTiles SMS_loadTiles
+#elif PLATFORM_SG || PLATFORM_SC
+#define loadTiles SG_loadTilePatterns
+#endif 
+
+#ifdef PLATFORM_SMS
+#define loadTiles SMS_loadBGPalette
+#elif PLATFORM_SG || PLATFORM_SC
+#define loadPalette SG_loadTileColours
+#endif 
+
+#ifdef PLATFORM_SMS
+#define setNextTileatXY SMS_setNextTileatXY
+#elif PLATFORM_SG || PLATFORM_SC
+#define setNextTileatXY SG_setNextTileatXY
+#endif 
+
+#ifdef PLATFORM_SMS
+#define setTile SMS_setTile
+#elif PLATFORM_SG || PLATFORM_SC
+#define setTile SG_setTile
+#endif
+
+#ifdef PLATFORM_SMS
+#define displayOn SMS_displayOn
+#elif PLATFORM_SG || PLATFORM_SC
+#define displayOn SG_displayOn
+#endif 
+
+#ifdef PLATFORM_SMS
+#define displayOn SMS_displayOn
+#elif PLATFORM_SG || PLATFORM_SC
+#define displayOn SG_displayOn
+#endif 
+
+#ifdef PLATFORM_SMS
+#define displayOff SMS_displayOff
+#elif PLATFORM_SG || PLATFORM_SC
+#define displayOff SG_displayOff
+#endif 
 
 #ifdef PLATFORM_SMS
 #define get_tile SMS_getTileatXY
-#elif PLATFORM_SG
+#elif PLATFORM_SG || PLATFORM_SC
 #define get_tile SG_getTileatXY
 #endif 
 
 #ifdef PLATFORM_SMS
 #define mapROMBank SMS_mapROMBank
-#elif PLATFORM_SG
+#elif PLATFORM_SG || PLATFORM_SC
 #define mapROMBank SG_mapROMBank
 #endif 
 
 #ifdef PLATFORM_SMS
 #define keypressed SMS_getKeysPressed 
-#elif PLATFORM_SG
+#elif PLATFORM_SG || PLATFORM_SC
 #define keypressed SG_getKeysPressed
 #endif 
 
 #ifdef PLATFORM_SMS
 #define readkey SMS_getKeysStatus
-#elif PLATFORM_SG
+#elif PLATFORM_SG || PLATFORM_SC
 #define readkey SG_getKeysStatus
 #endif 
 
-void print_tile(unsigned char x, unsigned char y, unsigned char tileno);
+#ifdef PLATFORM_SMS
+#define waitForVBlank SMS_waitForVBlank 
+#elif PLATFORM_SG || PLATFORM_SC
+#define waitForVBlank SG_waitForVBlank 
+#endif 
+
+
+
+void print_tile(unsigned char x, unsigned char y, unsigned int tileno);
 void print_str(unsigned char x, unsigned char y, char *str, int offset);
 void print_num(unsigned char x, unsigned char y, long num, int offset);
 
