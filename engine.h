@@ -16,7 +16,7 @@ _Bool is_border(const signed char x, const signed char y);
 long levelcode(char level);
 void update_statusline(Leveldata * level); 
 void setup_level(Leveldata * level);
-_Bool level_completed(Leveldata * level);
+//_Bool level_completed(Leveldata * level);
 _Bool is_pushing_object(Leveldata * level, Direction dir);
 void gameloop(unsigned char curr_level);
 

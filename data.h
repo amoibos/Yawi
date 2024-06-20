@@ -2,11 +2,19 @@
 #define DATA_H
 
 #define GAME_NAME (("Yawen"))
-#define VERSION "v0.6"
+#define VERSION_STRING "v0.6"
+
+#ifdef DEMO
+#define VERSION "DEMO " VERSION_STRING
+#else
+#define VERSION VERSION_STRING
+#endif 
 
 #define MAX_TELEPORTER ((5))
 
 #define TITLE_LINE ((0))
+
+#define PROGRESS_LINE ((21))
 #define STATUS_LINE ((22))
 #define INFO_LINE ((23))
 
@@ -16,11 +24,13 @@
 #define EXIT_SYMBOL (('E'))
 #define PLAYER_SYMBOL (('@'))
 #define GOLD_SYMBOL (('$'))
+//level 1-12 do not use this
 #define TELEPORTER_SYMBOL (('#'))
 
 #define SOMETHING1_SYMBOL (('X'))
-#define SOMETHING2_SYMBOL (('&'))
+#define SOMETHING2_SYMBOL (('8'))
 #define SOMETHING3_SYMBOL (('W'))
+#define SOMETHING4_SYMBOL (('o'))
 
 
 //removable by player and coverable by a stone
@@ -35,16 +45,16 @@
 
 #define EMPTY_SYMBOL ((' '))
 
-#define BARRIER_SYMBOL (("+|-"))
-#define MOVABLE_SYMBOL (("<>^v"))
+#define BARRIER_SYMBOL (("&O+|-%"))
+#define MOVABLE_SYMBOL (("<>^v8oWXYZ"))
 
 
 typedef enum eDirection {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT,
-    UNDEFINED_DIRECTION
+    DirectionRight,
+    DirectionUp,
+    DirectionLeft,
+    DirectionDown, 
+    DirectionUndefined
 } Direction;
 
 typedef enum eStatus {
@@ -62,7 +72,8 @@ typedef struct position_t {
 //Position steps[4] = { (0, -1), (0, 1), (-1, 0), (1, 0)};
 
 typedef struct leveldata_t {
-    char name[20+1];
+    char name[25+1];
+    char gold;
     char max_gold;
     signed char start_x;
     signed char start_y;
@@ -70,14 +81,13 @@ typedef struct leveldata_t {
     signed char exit_y;
     signed char x;
     signed char y;
-    char gold;
     Status status;
     Position teleport[MAX_TELEPORTER];
     char teleport_found;
 } Leveldata;
 
 #define MAX_LEVEL ((12))
-static char *level_names[] = {
+static char *level_names[MAX_LEVEL] = {
     "Darkness Falls",
     "Lateral Thinking",
     "Explosively Simple",
@@ -93,7 +103,7 @@ static char *level_names[] = {
 };
 
 #define MAX_INTRO_ITEMS ((2))
-static char *intro_items[] = {
+static char *intro_items[MAX_INTRO_ITEMS] = {
     "New Game",
     "Level Select"
 };
@@ -104,5 +114,17 @@ typedef enum eMenuMode {
     MenuModeLeft,
     MenuModeUndefined
 } MenuMode;
+
+typedef enum eInputType {
+    InputTypeNumerical,
+    InputTypeAlphaNumerical,
+    InputTypeUndefined
+} InputType;
+
+#define NUMERICSTRING "-0123456789."
+#define ALPHANUMERICAL "ABCDEFGHIJKLMNOPQRSTUVWXYZ"\
+                       "abcdefghijklmnopqrstuvwxyz"\
+                       NUMERICSTRING
+
 
 #endif

@@ -42,73 +42,6 @@ void next_level(char * menu_name, char level) {
     while(!keypressed()) waitForVBlank();
 }
 
-char menu(char **items, char amount, char start_line, char offset, MenuMode mode, _Bool numbers) {
-    char output[SCREEN_MAX_X+1];
-    char num[3+1];
-    char option = 0;
-    
-    while(1) {
-        char line = start_line; 
-        for (char n=0; n < amount; ++n) {
-            
-            
-            strcpy(output, "  ");
-            if (option == n) {
-                output[0] = '>';
-                
-            }
-            if (numbers)
-                    strcat(output, "   ");
-            strcat(output, items[n]);
-            if (option == n)
-                to_upper(output);
-
-            if (mode == MenuModeCenter)
-                offset =  SCREEN_MAX_X / 2 - strlen(output) / 2;
-            else if (mode == MenuModeLeft)
-                ;      
-
-            print_str(offset, line++, output, 128);
-            if (numbers) {
-                output[0] = 0;
-                if (n + 1 < 10)
-                    strcat(output, "0");
-                SEGA_itoa(n + 1, num);        
-                
-                strcat(output, num);
-                strcat(output, ".");
-                print_str(offset + strlen("> "), line-1, output, 0);
-            }   
-        }
-
-        _Bool selected = 0;
-        while(!keypressed()) waitForVBlank();
-        unsigned int key = readkey();
-        switch (key) {
-            case PORT_A_KEY_START: {
-                selected = 1;
-                break;
-            }
-            case PORT_A_KEY_UP: {
-                waitForVBlank();
-                option = (option <= 0) ? amount - 1 : option - 1;
-                break;
-            }
-            case PORT_A_KEY_DOWN: {
-                waitForVBlank();
-                option = (option + 1) >= amount ? 0 : option + 1;
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-        if (selected)
-            break;
-    }
-    return option + 1;
-}
-
 void level_select(char * menu_name) {
     char output[SCREEN_MAX_X+1];
     
@@ -148,7 +81,11 @@ void intro(char * menu_name) {
     for(char line=20; line < 24; ++line)
         print_str(0, line, "                                ", 128);
     
+//#ifdef DEMO
+//    strcpy(output, DEMO);
+//#else
     strcpy(output, VERSION);
+//#endif
     print_str(SCREEN_MAX_X - strlen(output), SCREEN_MAX_Y - 1, output, 128);
 
     char option = menu(intro_items, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0);

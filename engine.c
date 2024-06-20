@@ -20,12 +20,25 @@ char load_leveldata(const char no, Leveldata * level) {
             data = level1_dat;
             strcpy(level->name, level_names[no - 1]);
             break;
-        }
+        }  
+#ifndef DEMO
         case 2: {
             data = level2_dat;
             strcpy(level->name, level_names[no - 1]);
             break;
-        }   
+            } 
+     /*   case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 12:*/
+#endif            
+            
        default: {
             data = level1_dat;
             strcpy(level->name, level_names[1]);
@@ -134,6 +147,7 @@ void setup_level(Leveldata * level) {
     update_statusline(level);
 }
 
+/*
 _Bool level_completed(Leveldata * level) {
 
    return ( (level->x    == level->exit_x) &&  
@@ -141,25 +155,25 @@ _Bool level_completed(Leveldata * level) {
             (level->gold == level->max_gold) && 
             1
            );   
-}
+} */
 
 Position player_direction(Direction dir) {
     Position pos;
 
     switch (dir) {
-        case UP: {
+        case DirectionUp: {
             pos.x = 0, pos.y = -1;
             break;
         }
-        case DOWN: {  
+        case DirectionDown: {  
             pos.x = 0, pos.y = 1;
             break;
         }
-        case LEFT: {  
+        case DirectionLeft: {  
             pos.x = -1, pos.y = 0;
             break;
         }
-        case RIGHT: {  
+        case DirectionRight: {  
             pos.x = 1, pos.y = 0;
             break;
         } 
@@ -184,10 +198,10 @@ _Bool is_pushing_object(Leveldata * level, Direction dir) {
     item = get_tile(new.x, new.y + OFFSET_MAP); 
 
     _Bool precondition = 
-        (item == ROCK_LEFT_SYMBOL)  && (dir != RIGHT) ||
-        (item == ROCK_RIGHT_SYMBOL) && (dir != LEFT) ||
-        (item == ROCK_UP_SYMBOL)    && (dir != DOWN) ||
-        (item == ROCK_DOWN_SYMBOL)  && (dir != UP)   ||
+        (item == ROCK_LEFT_SYMBOL)  && (dir != DirectionRight) ||
+        (item == ROCK_RIGHT_SYMBOL) && (dir != DirectionLeft) ||
+        (item == ROCK_UP_SYMBOL)    && (dir != DirectionDown) ||
+        (item == ROCK_DOWN_SYMBOL)  && (dir != DirectionUp)   ||
         0;
 
     //check if is space behind the movable object
@@ -220,41 +234,50 @@ void gameloop(unsigned char curr_level) {
         setup_level(&level); 
         while ( (level.status != DIED) &&  (level.status != COMPLETED)) 
         {
-            motion = UNDEFINED_DIRECTION;
+            motion = DirectionUndefined;
 
             if (keypressed()) {
                 switch (readkey()) {
                     case PORT_A_KEY_LEFT: {
-                        motion = LEFT;
+                        motion = DirectionLeft;
                         break;
                     }
                     case PORT_A_KEY_RIGHT: {
-                        motion = RIGHT;
+                        motion = DirectionRight;
                         break;
                     }
                     case PORT_A_KEY_UP: {
-                        motion = UP;
+                        motion = DirectionUp;
                         break;
                     }
                     case PORT_A_KEY_DOWN: {
-                        motion = DOWN;
+                        motion = DirectionDown ;
                         break;
-                    }    
+                    }
+                    case PORT_B_KEY_1 /*|| PORT_B_KEY_2*/: {
+                        for(char i=0; i < 4; ++i) {
+                            print_str(0, PROGRESS_LINE, "loading..", 128);
+                            for(char j=0; j < 12; ++j)  waitForVBlank();
+                            clear_line(PROGRESS_LINE);
+                            for(char j=0; j < 12; ++j)  waitForVBlank();    
+                        }
+                        clear_line(PROGRESS_LINE);
+                        break;
+                    }
+                    case /* PORT_A_KEY_1 || */ PORT_A_KEY_2 : {
+                        for(char i=0; i < 4; ++i) {
+                            print_str(0, PROGRESS_LINE, "saving..", 128);
+                            for(char j=0; j < 12; ++j)  waitForVBlank();
+                            clear_line(PROGRESS_LINE);
+                            for(char j=0; j < 12; ++j)  waitForVBlank();    
+                        }
+                        clear_line(PROGRESS_LINE);
+                        break;
+                    }       
                 }
             }
 
-
-            if (level_completed(&level)) {
-                if (curr_level == MAX_LEVEL) {
-                    level.status = COMPLETED;
-                } else {
-                    load_leveldata(++curr_level, &level);
-                    setup_level(&level);      
-                }  
-            }  
-
-
-            if (motion != UNDEFINED_DIRECTION) {
+            if (motion != DirectionUndefined) {
                 Position new_pos, neighbour;
                 Position diffs;
                 diffs = player_direction(motion);
@@ -283,18 +306,36 @@ void gameloop(unsigned char curr_level) {
                 found = 0;
                 //when entered teleport field, find other teleport
                 if (item == TELEPORTER_SYMBOL) {
-                    for (char n=0; n < level.teleport_found; ++n) {
+                    for (char n=0; (n < level.teleport_found) && (!found); ++n) {
                         if ((new_pos.x = level.teleport[n].x) &&
                             (new_pos.y = level.teleport[n].y) ) {
-                                found = (n + 1) % level.teleport_found;
-                                new_pos.x = level.teleport[found].x;
-                                new_pos.y = level.teleport[found].y;
-                                break;
+                                // set player nearby teleporter, search right, up, left then down
+                                for (int dir=DirectionRight; dir < DirectionUndefined; ++dir) {
+                                    Position diffs;
+                                    diffs = player_direction(dir);
+                                    if (get_tile(diffs.x + level.teleport[n].x, 
+                                                diffs.y + level.teleport[n].y + OFFSET_MAP) == EMPTY_SYMBOL) {
+                                        found = (n + 1) % level.teleport_found;
+                                        new_pos.x = level.teleport[found].x + diffs.x;
+                                        new_pos.y = level.teleport[found].y + diffs.y; 
+                                        break;   
+                                    }
+                                }
                         }
                     }
-                } else if (item == GOLD_SYMBOL)
+                } else if (item == GOLD_SYMBOL) {
                     ++level.gold;
-                else {
+                } else if ((item == EXIT_SYMBOL)) {
+                    if (level.gold >= level.max_gold) {
+                        if (curr_level == MAX_LEVEL) {
+                            level.status = COMPLETED;
+                        } else {
+                            load_leveldata(++curr_level, &level);
+                            setup_level(&level);      
+                        }  
+                    } else //not collected all gold 
+                        continue;
+                } else {
                     for (char n=0; n < level.teleport_found; ++n) {
                         if ((level.x == level.teleport[n].x) &&
                             (level.y == level.teleport[n].y)) 
