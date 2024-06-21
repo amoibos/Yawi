@@ -1,22 +1,13 @@
 @echo off
 setlocal
 call :setESC
-set output=yawen
-
+REM set output=yawi
+for %%I in (.) do set output=%%~nxI
 
 set TARGET_PLATFORM="SG" 
 
 call compile
-call print_phase Starting binary..
-
-set command=echo.
-if %TARGET_PLATFORM% == "SMS" 	  set command=call run %output% %TARGET_PLATFORM%
-if %TARGET_PLATFORM% == "SG"  	  set command=call run %output% %TARGET_PLATFORM%
-if %TARGET_PLATFORM% == "SC"  	  set command=call run %output% %TARGET_PLATFORM%
-if %TARGET_PLATFORM% == "WINDOWS"	set command=call run %output% %TARGET_PLATFORM%  
-
-call print_exec %command%
-REM if not %ERRORLEVEL% == 0 goto error
+call play
 
 goto exit
 :setESC

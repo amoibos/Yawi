@@ -56,43 +56,37 @@ void level_select(char * menu_name) {
 
 void intro(char * menu_name) {
     char output[SCREEN_MAX_X+1];
-    char line=1;
-    long time = 3000;
-    unsigned char color=0; 
-
-    load_font();
-    clear_screen();
-
-    while(--time)
-        SG_setBackdropColor(color = (color + 1) % 16);
-    SG_setBackdropColor(0);
-
-    strcpy(output, menu_name);
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line++, output, 128);
-
-    strcpy(output, "Written by Darktrym");
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line++, output, 128);
-    strcpy(output, "in 2024");
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line++, output, 128);
-
-    print_img(  city__tiles__bin, city__tiles__bin_size,
-                city__palette__bin, city__palette__bin_size,
-                256, 96, 0, 8); 
-    for(char line=20; line < 24; ++line)
-        print_str(0, line, "                                ", 128);
+    char line;
     
-//#ifdef DEMO
-//    strcpy(output, DEMO);
-//#else
-    strcpy(output, VERSION);
-//#endif
-    print_str(SCREEN_MAX_X - strlen(output), SCREEN_MAX_Y - 1, output, 128);
+    do {
+        load_font();
+        clear_screen();
 
-    char option = menu(intro_items, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0);
-    if (option == 2)
-        level_select("Level Select");
-    else
-        gameloop(1);
+        line=1;
+        strcpy(output, menu_name);
+        print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line++, output, 0);
+
+        strcpy(output, "Written by Darktrym");
+        print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line++, output, 128);
+        strcpy(output, "in 2024");
+        print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line++, output, 128);
+
+        print_img(  city__tiles__bin, city__tiles__bin_size,
+                    city__palette__bin, city__palette__bin_size,
+                    256, 96, 0, 8); 
+        for(char y=20; y < 24; ++y)
+            print_str(0, y, "                                ", 128);
+        
+
+        strcpy(output, VERSION);
+        print_str(SCREEN_MAX_X - strlen(output), SCREEN_MAX_Y - 1, output, 128);
+
+        char option = menu(intro_items, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0);
+        if (option == 2)
+            level_select("Level Select");
+        else
+            gameloop(1);
+     } while (1);
 }
 
 void print_img( const char *tiledata, unsigned int tile_length, 

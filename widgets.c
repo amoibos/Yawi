@@ -4,11 +4,14 @@ char menu(char **items, char amount, char start_line, char offset, MenuMode mode
     char output[SCREEN_MAX_X+1];
     char num[3+1];
     char option = 0;
+    signed char previous=-1;
     
     while(1) {
         char line = start_line; 
+        
         for (char n=0; n < amount; ++n) {
-            
+            if (!((previous == -1) || (n == option) || (n == previous)))
+                continue;    
             
             strcpy(output, "  ");
             if (option == n) {
@@ -16,7 +19,7 @@ char menu(char **items, char amount, char start_line, char offset, MenuMode mode
                 
             }
             if (numbers)
-                    strcat(output, "   ");
+                strcat(output, "   ");
             strcat(output, items[n]);
             if (option == n)
                 to_upper(output);
@@ -26,7 +29,9 @@ char menu(char **items, char amount, char start_line, char offset, MenuMode mode
             else if (mode == MenuModeLeft)
                 ;      
 
-            print_str(offset, line++, output, 128);
+            line = start_line + n;
+            print_str(offset, line, output, 128);
+            
             if (numbers) {
                 output[0] = 0;
                 if (n + 1 < 10)
@@ -35,7 +40,7 @@ char menu(char **items, char amount, char start_line, char offset, MenuMode mode
                 
                 strcat(output, num);
                 strcat(output, ".");
-                print_str(offset + strlen("> "), line-1, output, 0);
+                print_str(offset + strlen("> "), line, output, 0);
             }   
         }
 
@@ -49,11 +54,13 @@ char menu(char **items, char amount, char start_line, char offset, MenuMode mode
             }
             case PORT_A_KEY_UP: {
                 waitForVBlank();
+                previous = option;
                 option = (option <= 0) ? amount - 1 : option - 1;
                 break;
             }
             case PORT_A_KEY_DOWN: {
                 waitForVBlank();
+                previous = option;
                 option = (option + 1) >= amount ? 0 : option + 1;
                 break;
             }
@@ -72,15 +79,15 @@ char * input(char x, char y, char * buffer, char size, InputType input_type) {
 
     switch(input_type) {
         case InputTypeNumerical: {
-            valid_chars = NUMERICSTRING;
+            valid_chars = NUMERIC;
             break;
         }
         case InputTypeAlphaNumerical: {
-            valid_chars = ALPHANUMERICAL;
+            valid_chars = ALPHA_NUMERIC;
             break;
         }
         default: {
-            valid_chars = ALPHANUMERICAL;
+            valid_chars = ALPHA_NUMERIC;
             break;
         }
     }

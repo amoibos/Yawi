@@ -1,7 +1,8 @@
 @echo off
 setlocal
 call :setESC
-set output=yawen
+REM set output=yawi
+for %%I in (.) do set output=%%~nxI
 
 REM set DEMOFLAG=-D DEMO
 set DEMOFLAG=

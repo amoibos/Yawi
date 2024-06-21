@@ -39,11 +39,11 @@ def convert(output_name):
         
         # do not use transparency color
         if color_cnt > 15:
-            print("too many colors", file=sys.stderr)
+            print("too many colors, platform supports only 15 colors", file=sys.stderr)
             return
 
         if width > MAX_X or height > MAX_Y:
-            print("invalid image dimensions", file=sys.stderr)
+            print("invalid image dimensions, platform supports maximal resolution 256x192", file=sys.stderr)
             return
 
         # convert single band color representation to RGB
@@ -80,7 +80,7 @@ def convert(output_name):
                         #colors = sorted(colors_in_line.items(), key=lambda x: x[-1])
                         
                         # use color index for ordering
-                        colors = sorted(colors_in_line.items(), key=lambda x: x)
+                        colors = sorted(colors_in_line.items(), key=lambda x: x[-1])
                         colors.insert(0, (0, 0))    
                         foreground = colors[-1][0]
                         background = colors[-2][0]

@@ -8,9 +8,5 @@ SMS_EMBED_SDSC_HEADER_AUTO_DATE_16KB(1,0,Darktrym,Yawen,"puzzle game")
 
 void main(void) {
     displayOn(); 
-    load_font();
     intro(GAME_NAME);
-    
-    //never terminate app
-    while(1); 
 }

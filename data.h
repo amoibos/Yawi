@@ -1,7 +1,7 @@
 #ifndef DATA_H
 #define DATA_H
 
-#define GAME_NAME (("Yawen"))
+#define GAME_NAME (("Yawi"))
 #define VERSION_STRING "v0.6"
 
 #ifdef DEMO
@@ -10,6 +10,7 @@
 #define VERSION VERSION_STRING
 #endif 
 
+#define MAX_MOTION_ITEMS ((20))
 #define MAX_TELEPORTER ((5))
 
 #define TITLE_LINE ((0))
@@ -18,22 +19,28 @@
 #define STATUS_LINE ((22))
 #define INFO_LINE ((23))
 
-#define LEVEL_HEIGHT ((20))
-#define OFFSET_MAP ((1))
+#define LEVEL_HEIGHT ((18))
+#define OFFSET_MAP ((2))
 
 #define EXIT_SYMBOL (('E'))
-#define PLAYER_SYMBOL (('@'))
+#define PLAYER1_SYMBOL (('@'))
+#define PLAYER2_SYMBOL (('O'))
 #define GOLD_SYMBOL (('$'))
 //level 1-12 do not use this
 #define TELEPORTER_SYMBOL (('#'))
 
-#define SOMETHING1_SYMBOL (('X'))
-#define SOMETHING2_SYMBOL (('8'))
-#define SOMETHING3_SYMBOL (('W'))
-#define SOMETHING4_SYMBOL (('o'))
 
 
-//removable by player and coverable by a stone
+#define BOMB1_SYMBOL (('X'))
+#define BOMB2_SYMBOL (('W'))
+#define BOMB3_SYMBOL (('Y'))
+#define BOMB4_SYMBOL (('Z'))
+
+#define TANK_SYMBOL (('8'))
+#define SOMETHING6_SYMBOL (('o'))
+#define THORNS_SYMBOL (('&'))
+
+//removable by player but also destroyable by falling rock
 #define PEBBLE_SYMBOL (('.'))
 //removable by player
 #define STONE_SYMBOL ((':'))
@@ -45,7 +52,7 @@
 
 #define EMPTY_SYMBOL ((' '))
 
-#define BARRIER_SYMBOL (("&O+|-%"))
+#define BARRIER_SYMBOL (("&+|-%~"))
 #define MOVABLE_SYMBOL (("<>^v8oWXYZ"))
 
 
@@ -58,13 +65,13 @@ typedef enum eDirection {
 } Direction;
 
 typedef enum eStatus {
-  ALIVE,
-  DIED,
-  COMPLETED,
-  UNDEFINED_STATUS
+  StatusAlive,
+  StatusDied,
+  StatusCompleted,
+  StatusUndefinied
 } Status;
 
-typedef struct position_t {
+typedef struct tPosition {
     signed char x;
     signed char y;
 } Position;
@@ -117,14 +124,15 @@ typedef enum eMenuMode {
 
 typedef enum eInputType {
     InputTypeNumerical,
+    InputTypeNumericalExtended,
     InputTypeAlphaNumerical,
     InputTypeUndefined
 } InputType;
 
-#define NUMERICSTRING "-0123456789."
-#define ALPHANUMERICAL "ABCDEFGHIJKLMNOPQRSTUVWXYZ"\
-                       "abcdefghijklmnopqrstuvwxyz"\
-                       NUMERICSTRING
-
+#define NUMERIC "0123456789"
+#define EXTENDED_NUMERIC NUMERIC "+-."
+#define ALPHA_NUMERIC   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"\
+                        "abcdefghijklmnopqrstuvwxyz"\
+                        EXTENDED_NUMERIC
 
 #endif
