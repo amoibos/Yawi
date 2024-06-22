@@ -1,7 +1,7 @@
 #ifndef DATA_H
 #define DATA_H
 
-#define GAME_NAME (("Yawi"))
+//#define GAME_NAME (("Yawi"))
 #define VERSION_STRING "v0.6"
 
 #ifdef DEMO
@@ -20,7 +20,9 @@
 #define INFO_LINE ((23))
 
 #define LEVEL_HEIGHT ((18))
-#define OFFSET_MAP ((2))
+#define OFFSET_MAP_Y ((2))
+#define OFFSET_MAP_X ((0))
+
 
 #define EXIT_SYMBOL (('E'))
 #define PLAYER1_SYMBOL (('@'))
@@ -30,13 +32,16 @@
 #define TELEPORTER_SYMBOL (('#'))
 
 
-
 #define BOMB1_SYMBOL (('X'))
 #define BOMB2_SYMBOL (('W'))
 #define BOMB3_SYMBOL (('Y'))
 #define BOMB4_SYMBOL (('Z'))
 
 #define TANK_SYMBOL (('8'))
+
+#define BOMBS_SYMBOL "XWYZ8"
+
+
 #define SOMETHING6_SYMBOL (('o'))
 #define THORNS_SYMBOL (('&'))
 
@@ -135,4 +140,6 @@ typedef enum eInputType {
                         "abcdefghijklmnopqrstuvwxyz"\
                         EXTENDED_NUMERIC
 
+
+#define MAX_LEVELCODE_FACTOR ((3))
 #endif

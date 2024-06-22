@@ -1,12 +1,12 @@
 #define PREFIX SEGA_
 
-char strlen(char* str) {
+char strlen(const char * str) {
 	const char *s;
 	for (s = str; *s; ++s) ;
 	return s - str;
 }
 
-char strpos(char* search, char* content, char start) {
+char strpos(char * search, char * content, char start) {
 	int i, j, check, result = -1;
 	int len_search = strlen(search);
 	int len_content = strlen(content);  
@@ -67,7 +67,7 @@ void SEGA_itoa(long value, char *sp) {
     }
 }
 
-int atoi(char* str) {
+int SEGA_atoi(char* str) {
 	int k = 0;
 	while (*str) 
 	{
@@ -118,7 +118,6 @@ char upcase(char c) {
 
 }	
 
-
 const char *strchr(const char *s, const char ch) {
 	for (; *s != '\0'; ++s)
   		if (*s == ch)
@@ -128,7 +127,7 @@ const char *strchr(const char *s, const char ch) {
 }
 
 
-char isalpha(const char mark) {
+char is_alpha(const char mark) {
 	return 	(mark >= 0x41) && (mark <= 0x5A) ||
 			(mark >= 0x61) && (mark <= 0x7A); 
 }
@@ -180,7 +179,7 @@ int itoa_s(int value, char *buf) {
         return index;
 }
 
-char* ftoa(float value, int decimals, char* buf) {
+char * ftoa(float value, int decimals, char* buf) {
 	int d;	
 	int index = 0;
 	// Handle negative values
@@ -215,14 +214,64 @@ char* ftoa(float value, int decimals, char* buf) {
   } 
 
 // WARNING: capitalize source string! 
-char* to_upper(char* string) {
+char * to_upper(char* string) {
 	char *temp;
 	for (temp = string; *temp; ++temp)
 		*temp = (char)upcase(*temp);
 	return string;
 }
 
-char isdigit(const char ch) {
+char is_digit(const char ch) {
 	return (ch >= '0') && (ch <= '9');
 
+}
+
+char * sprint(char * buffer, char * format, char **strings, long  * numbersInt, float *numbersFloat) {
+    char * str;
+    long integer;
+    float real;
+    char buffer_pos=0;
+    char temp[80+1];
+    char * start;
+
+    start = buffer;
+    buffer[0] = 0;
+    for (char format_pos=0; format_pos < strlen(format); ++format_pos) {
+        if (format[format_pos] != '%') {
+            buffer[buffer_pos++] = format[format_pos];
+        } else if ((format[format_pos] == '%') && (format[format_pos+1] == '%')) {
+            buffer[buffer_pos++] = format[format_pos++];    
+        } else {
+            ++format_pos;
+            switch (format[format_pos]) {
+                case 's': { 
+                    str = *strings;
+                    ++strings;
+                    buffer[buffer_pos] = 0;
+                    strcat(buffer, str);
+                    break;
+                }
+                case 'd': { 
+                    integer = *numbersInt++;
+                    buffer[buffer_pos] = 0;
+                    SEGA_itoa(integer, temp);
+                    strcat(buffer, temp);
+                    break;
+                }
+                  case 'f': { 
+                    real = *numbersFloat++;
+                    buffer[buffer_pos] = 0;
+                    ftoa(real, 10, temp);
+                    strcat(buffer, temp);
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+
+        }
+    }
+    buffer[buffer_pos] = 0;
+    return start;
 }

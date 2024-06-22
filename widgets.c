@@ -10,7 +10,7 @@ char menu(char **items, char amount, char start_line, char offset, MenuMode mode
         char line = start_line; 
         
         for (char n=0; n < amount; ++n) {
-            if (!((previous == -1) || (n == option) || (n == previous)))
+            if (!((previous == -1) || (n == option) || ((signed int)n == (signed int)previous)))
                 continue;    
             
             strcpy(output, "  ");

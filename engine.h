@@ -11,13 +11,15 @@
 void load_font(void);
 
 char load_leveldata(const char no, Leveldata * level);
-_Bool in_Field(const signed char x, const signed char y);
+_Bool in_field(const signed char x, const signed char y);
 _Bool is_border(const signed char x, const signed char y);
-long levelcode(char level);
+long get_levelcode(char level);
 void update_statusline(Leveldata * level); 
 void setup_level(Leveldata * level);
 //_Bool level_completed(Leveldata * level);
 _Bool is_pushing_object(Leveldata * level, Direction dir);
 void gameloop(unsigned char curr_level);
+signed int get_checked_tile(signed char x, signed char y);
+void check_for_changes(Position * motion_objects, Position source);
 
 #endif

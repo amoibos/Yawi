@@ -31,7 +31,7 @@ void next_level(char * menu_name, char level) {
     strcpy(output, "Password code: ");
     
     num[0] = 0;
-    SEGA_itoa(levelcode(level), num);
+    SEGA_itoa(get_levelcode(level), num);
 
     strcat(output, num);
     print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
