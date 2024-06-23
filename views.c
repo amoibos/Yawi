@@ -1,34 +1,32 @@
 #include "views.h"
 
-void endscreen(char * menu_name) {
-    char output[SCREEN_MAX_X+1];
+void endscreen(unsigned char * menu_name) {
+    unsigned char output[SCREEN_MAX_X+1];
 
     clear_screen();
     strcpy(output, menu_name);
     print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
-
     print_str(0, 0, "Congrats", 128);
 }
 
-void deathscreen(char * menu_name) {
-    char output[SCREEN_MAX_X+1];
+void deathscreen(unsigned char * menu_name) {
+    unsigned char output[SCREEN_MAX_X+1];
 
     clear_screen();
     strcpy(output, menu_name);
     print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
-
     print_str(0, 0, "Try it again", 128);
 }
 
-void next_level(char * menu_name, char level) {
-    char output[SCREEN_MAX_X+1];
-    char num[10+1];
+void next_level(unsigned char * menu_name, unsigned char level) {
+    unsigned char output[SCREEN_MAX_X+1];
+    unsigned char num[10+1];
 
     clear_screen();
     strcpy(output, menu_name);
     print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
 
-    strcpy(output, "Password code: ");
+    strcpy(output, "Level code: ");
     
     num[0] = 0;
     SEGA_itoa(get_levelcode(level), num);
@@ -42,8 +40,8 @@ void next_level(char * menu_name, char level) {
     while(!keypressed()) waitForVBlank();
 }
 
-void level_select(char * menu_name) {
-    char output[SCREEN_MAX_X+1];
+void level_select(unsigned char * menu_name) {
+    unsigned char output[SCREEN_MAX_X+1];
     
     load_font();
     clear_screen();
@@ -55,8 +53,8 @@ void level_select(char * menu_name) {
 }
 
 void intro(char * menu_name) {
-    char output[SCREEN_MAX_X+1];
-    char line;
+    unsigned char output[SCREEN_MAX_X+1];
+    unsigned char line;
     
     do {
         load_font();
@@ -89,17 +87,17 @@ void intro(char * menu_name) {
      } while (1);
 }
 
-void print_img( const char *tiledata, unsigned int tile_length, 
-                const char *colordata, unsigned int color_length, 
-                int width, int height, char left, char top) {
-    const int start_img_tiles = 256; 
+void print_img( const unsigned char *tiledata, unsigned int tile_length, 
+                const unsigned char *colordata, unsigned int color_length, 
+                const unsigned int width, const unsigned int height, const unsigned char left, const unsigned char top) {
+    const unsigned int start_img_tiles = 256; 
 
     loadTiles(tiledata, start_img_tiles, tile_length);
     loadPalette(colordata, start_img_tiles, color_length); 
     
     int tileno = 0;
-    for (char y=top; y < top + height / 8; ++y) {
-        for(char x=left; x < left + width / 8; ++x) {
+    for (unsigned char y=top; y < top + height / 8; ++y) {
+        for(unsigned char x=left; x < left + width / 8; ++x) {
             print_tile(x, y, tileno + start_img_tiles);
             ++tileno;
         }

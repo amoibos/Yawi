@@ -1,15 +1,18 @@
-#define PREFIX SEGA_
+#include "strings.h"
 
-char strlen(const char * str) {
+unsigned char strlen(const unsigned char * str) {
 	const char *s;
 	for (s = str; *s; ++s) ;
 	return s - str;
 }
 
-char strpos(char * search, char * content, char start) {
-	int i, j, check, result = -1;
-	int len_search = strlen(search);
-	int len_content = strlen(content);  
+/*FIXME: hopefully the result is never above 127*/
+signed char strpos(const unsigned char * search, const unsigned char * content, const unsigned char start) {
+	unsigned char i, j, check;
+    signed char result=-1;
+	unsigned char len_search = strlen(search);
+	unsigned char len_content = strlen(content);  
+
 	i = start;
 	if (
         (len_search > len_content) || 
@@ -33,10 +36,10 @@ char strpos(char * search, char * content, char start) {
 	return result;
 }
 
-void SEGA_itoa(long value, char *sp) {
+void SEGA_itoa(long value, unsigned char * sp) {
     long q, r;
-    char *start;
-    char t, sign = value < 0;
+    unsigned char *start;
+    unsigned char t, sign = value < 0;
 
     start = sp;
     
@@ -67,18 +70,18 @@ void SEGA_itoa(long value, char *sp) {
     }
 }
 
-int SEGA_atoi(char* str) {
-	int k = 0;
+long SEGA_atoi(unsigned char * str) {
+	long k = 0;
 	while (*str) 
 	{
 		k = (k << 3) + (k << 1) + (*str) - '0';
 		++str;
 	}
-	return k;
+	return k * ((str[0] == '-') ? -1 : 1);
 }
 
-char* strcat(char *dest, const char *src) {
-	char *rdest = dest;
+unsigned char* strcat(unsigned char * dest, const unsigned char * src) {
+	unsigned char *rdest = dest;
 
 	while (*dest)	dest++;
 	while (*dest++ = *src++) ;
@@ -86,24 +89,24 @@ char* strcat(char *dest, const char *src) {
 	return rdest;
 }
 
-int strcmp(const char* str1, const char* str2) {
+signed char strcmp(const char * str1, const char * str2) {
 	while(*str1 && (*str1 == *str2)) {
 		++str1;
 		++str2;
 	}
 	return *(const unsigned char*)str1 - *(const unsigned char*)str2;
 }
+/*
+void strncpy(unsigned char* dst, const unsigned char* src, const unsigned char amount) {
+	unsigned char i = 0;
+	while(i++ != amount && (*dst++ = *src++));
+}*/
 
-void strncpy(char* dst, const char* src, char n) {
-	char i = 0;
-	while(i++ != n && (*dst++ = *src++));
-}
-
-void strcpy(char* dst, const char* src) {
+void strcpy(unsigned char* dst, const unsigned char* src) {
 	while(*dst++ = *src++);
 }
 
-char upcase(char c) {
+unsigned char upcase(const unsigned char c) {
 	
     if ((c >= 'A') && (c <='Z'))
         return c;
@@ -118,7 +121,7 @@ char upcase(char c) {
 
 }	
 
-const char *strchr(const char *s, const char ch) {
+const unsigned char *strchr(const unsigned char *s, const unsigned char ch) {
 	for (; *s != '\0'; ++s)
   		if (*s == ch)
     		return s;
@@ -127,19 +130,19 @@ const char *strchr(const char *s, const char ch) {
 }
 
 
-char is_alpha(const char mark) {
+unsigned char is_alpha(const unsigned char mark) {
 	return 	(mark >= 0x41) && (mark <= 0x5A) ||
 			(mark >= 0x61) && (mark <= 0x7A); 
 }
 
-int pow(int base, int ex) {
-	int result = base;
+long long pow(long long base, int ex) {
+	long long result = base;
 	for(int i = 0; i < ex; ++i)
 		result *= base;
 	return result;
 }
 
-float str_to_float(char *arr) {
+float str_to_float(const unsigned char  * arr) {
     int i,j,flag;
     float val;
     char c;
@@ -168,6 +171,8 @@ float str_to_float(char *arr) {
     return val;
 }
 
+// used in ftoa
+/*
 int itoa_s(int value, char *buf) {
         int index = 0;
         int i = value % 10;
@@ -177,11 +182,11 @@ int itoa_s(int value, char *buf) {
         buf[index] = i+0x30;
         index++;
         return index;
-}
+} 
 
-char * ftoa(float value, int decimals, char* buf) {
-	int d;	
-	int index = 0;
+unsigned char * ftoa(float value, int decimals, unsigned char * buf) {
+	unsigned int d;	
+	unsigned int index = 0;
 	// Handle negative values
 	if (value < 0) {
 	       buf[index] = '-';
@@ -211,27 +216,27 @@ char * ftoa(float value, int decimals, char* buf) {
 	buf[index] = '\0';
 
   return buf;
-  } 
+} 
+*/
 
 // WARNING: capitalize source string! 
-char * to_upper(char* string) {
-	char *temp;
+unsigned char * to_upper(unsigned char * string) {
+	unsigned char *temp;
 	for (temp = string; *temp; ++temp)
 		*temp = (char)upcase(*temp);
 	return string;
 }
 
-char is_digit(const char ch) {
+unsigned char is_digit(const unsigned char ch) {
 	return (ch >= '0') && (ch <= '9');
-
 }
-
-char * sprint(char * buffer, char * format, char **strings, long  * numbersInt, float *numbersFloat) {
-    char * str;
+/*
+unsigned char * sprint(unsigned char * buffer, unsigned char * format, unsigned char **strings, long  * numbersInt, float * numbersFloat) {
+    unsigned char * str;
     long integer;
     float real;
-    char buffer_pos=0;
-    char temp[80+1];
+    unsigned char buffer_pos=0;
+    unsigned char temp[80+1];
     char * start;
 
     start = buffer;
@@ -275,3 +280,4 @@ char * sprint(char * buffer, char * format, char **strings, long  * numbersInt, 
     buffer[buffer_pos] = 0;
     return start;
 }
+*/

@@ -1,29 +1,27 @@
 #ifndef STRINGS_H
 #define STRINGS_H
 
-#define PREFIX SEGA_
-
-void SEGA_itoa(long value, char *sp);
-int SEGA_atoi(char* str);
+void SEGA_itoa(const long value, unsigned char * sp);
+long SEGA_atoi(const unsigned char * str);
 //float atof(char* arr);
 //char* ftoa(float value, int decimals, char* buf);
 
 
-void strcat(char* str1, char* str2);
+unsigned char * strcat(unsigned char * str1, unsigned char * str2);
 
-char strcmp(char* str1, char* str2);
-//void strncpy(char* dest, char* src, int n); 
-char strlen(const char* str);
-char strpos(char* search, char* content, char start);
-void strcpy(char* dst, char* src);
+signed char strcmp(unsigned char * str1, const unsigned char * str2);
+//void strncpy(unsigned char * dest, const unsigned char * src, const unsigned char amount); 
+unsigned char strlen(const unsigned char* str);
+signed char strpos(unsigned char* search, unsigned char * content, unsigned char start);
+void strcpy(unsigned char* dst, const unsigned char* src);
 
-char * strchr(const char *s, char ch);
+unsigned char * strchr(const unsigned char *s, unsigned char ch);
 
-char upcase(char c);
-char is_alpha(const char mark);
-char * to_upper(char* string);
-char is_digit(const char ch);
-char * sprint(char * buffer, char * format, char **strings, long  * numbersInt, float *numbersFloat);
+unsigned char upcase(const unsigned char c);
+unsigned char is_alpha(const unsigned char mark);
+unsigned char * to_upper(unsigned char * string);
+unsigned char is_digit(const unsigned char ch);
+//unsigned char * sprint(unsigned char * buffer, const unsigned char * format, const unsigned char **strings, const long * numbersInt, const float * numbersFloat);
 
 
 #endif

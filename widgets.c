@@ -1,15 +1,15 @@
 #include "widgets.h"
 
-char menu(char **items, char amount, char start_line, char offset, MenuMode mode, _Bool numbers) {
-    char output[SCREEN_MAX_X+1];
-    char num[3+1];
-    char option = 0;
+unsigned char menu(unsigned char **items, unsigned char amount, unsigned char start_line, unsigned char offset, MenuMode mode, _Bool numbers) {
+    unsigned char output[SCREEN_MAX_X+1];
+    unsigned char num[3+1];
+    unsigned char option = 0;
     signed char previous=-1;
     
     while(1) {
         char line = start_line; 
         
-        for (char n=0; n < amount; ++n) {
+        for (unsigned char n=0; n < amount; ++n) {
             if (!((previous == -1) || (n == option) || ((signed int)n == (signed int)previous)))
                 continue;    
             
@@ -74,8 +74,8 @@ char menu(char **items, char amount, char start_line, char offset, MenuMode mode
     return option + 1;
 }
 
-char * input(char x, char y, char * buffer, char size, InputType input_type) {
-    const char * valid_chars;
+unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, unsigned char size, InputType input_type) {
+    const unsigned char * valid_chars;
 
     switch(input_type) {
         case InputTypeNumerical: {
@@ -92,18 +92,18 @@ char * input(char x, char y, char * buffer, char size, InputType input_type) {
         }
     }
 
-    char set_size = strlen(valid_chars);
+    unsigned char set_size = strlen(valid_chars);
     // garantee null character at the end
-    for (char c=0; c < size; ++c)
+    for (unsigned char c=0; c < size; ++c)
         buffer[c] = 0;
     
     signed char pos = 0;
-    char idx = 0;
+    unsigned char idx = 0;
     unsigned int key;
     do {
         while (!keypressed) ;
         //slow down key processing
-        for (char i=0; i < 5; ++i)
+        for (unsigned char i=0; i < 5; ++i)
                 waitForVBlank();
         key = readkey();
         switch(key) {

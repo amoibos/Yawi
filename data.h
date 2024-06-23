@@ -37,9 +37,9 @@
 #define BOMB3_SYMBOL (('Y'))
 #define BOMB4_SYMBOL (('Z'))
 
-#define TANK_SYMBOL (('8'))
+#define TANK_SYMBOL (('B'))
 
-#define BOMBS_SYMBOL "XWYZ8"
+#define BOMBS_SYMBOL "XWYZB"
 
 
 #define SOMETHING6_SYMBOL (('o'))
@@ -58,8 +58,8 @@
 #define EMPTY_SYMBOL ((' '))
 
 #define BARRIER_SYMBOL (("&+|-%~"))
-#define MOVABLE_SYMBOL (("<>^v8oWXYZ"))
-
+#define MOVABLE_SYMBOL (("<>^vBoWXYZ"))
+#define BLOCKING_SYMBOL (("<>^v:@$")) 
 
 typedef enum eDirection {
     DirectionRight,
@@ -84,9 +84,9 @@ typedef struct tPosition {
 //Position steps[4] = { (0, -1), (0, 1), (-1, 0), (1, 0)};
 
 typedef struct leveldata_t {
-    char name[25+1];
-    char gold;
-    char max_gold;
+    unsigned char name[25+1];
+    unsigned char gold;
+    unsigned char max_gold;
     signed char start_x;
     signed char start_y;
     signed char exit_x;
@@ -95,11 +95,11 @@ typedef struct leveldata_t {
     signed char y;
     Status status;
     Position teleport[MAX_TELEPORTER];
-    char teleport_found;
+    unsigned char teleport_found;
 } Leveldata;
 
 #define MAX_LEVEL ((12))
-static char *level_names[MAX_LEVEL] = {
+static unsigned char *level_names[MAX_LEVEL] = {
     "Darkness Falls",
     "Lateral Thinking",
     "Explosively Simple",
@@ -115,7 +115,7 @@ static char *level_names[MAX_LEVEL] = {
 };
 
 #define MAX_INTRO_ITEMS ((2))
-static char *intro_items[MAX_INTRO_ITEMS] = {
+static unsigned char *intro_items[MAX_INTRO_ITEMS] = {
     "New Game",
     "Level Select"
 };

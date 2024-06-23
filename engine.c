@@ -7,7 +7,7 @@ void load_font(void) {
 }
 
 char load_leveldata(const char no, Leveldata * level) {
-    const char *data;
+    const unsigned char *data;
     
     if ( (no < 1) || (no > MAX_LEVEL)) {
         return 0;
@@ -48,9 +48,9 @@ char load_leveldata(const char no, Leveldata * level) {
     
     level->max_gold = 0;
     level->teleport_found = 0; 
-    char first_char = *data;
-    for(char y=0; y < LEVEL_HEIGHT; ++y) {
-        for(char x=0; x < SCREEN_MAX_X; ++x) {
+    unsigned char first_char=0;
+    for(unsigned char y=0; y < LEVEL_HEIGHT; ++y) {
+        for(unsigned char x=0; x < SCREEN_MAX_X; ++x) {
             // skip control characters, 
             while (*data < ' ') data++;
             if (*data == PLAYER1_SYMBOL) {
@@ -70,12 +70,14 @@ char load_leveldata(const char no, Leveldata * level) {
 
             //todo: checks if data is too short or too long 
             print_tile(x + OFFSET_MAP_X, y + OFFSET_MAP_Y, *data);
+            if ((strchr(BARRIER_SYMBOL, *data) != 0) && !(first_char))
+                first_char = *data;
             ++data;
         }
     }
     
     //save 2 * SCREEN_MAX_X data in every map
-    for (char x=0; x < SCREEN_MAX_X; ++x) {
+    for (unsigned char x=0; x < SCREEN_MAX_X; ++x) {
         print_tile(x + OFFSET_MAP_X, OFFSET_MAP_Y - 1, first_char);
         print_tile(x + OFFSET_MAP_X, LEVEL_HEIGHT + OFFSET_MAP_Y, first_char);
     }
@@ -96,14 +98,14 @@ _Bool is_border(const signed char x, const signed char y) {
 
     unsigned int brick = get_tile(x, y); 
    
-    if (strchr(BARRIER_SYMBOL, brick) != 0)
+    if (strchr(BARRIER_SYMBOL, (unsigned char)brick) != 0)
         return 1;
 
     return 0;
 }
 
 /*
-    level select code    
+    compute level select code    
 */
 long get_levelcode(const char level) {
     long code=0;
@@ -112,16 +114,16 @@ long get_levelcode(const char level) {
     
     for(char idx=0; idx < strlen(level_names[level]); ++idx)
         code += level_names[level][idx] * factors[idx % MAX_LEVELCODE_FACTOR]; 
-    return code;
+    return code * ((code < 0) ? -1 : 1);
 }
 
 
 /*
-    
+    printing status line
 */
 void update_statusline(Leveldata * level) {
-    char output[30+1];
-    char numstr[10+1];
+    unsigned char output[30+1];
+    unsigned char numstr[10+1];
 
     output[0] = 0;
     numstr[0] = 0;
@@ -144,8 +146,8 @@ void print_title(void) {
 }
 
 void setup_level(Leveldata * level) {
-    char output[30+1];
-    char numstr[10+1];
+    unsigned char output[30+1];
+    unsigned char numstr[10+1];
 
     output[0] = 0;
     numstr[0] = 0;
@@ -258,7 +260,7 @@ _Bool is_pushing_object(Leveldata * level, Direction dir) {
 
 signed char get_first_motion(Position * motion_objects, _Bool exist) {
 
-    for (char pos=0; pos < MAX_MOTION_ITEMS; ++pos)
+    for (unsigned char pos=0; pos < MAX_MOTION_ITEMS; ++pos)
         if ( (exist) ? (motion_objects[pos].x != -1) : (motion_objects[pos].x == -1))
             return pos;
     return -1;
@@ -266,7 +268,7 @@ signed char get_first_motion(Position * motion_objects, _Bool exist) {
 
 signed char get_motion_position(Position * motion_objects, Position movable) {
 
-    for (char pos=0; pos < MAX_MOTION_ITEMS; ++pos)
+    for (unsigned char pos=0; pos < MAX_MOTION_ITEMS; ++pos)
         if ((motion_objects[pos].x == movable.x) && (motion_objects[pos].x == movable.x))             
             return pos;
     return -1;    
@@ -307,22 +309,27 @@ void gravitation(Position * motion_objects, Leveldata * level) {
         
         Position dest, src;
         src.x = motion_objects[pos].x, src.y = motion_objects[pos].y; 
-        signed int item = get_checked_tile(motion_objects[pos].x, motion_objects[pos].y);
-        switch (item) {
+        signed int falling_item = get_checked_tile(motion_objects[pos].x, motion_objects[pos].y);
+        switch (falling_item) {
             case ROCK_UP_SYMBOL:    case ROCK_DOWN_SYMBOL:
             case ROCK_LEFT_SYMBOL:  case ROCK_RIGHT_SYMBOL: {
                 Position diff;
-                diff = rock_fall_direction(item);
+                //compute destination coordinates
+                diff = rock_fall_direction(falling_item);
                 dest.x = motion_objects[pos].x + diff.x;
                 dest.y = motion_objects[pos].y + diff.y;
                 
+                //check if falling ends here 
                 signed int dest_item = get_checked_tile(dest.x, dest.y);
-                if ((dest_item != PEBBLE_SYMBOL) && 
-                    (dest_item != EMPTY_SYMBOL) &&
-                    (is_within(dest.x, dest.y))) {
+                if  (
+                    (strchr(BLOCKING_SYMBOL, dest_item) != 0) ||
+                    (strchr(BARRIER_SYMBOL, dest_item) != 0) ||
+                    (!is_within(dest.x, dest.y))
+                    ) {
                     //reached boundary
                     motion_objects[pos].x = -1;
-                    print_tile(src.x, src.y, item);
+                    print_tile(src.x, src.y, falling_item);
+                    check_for_changes(motion_objects, src); 
                     continue;
                 }    
                 
@@ -331,21 +338,14 @@ void gravitation(Position * motion_objects, Leveldata * level) {
                     case PEBBLE_SYMBOL: { //continue falling
                         motion_objects[pos].x = dest.x;
                         motion_objects[pos].y = dest.y;
-                        print_tile(dest.x, dest.y, item);  
+                        print_tile(dest.x, dest.y, falling_item);  
                         break;   
                     }
                     case PLAYER1_SYMBOL: {
                         motion_objects[pos].x = -1;
-                        print_tile(dest.x, dest.y, item);
+                        print_tile(dest.x, dest.y, falling_item);
                         level->status = StatusDied;
                         continue;
-                    }
-                    case TELEPORTER_SYMBOL: case EXIT_SYMBOL: 
-                    case STONE_SYMBOL:      case GOLD_SYMBOL: 
-                    case ROCK_UP_SYMBOL:    case ROCK_DOWN_SYMBOL:
-                    case ROCK_LEFT_SYMBOL:  case ROCK_RIGHT_SYMBOL: {
-                        motion_objects[pos].x = -1;
-                        break;     
                     }
                     case BOMB1_SYMBOL: case BOMB2_SYMBOL:
                     case BOMB3_SYMBOL: case BOMB4_SYMBOL:
