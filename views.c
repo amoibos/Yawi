@@ -46,12 +46,12 @@ void next_level(unsigned char * menu_name, unsigned char level) {
 
     line = 10;
     strcpy(output, "Level: ");
-    strcat(output, level_names[level]);
+    strcat(output, level_names[level-1]);
     print_str(offset, line++, output, 128);
     
     strcpy(output, "Level code: ");
     num[0] = 0;
-    SEGA_itoa(get_levelcode(level), num);
+    SEGA_itoa(get_levelcode(level-1), num);
     strcat(output, num);
     print_str(offset, line++, output, 128);
 
@@ -64,13 +64,25 @@ void next_level(unsigned char * menu_name, unsigned char level) {
 
 void level_select(unsigned char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
+    const unsigned char offset=5;
+    unsigned char line=5;
+    char option;
+
     
     load_font();
     clear_screen();
     strcpy(output, menu_name);
     print_str(SCREEN_MAX_X / 2 - strlen(output) / 2 , TITLE_LINE + 1, output, 128);
-
-    char option = menu(level_names, MAX_LEVEL, 10, 4, MenuModeLeft, 1);
+    strcpy(output, "Level code: ");
+    print_str(offset, line, output, 128);
+    /*
+    input(strlen(output), line, output, SCREEN_MAX_X, InputTypeNumerical);
+    long code = SEGA_atoi(unsigned char * str) 
+    for (option=1; option <= MAX_LEVEL; ++option)
+        if (code == get_levelcode(1))
+            gameloop(option);
+    */
+    option = menu(level_names, MAX_LEVEL, 10, 4, MenuModeLeft, 1);
     gameloop(option);
 }
 

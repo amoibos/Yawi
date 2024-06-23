@@ -156,10 +156,11 @@ void setup_level(Leveldata * level) {
     level->y = level->start_y;
     level->gold = 0;
     level->status = StatusAlive;
+    
 
     print_title();
 
-    strcat(output, "Chapter: "); 
+    strcat(output, "Level: "); 
     strcat(output, level->name);
     clear_line(STATUS_LINE);
     print_str(0, STATUS_LINE, output, 128);

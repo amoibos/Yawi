@@ -72,12 +72,15 @@ void SEGA_itoa(long value, unsigned char * sp) {
 
 long SEGA_atoi(unsigned char * str) {
 	long k = 0;
+    unsigned char start;
+
+    start = *str;
 	while (*str) 
 	{
 		k = (k << 3) + (k << 1) + (*str) - '0';
 		++str;
 	}
-	return k * ((str[0] == '-') ? -1 : 1);
+	return k * ((start == '-') ? -1 : 1);
 }
 
 unsigned char* strcat(unsigned char * dest, const unsigned char * src) {
