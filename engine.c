@@ -110,10 +110,10 @@ _Bool is_border(const signed char x, const signed char y) {
 long get_levelcode(const char level) {
     long code=0;
 
-    signed char factors[MAX_LEVELCODE_FACTOR] = {3, 5, -2};
+    signed char factors[MAX_LEVELCODE_FACTOR] = {2, 3, 5, -2, 4};
     
     for(char idx=0; idx < strlen(level_names[level]); ++idx)
-        code += level_names[level][idx] * factors[idx % MAX_LEVELCODE_FACTOR]; 
+        code += level_names[level][idx] * factors[idx % MAX_LEVELCODE_FACTOR] * 10; 
     return code * ((code < 0) ? -1 : 1);
 }
 
@@ -362,6 +362,7 @@ void gravitation(Position * motion_objects, Leveldata * level) {
                     } 
                     default: {
                         motion_objects[pos].x = -1;
+
                         break;
                     }
                 } //switch (dest_item) {
@@ -531,7 +532,8 @@ void gameloop(unsigned char curr_level) {
                         if (curr_level == MAX_LEVEL) {
                             level.status = StatusCompleted;
                         } else {
-                            load_leveldata(++curr_level, &level);
+                            next_level("Not hard enough", ++curr_level);
+                            load_leveldata(curr_level, &level);
                             setup_level(&level);      
                         }  
                     } else //not collected all gold 

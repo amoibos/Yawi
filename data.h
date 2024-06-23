@@ -59,7 +59,7 @@
 
 #define BARRIER_SYMBOL (("&+|-%~"))
 #define MOVABLE_SYMBOL (("<>^vBoWXYZ"))
-#define BLOCKING_SYMBOL (("<>^v:@$")) 
+#define BLOCKING_SYMBOL (("<>^v:$")) 
 
 typedef enum eDirection {
     DirectionRight,
@@ -146,5 +146,5 @@ typedef enum eInputType {
                         EXTENDED_NUMERIC
 
 
-#define MAX_LEVELCODE_FACTOR ((3))
+#define MAX_LEVELCODE_FACTOR ((5))
 #endif

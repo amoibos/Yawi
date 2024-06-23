@@ -2,40 +2,62 @@
 
 void endscreen(unsigned char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
+    unsigned char line=20;
 
+    load_font();
     clear_screen();
     strcpy(output, menu_name);
     print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
-    print_str(0, 0, "Congrats", 128);
+    
+    strcpy(output, "Congrats");
+    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line, output, 128);
+
+    while(!keypressed()) waitForVBlank();
+
 }
 
 void deathscreen(unsigned char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
+    unsigned char line=20;
 
+    load_font();
     clear_screen();
     strcpy(output, menu_name);
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
-    print_str(0, 0, "Try it again", 128);
+    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, TITLE_LINE + 1, output, 128);
+    
+    strcpy(output, "Try it again");
+    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line, output, 128);
+
+    while(!keypressed()) waitForVBlank();
 }
 
 void next_level(unsigned char * menu_name, unsigned char level) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char num[10+1];
+    unsigned char line=2;
+    const unsigned char offset=5;
 
+    load_font();
     clear_screen();
     strcpy(output, menu_name);
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
+    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, TITLE_LINE + 1, output, 128);
+    strcpy(output, "try the next level");
+    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line++, output, 128);
 
-    strcpy(output, "Level code: ");
+    line = 10;
+    strcpy(output, "Level: ");
+    strcat(output, level_names[level]);
+    print_str(offset, line++, output, 128);
     
+    strcpy(output, "Level code: ");
     num[0] = 0;
     SEGA_itoa(get_levelcode(level), num);
-
     strcat(output, num);
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
+    print_str(offset, line++, output, 128);
 
+    line = 20;
     strcpy(output, "Press a key to continue");
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
+    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line, output, 128);
 
     while(!keypressed()) waitForVBlank();
 }
@@ -46,7 +68,7 @@ void level_select(unsigned char * menu_name) {
     load_font();
     clear_screen();
     strcpy(output, menu_name);
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2 , 1, output, 128);
+    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2 , TITLE_LINE + 1, output, 128);
 
     char option = menu(level_names, MAX_LEVEL, 10, 4, MenuModeLeft, 1);
     gameloop(option);
@@ -59,7 +81,7 @@ void credits(const unsigned char * menu_name) {
     load_font();
     clear_screen();
     strcpy(output, menu_name);
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
+    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, TITLE_LINE + 1, output, 128);
 
     for (unsigned char entry=0; entry < CREDIT_NAMES_MAX; ++entry) {
         strcpy(output, credits_names[entry]);
@@ -82,10 +104,11 @@ void intro(char * menu_name) {
         load_font();
         clear_screen();
 
-        line=1;
+        
         strcpy(output, menu_name);
-        print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line++, output, 0);
+        print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, TITLE_LINE + 1, output, 0);
 
+        line=2;
         strcpy(output, "Written by Darktrym");
         print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line++, output, 128);
         strcpy(output, "in 2024");
