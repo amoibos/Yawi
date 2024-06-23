@@ -238,10 +238,10 @@ _Bool is_pushing_object(Leveldata * level, Direction dir) {
         (item == ROCK_RIGHT_SYMBOL)     && (dir != DirectionLeft)   ||
         (item == ROCK_UP_SYMBOL)        && (dir != DirectionDown)   ||
         (item == ROCK_DOWN_SYMBOL)      && (dir != DirectionUp)     ||
-        (item == BOMB1_SYMBOL)     && (dir != DirectionUp)     ||
-        (item == BOMB2_SYMBOL)     && (dir != DirectionLeft)   ||
-        (item == BOMB3_SYMBOL)     && (dir != DirectionRight)  ||
-        (item == BOMB4_SYMBOL)     && (dir != DirectionDown)   ||
+        (item == BOMB1_SYMBOL)          && (dir != DirectionUp)     ||
+        (item == BOMB2_SYMBOL)          && (dir != DirectionLeft)   ||
+        (item == BOMB3_SYMBOL)          && (dir != DirectionRight)  ||
+        (item == BOMB4_SYMBOL)          && (dir != DirectionDown)   ||
         0;
 
     //check if is space behind the movable object
@@ -261,7 +261,11 @@ _Bool is_pushing_object(Leveldata * level, Direction dir) {
 signed char get_first_motion(Position * motion_objects, _Bool exist) {
 
     for (unsigned char pos=0; pos < MAX_MOTION_ITEMS; ++pos)
-        if ( (exist) ? (motion_objects[pos].x != -1) : (motion_objects[pos].x == -1))
+        if (exist) {
+            if (motion_objects[pos].x != -1) 
+                return pos;
+            
+        } else if (motion_objects[pos].x == -1)
             return pos;
     return -1;
 }
@@ -269,7 +273,8 @@ signed char get_first_motion(Position * motion_objects, _Bool exist) {
 signed char get_motion_position(Position * motion_objects, Position movable) {
 
     for (unsigned char pos=0; pos < MAX_MOTION_ITEMS; ++pos)
-        if ((motion_objects[pos].x == movable.x) && (motion_objects[pos].x == movable.x))             
+        if ((motion_objects[pos].x == movable.x) && 
+            (motion_objects[pos].y == movable.y))             
             return pos;
     return -1;    
 }
@@ -292,14 +297,14 @@ signed char add_motion(Position * motion_objects, Position item) {
 
 signed int get_checked_tile(signed char x, signed char y) {
     
-    if (is_border(x, y))
+    if (!is_within(x, y))
         return -1;
 
     return get_tile(x, y);       
 }
 
 void gravitation(Position * motion_objects, Leveldata * level) {
-    clear_line(STATUS_LINE);
+    //clear_line(STATUS_LINE);
    
     while (level->status != StatusDied) {
         signed char pos = get_first_motion(motion_objects, 1); 
@@ -338,7 +343,8 @@ void gravitation(Position * motion_objects, Leveldata * level) {
                     case PEBBLE_SYMBOL: { //continue falling
                         motion_objects[pos].x = dest.x;
                         motion_objects[pos].y = dest.y;
-                        print_tile(dest.x, dest.y, falling_item);  
+                        print_tile(dest.x, dest.y, falling_item);
+                        //check_for_changes(motion_objects, dest);  
                         break;   
                     }
                     case PLAYER1_SYMBOL: {
@@ -375,7 +381,7 @@ void check_for_changes(Position * motion_objects, Position source) {
 
     for (signed char y = source.y - 3; y < source.y + 3; ++y) 
         for (signed char x = source.x - 3; x < source.x + 3; ++x) {
-            unsigned int item = get_checked_tile(x, y);
+            signed int item = get_checked_tile(x, y);
             switch (item) {
                 case ROCK_UP_SYMBOL: {
                     motion.x = x, motion.y = y;

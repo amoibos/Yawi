@@ -99,7 +99,7 @@ typedef struct leveldata_t {
 } Leveldata;
 
 #define MAX_LEVEL ((12))
-static unsigned char *level_names[MAX_LEVEL] = {
+static unsigned char * level_names[MAX_LEVEL] = {
     "Darkness Falls",
     "Lateral Thinking",
     "Explosively Simple",
@@ -114,12 +114,17 @@ static unsigned char *level_names[MAX_LEVEL] = {
     "Shrouded Glory"
 };
 
-#define MAX_INTRO_ITEMS ((2))
-static unsigned char *intro_items[MAX_INTRO_ITEMS] = {
+#define MAX_INTRO_ITEMS ((3))
+static unsigned char * intro_items[MAX_INTRO_ITEMS] = {
     "New Game",
-    "Level Select"
+    "Level Select",
+    "Credits"
 };
 
+#define CREDIT_NAMES_MAX ((1))
+static unsigned char * credits_names[CREDIT_NAMES_MAX] = {
+    "Daniel aka Darktrym",
+};
 
 typedef enum eMenuMode {
     MenuModeCenter,

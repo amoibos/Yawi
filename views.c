@@ -52,6 +52,28 @@ void level_select(unsigned char * menu_name) {
     gameloop(option);
 }
 
+void credits(const unsigned char * menu_name) {
+    unsigned char output[SCREEN_MAX_X+1];
+    unsigned char line=5;
+
+    load_font();
+    clear_screen();
+    strcpy(output, menu_name);
+    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
+
+    for (unsigned char entry=0; entry < CREDIT_NAMES_MAX; ++entry) {
+        strcpy(output, credits_names[entry]);
+        unsigned center = SCREEN_MAX_X / 2 - strlen(output) / 2;
+
+        for (unsigned char pos=0; pos < strlen(output); ++pos) {
+            print_tile(center++, line + entry, 128 + output[pos]);
+            for (unsigned char wait=0; (wait < 10) && (!keypressed()); ++wait) waitForVBlank(); 
+        }   
+    }
+
+    while(!keypressed()) waitForVBlank();
+}
+
 void intro(char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char line;
@@ -80,10 +102,25 @@ void intro(char * menu_name) {
         print_str(SCREEN_MAX_X - strlen(output), SCREEN_MAX_Y - 1, output, 128);
 
         char option = menu(intro_items, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0);
-        if (option == 2)
-            level_select("Level Select");
-        else
-            gameloop(1);
+        switch (option) {
+            case 1: {
+                gameloop(1);
+                break;
+            }
+            case 2: {
+                level_select("Level Select");
+                break;
+            }
+            case 3: {
+                credits("Credits");
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+
+            
      } while (1);
 }
 

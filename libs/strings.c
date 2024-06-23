@@ -121,7 +121,7 @@ unsigned char upcase(const unsigned char c) {
 
 }	
 
-const unsigned char *strchr(const unsigned char *s, const unsigned char ch) {
+unsigned char *strchr(const unsigned char *s, const unsigned char ch) {
 	for (; *s != '\0'; ++s)
   		if (*s == ch)
     		return s;
