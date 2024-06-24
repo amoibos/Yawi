@@ -2,7 +2,7 @@
 #define DATA_H
 
 //#define GAME_NAME (("Yawi"))
-#define VERSION_STRING "v0.6"
+#define VERSION_STRING "v0.7"
 
 #ifdef DEMO
 #define VERSION "DEMO " VERSION_STRING
@@ -89,8 +89,6 @@ typedef struct leveldata_t {
     unsigned char max_gold;
     signed char start_x;
     signed char start_y;
-    signed char exit_x;
-    signed char exit_y;
     signed char x;
     signed char y;
     Status status;
@@ -99,7 +97,7 @@ typedef struct leveldata_t {
 } Leveldata;
 
 #define MAX_LEVEL ((12))
-static unsigned char * level_names[MAX_LEVEL] = {
+static unsigned char * level_names[MAX_LEVEL+1] = {
     "Darkness Falls",
     "Lateral Thinking",
     "Explosively Simple",
@@ -111,7 +109,8 @@ static unsigned char * level_names[MAX_LEVEL] = {
     "Complexity",
     "Nature of the Beast",
     "Devil\'s Despair",
-    "Shrouded Glory"
+    "Shrouded Glory",
+    "..."
 };
 
 #define MAX_INTRO_ITEMS ((3))

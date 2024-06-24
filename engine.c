@@ -7,14 +7,13 @@ void load_font(void) {
 }
 
 char load_leveldata(const char no, Leveldata * level) {
-    const unsigned char *data;
+    const unsigned char * data;
     
     if ( (no < 1) || (no > MAX_LEVEL)) {
         return 0;
     }
 
     //mapROMBank(no);
-
     switch (no) {
         case 1: {
             data = level1_dat;
@@ -37,8 +36,7 @@ char load_leveldata(const char no, Leveldata * level) {
         case 10:
         case 11:
         case 12:*/
-#endif            
-            
+#endif               
        default: {
             data = level1_dat;
             strcpy(level->name, level_names[1]);
@@ -49,27 +47,23 @@ char load_leveldata(const char no, Leveldata * level) {
     level->max_gold = 0;
     level->teleport_found = 0; 
     unsigned char first_char=0;
-    for(unsigned char y=0; y < LEVEL_HEIGHT; ++y) {
-        for(unsigned char x=0; x < SCREEN_MAX_X; ++x) {
+    for(unsigned char y=OFFSET_MAP_Y; y < LEVEL_HEIGHT + OFFSET_MAP_Y; ++y) {
+        for(unsigned char x=OFFSET_MAP_X; x < SCREEN_MAX_X + OFFSET_MAP_X; ++x) {
             // skip control characters, 
             while (*data < ' ') data++;
             if (*data == PLAYER1_SYMBOL) {
-                level->start_x = x + OFFSET_MAP_X;
-                level->start_y = y + OFFSET_MAP_Y;    
-            } else if (*data == EXIT_SYMBOL) {
-                level->exit_x = x + OFFSET_MAP_X;
-                level->exit_y = y + OFFSET_MAP_Y;
+                level->start_x = x, level->start_y = y;    
             } else if (*data == GOLD_SYMBOL) {
                 level->max_gold++;
             } else if ((*data == TELEPORTER_SYMBOL) && 
                        (level->teleport_found < MAX_TELEPORTER) ) {
-                level->teleport[level->teleport_found].x = x + OFFSET_MAP_X;
-                level->teleport[level->teleport_found].y = y + OFFSET_MAP_Y;
+                level->teleport[level->teleport_found].x = x;
+                level->teleport[level->teleport_found].y = y;
                 ++level->teleport_found;
             }
 
             //todo: checks if data is too short or too long 
-            print_tile(x + OFFSET_MAP_X, y + OFFSET_MAP_Y, *data);
+            print_tile(x, y, *data);
             if ((strchr(BARRIER_SYMBOL, *data) != 0) && !(first_char))
                 first_char = *data;
             ++data;
@@ -77,14 +71,15 @@ char load_leveldata(const char no, Leveldata * level) {
     }
     
     //save 2 * SCREEN_MAX_X data in every map
-    for (unsigned char x=0; x < SCREEN_MAX_X; ++x) {
-        print_tile(x + OFFSET_MAP_X, OFFSET_MAP_Y - 1, first_char);
-        print_tile(x + OFFSET_MAP_X, LEVEL_HEIGHT + OFFSET_MAP_Y, first_char);
+    for (unsigned char x=OFFSET_MAP_X; x < SCREEN_MAX_X + OFFSET_MAP_X; ++x) {
+        print_tile(x, OFFSET_MAP_Y - 1, first_char);
+        print_tile(x, LEVEL_HEIGHT + OFFSET_MAP_Y, first_char);
     }
     return 1;
 }
 
 _Bool is_within(const signed char x, const signed char y) {
+    
     return  (x >= OFFSET_MAP_X) &&
             (y >= OFFSET_MAP_Y) && 
             (x < SCREEN_MAX_X) &&
@@ -98,22 +93,20 @@ _Bool is_border(const signed char x, const signed char y) {
 
     unsigned int brick = get_tile(x, y); 
    
-    if (strchr(BARRIER_SYMBOL, (unsigned char)brick) != 0)
-        return 1;
-
-    return 0;
+    
+    return strchr(BARRIER_SYMBOL, (unsigned char)brick) != 0;
 }
 
 /*
     compute level select code    
 */
-long get_levelcode(const char level) {
+long get_levelcode(const unsigned char level) {
     long code=0;
 
     signed char factors[MAX_LEVELCODE_FACTOR] = {2, 3, 5, -2, 4};
     
-    for(char idx=0; idx < strlen(level_names[level]); ++idx)
-        code += level_names[level][idx] * factors[idx % MAX_LEVELCODE_FACTOR] * 10; 
+    for(char idx=0; idx < strlen(level_names[level-1]); ++idx)
+        code += level_names[level-1][idx] * factors[idx % MAX_LEVELCODE_FACTOR] * 10; 
     return code * ((code < 0) ? -1 : 1);
 }
 
@@ -122,7 +115,7 @@ long get_levelcode(const char level) {
     printing status line
 */
 void update_statusline(Leveldata * level) {
-    unsigned char output[30+1];
+    unsigned char output[32+1];
     unsigned char numstr[10+1];
 
     output[0] = 0;
@@ -146,17 +139,14 @@ void print_title(void) {
 }
 
 void setup_level(Leveldata * level) {
-    unsigned char output[30+1];
-    unsigned char numstr[10+1];
+    unsigned char output[32+1];
 
     output[0] = 0;
-    numstr[0] = 0;
     
     level->x = level->start_x;
     level->y = level->start_y;
     level->gold = 0;
     level->status = StatusAlive;
-    
 
     print_title();
 
@@ -231,7 +221,6 @@ _Bool is_pushing_object(Leveldata * level, Direction dir) {
     dest.y = level->y + diffs.y;
     neighbour.x = level->x + 2 * diffs.x;
     neighbour.y = level->y + 2 * diffs.y;
-
     item = get_tile(dest.x, dest.y); 
 
     _Bool precondition = 
@@ -242,8 +231,7 @@ _Bool is_pushing_object(Leveldata * level, Direction dir) {
         (item == BOMB1_SYMBOL)          && (dir != DirectionUp)     ||
         (item == BOMB2_SYMBOL)          && (dir != DirectionLeft)   ||
         (item == BOMB3_SYMBOL)          && (dir != DirectionRight)  ||
-        (item == BOMB4_SYMBOL)          && (dir != DirectionDown)   ||
-        0;
+        (item == BOMB4_SYMBOL)          && (dir != DirectionDown);
 
     //check if is space behind the movable object
     //but first check boundaries
@@ -271,16 +259,16 @@ signed char get_first_motion(Position * motion_objects, _Bool exist) {
     return -1;
 }
 
-signed char get_motion_position(Position * motion_objects, Position movable) {
+signed char get_motion_position(Position * motion_objects, Position * movable) {
 
     for (unsigned char pos=0; pos < MAX_MOTION_ITEMS; ++pos)
-        if ((motion_objects[pos].x == movable.x) && 
-            (motion_objects[pos].y == movable.y))             
+        if ((motion_objects[pos].x == movable->x) && 
+            (motion_objects[pos].y == movable->y))             
             return pos;
     return -1;    
 }
 
-signed char add_motion(Position * motion_objects, Position item) {
+signed char add_motion(Position * motion_objects, Position * item) {
     signed char slot;
     
     //check if it is already in this list
@@ -290,8 +278,8 @@ signed char add_motion(Position * motion_objects, Position item) {
    
     slot = get_first_motion(motion_objects, 0); 
     if (slot > -1) {
-        motion_objects[slot].x = item.x;
-        motion_objects[slot].y = item.y;   
+        motion_objects[slot].x = item->x;
+        motion_objects[slot].y = item->y;   
     }
     return slot;
 }
@@ -305,25 +293,27 @@ signed int get_checked_tile(signed char x, signed char y) {
 }
 
 void gravitation(Position * motion_objects, Leveldata * level) {
-    //clear_line(STATUS_LINE);
-   
+    
     while (level->status != StatusDied) {
         signed char pos = get_first_motion(motion_objects, 1); 
         //no motion found then everything is done
         if (pos == -1) 
             break;
         
+        Position * current_Motion;
+        current_Motion = &motion_objects[pos];
+
         Position dest, src;
-        src.x = motion_objects[pos].x, src.y = motion_objects[pos].y; 
-        signed int falling_item = get_checked_tile(motion_objects[pos].x, motion_objects[pos].y);
+        src.x = current_Motion->x, src.y = current_Motion->y; 
+        signed int falling_item = get_checked_tile(current_Motion->x, current_Motion->y);
         switch (falling_item) {
             case ROCK_UP_SYMBOL:    case ROCK_DOWN_SYMBOL:
             case ROCK_LEFT_SYMBOL:  case ROCK_RIGHT_SYMBOL: {
                 Position diff;
                 //compute destination coordinates
                 diff = rock_fall_direction(falling_item);
-                dest.x = motion_objects[pos].x + diff.x;
-                dest.y = motion_objects[pos].y + diff.y;
+                dest.x = current_Motion->x + diff.x;
+                dest.y = current_Motion->y + diff.y;
                 
                 //check if falling ends here 
                 signed int dest_item = get_checked_tile(dest.x, dest.y);
@@ -333,23 +323,23 @@ void gravitation(Position * motion_objects, Leveldata * level) {
                     (!is_within(dest.x, dest.y))
                     ) {
                     //reached boundary
-                    motion_objects[pos].x = -1;
+                    current_Motion->x = -1;
                     print_tile(src.x, src.y, falling_item);
-                    check_for_changes(motion_objects, src); 
+                    check_for_changes(motion_objects, &src); 
                     continue;
                 }    
                 
                 switch (dest_item) {
                     case EMPTY_SYMBOL:
                     case PEBBLE_SYMBOL: { //continue falling
-                        motion_objects[pos].x = dest.x;
-                        motion_objects[pos].y = dest.y;
+                        current_Motion->x = dest.x;
+                        current_Motion->y = dest.y;
                         print_tile(dest.x, dest.y, falling_item);
                         //check_for_changes(motion_objects, dest);  
                         break;   
                     }
                     case PLAYER1_SYMBOL: {
-                        motion_objects[pos].x = -1;
+                        print_tile(src.x, src.y, EMPTY_SYMBOL);
                         print_tile(dest.x, dest.y, falling_item);
                         level->status = StatusDied;
                         continue;
@@ -358,12 +348,11 @@ void gravitation(Position * motion_objects, Leveldata * level) {
                     case BOMB3_SYMBOL: case BOMB4_SYMBOL:
                     case TANK_SYMBOL: {
                         //explosion
-                        motion_objects[pos].x = -1;
+                        current_Motion->x = -1;
                         break;
                     } 
                     default: {
-                        motion_objects[pos].x = -1;
-
+                        current_Motion->x = -1;
                         break;
                     }
                 } //switch (dest_item) {
@@ -374,39 +363,47 @@ void gravitation(Position * motion_objects, Leveldata * level) {
             }   
         } //switch (item) {
         print_tile(src.x, src.y, EMPTY_SYMBOL);
-        check_for_changes(motion_objects, src); 
+        check_for_changes(motion_objects, &src); 
     }
 }
 
-void check_for_changes(Position * motion_objects, Position source) {
+void check_for_changes(Position * motion_objects, Position * source) {
     Position motion;
 
-    for (signed char y = source.y - 3; y < source.y + 3; ++y) 
-        for (signed char x = source.x - 3; x < source.x + 3; ++x) {
+    for (signed char y=source->y - 3; y < source->y + 3; ++y) 
+        for (signed char x=source->x - 3; x < source->x + 3; ++x) {
             signed int item = get_checked_tile(x, y);
             switch (item) {
                 case ROCK_UP_SYMBOL: {
                     motion.x = x, motion.y = y;
-                    if (get_checked_tile(motion.x, motion.y - 1) == EMPTY_SYMBOL)
-                        add_motion(motion_objects, motion);
+                    if (get_checked_tile(motion.x, motion.y - 1) == EMPTY_SYMBOL) {
+                        add_motion(motion_objects, &motion);
+                        return;
+                    }
                     break;   
                 }
                 case ROCK_DOWN_SYMBOL: {
                     motion.x = x, motion.y = y;
-                    if (get_checked_tile(motion.x, motion.y + 1) == EMPTY_SYMBOL) 
-                        add_motion(motion_objects, motion);
+                    if (get_checked_tile(motion.x, motion.y + 1) == EMPTY_SYMBOL) {
+                        add_motion(motion_objects, &motion);
+                        return;
+                    }
                     break;     
                 }
                 case ROCK_LEFT_SYMBOL: {
                     motion.x = x, motion.y = y;
-                    if (get_checked_tile(motion.x - 1, motion.y) == EMPTY_SYMBOL)
-                        add_motion(motion_objects, motion);
+                    if (get_checked_tile(motion.x - 1, motion.y) == EMPTY_SYMBOL) {
+                        add_motion(motion_objects, &motion);
+                        return;
+                    }
                     break;   
                 }
                 case ROCK_RIGHT_SYMBOL: {
                     motion.x = x, motion.y = y;
-                    if (get_checked_tile(motion.x + 1, motion.y) == EMPTY_SYMBOL)
-                        add_motion(motion_objects, motion);
+                    if (get_checked_tile(motion.x + 1, motion.y) == EMPTY_SYMBOL) {
+                        add_motion(motion_objects, &motion);
+                        return;
+                    }
                     break;   
                 }
                 default: {
@@ -418,9 +415,9 @@ void check_for_changes(Position * motion_objects, Position source) {
 }
 
 void gameloop(unsigned char curr_level) {
-    Direction motion;
+    Direction dir;
     Leveldata level;
-    char found;
+    unsigned char found;
     _Bool moved_stone = 0;
     // history of all objects which were activated by user action like releasing stones
     Position motion_objects[MAX_MOTION_ITEMS];
@@ -434,57 +431,34 @@ void gameloop(unsigned char curr_level) {
         }
 
         while ( (level.status != StatusDied) &&  (level.status != StatusCompleted)) {
-            motion = DirectionUndefined;
+            dir = DirectionUndefined;
 
             if (keypressed()) {
                 switch (readkey()) {
                     case PORT_A_KEY_LEFT: {
-                        motion = DirectionLeft;
+                        dir = DirectionLeft;
                         break;
                     }
                     case PORT_A_KEY_RIGHT: {
-                        motion = DirectionRight;
+                        dir = DirectionRight;
                         break;
                     }
                     case PORT_A_KEY_UP: {
-                        motion = DirectionUp;
+                        dir = DirectionUp;
                         break;
                     }
                     case PORT_A_KEY_DOWN: {
-                        motion = DirectionDown ;
+                        dir = DirectionDown ;
                         break;
-                    }
-                    case PORT_B_KEY_1 /*|| PORT_B_KEY_2*/: {
-                        for(char i=0; i < 4; ++i) {
-                            print_str(0, PROGRESS_LINE, "loading..", 128);
-                            for(char j=0; j < 12; ++j)  waitForVBlank();
-                            clear_line(PROGRESS_LINE);
-                            for(char j=0; j < 12; ++j)  waitForVBlank();    
-                        }
-                        clear_line(PROGRESS_LINE);
-                        break;
-                    }
-                    case /* PORT_A_KEY_1 || */ PORT_A_KEY_2 : {
-                        for(char i=0; i < 4; ++i) {
-                            print_str(0, PROGRESS_LINE, "saving..", 128);
-                            for(char j=0; j < 12; ++j)  waitForVBlank();
-                            clear_line(PROGRESS_LINE);
-                            for(char j=0; j < 12; ++j)  waitForVBlank();    
-                        }
-                        clear_line(PROGRESS_LINE);
-                        break;
-                    }       
+                    }  
                 }
             }
 
-            if (motion != DirectionUndefined) {
+            if (dir != DirectionUndefined) {
                 //dest: next position, neighbour position afternext 
-                Position dest, neighbour;
-                Position diffs;
-                Position source;
-                diffs = get_diff_position(motion);
-                dest.x = diffs.x, dest.y = diffs.y;
-                dest.x += level.x, dest.y += level.y;  
+                Position dest, neighbour, diffs, source;
+                diffs = get_diff_position(dir);
+                dest.x = diffs.x + level.x, dest.y = diffs.y + level.y;
                 unsigned int item = get_tile(dest.x, dest.y);
 
                 // walk against a wall, nothing happen
@@ -492,7 +466,7 @@ void gameloop(unsigned char curr_level) {
                     continue;
                 
                 if (strchr(MOVABLE_SYMBOL, item) != 0) {
-                    if (is_pushing_object(&level, motion)) {
+                    if (is_pushing_object(&level, dir)) {
                         moved_stone = 1;
                         source.x = level.x, source.y = level.y;
                         neighbour.x = source.x + 2 * diffs.x;
@@ -507,11 +481,11 @@ void gameloop(unsigned char curr_level) {
                 found = 0;
                 //when entered teleport field, find other teleport
                 if (item == TELEPORTER_SYMBOL) {
-                    for (char n=0; (n < level.teleport_found) && (!found); ++n) {
+                    for (unsigned char n=0; (n < level.teleport_found) && (!found); ++n) {
                         if ((dest.x = level.teleport[n].x) &&
                             (dest.y = level.teleport[n].y) ) {
                                 // set player nearby teleporter, search right, up, left then down
-                                for (int dir=DirectionRight; dir < DirectionUndefined; ++dir) {
+                                for (unsigned int dir=DirectionRight; dir < DirectionUndefined; ++dir) {
                                     diffs = get_diff_position(dir);
                                     if (get_tile(diffs.x + level.teleport[n].x, 
                                                  diffs.y + level.teleport[n].y) == EMPTY_SYMBOL) {
@@ -533,31 +507,28 @@ void gameloop(unsigned char curr_level) {
                         if (curr_level == MAX_LEVEL) {
                             level.status = StatusCompleted;
                         } else {
-                            next_level("Not hard enough", ++curr_level);
+                            next_level("Not hard enough?", ++curr_level);
                             load_leveldata(curr_level, &level);
-                            setup_level(&level);      
+                            setup_level(&level);
+                            continue;      
                         }  
                     } else //not collected all gold 
                         continue;
                 } else {
-                    for (char n=0; n < level.teleport_found; ++n) {
+                    for (unsigned char n=0; n < level.teleport_found; ++n) {
                         if ((level.x == level.teleport[n].x) &&
                             (level.y == level.teleport[n].y)) 
                             found = 1;
                     }
                 }
-                //source.x = level.x, source.y = level.y;
-                //check_for_changes(motion_objects, source, diffs);
                 print_tile(level.x, level.y, (found) ? TELEPORTER_SYMBOL : EMPTY_SYMBOL);
 
                 level.x = dest.x;
                 level.y = dest.y;
-                //source.x = level.x, source.y = level.y;
-                //check_for_changes(motion_objects, source, diffs);
                 print_tile(level.x, level.y, PLAYER1_SYMBOL);
 
                 update_statusline(&level);
-                check_for_changes(motion_objects, dest);
+                check_for_changes(motion_objects, &dest);
                 gravitation(motion_objects, &level); 
             }
             waitForVBlank();        

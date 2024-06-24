@@ -20,6 +20,7 @@ void deathscreen(unsigned char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char line=20;
 
+    while(!keypressed()) waitForVBlank();
     load_font();
     clear_screen();
     strcpy(output, menu_name);
@@ -41,17 +42,17 @@ void next_level(unsigned char * menu_name, unsigned char level) {
     clear_screen();
     strcpy(output, menu_name);
     print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, TITLE_LINE + 1, output, 128);
-    strcpy(output, "try the next level");
+    strcpy(output, "Try the next one!");
     print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line++, output, 128);
 
     line = 10;
-    strcpy(output, "Level: ");
+    strcpy(output, "Level: "); 
     strcat(output, level_names[level-1]);
     print_str(offset, line++, output, 128);
     
     strcpy(output, "Level code: ");
     num[0] = 0;
-    SEGA_itoa(get_levelcode(level-1), num);
+    SEGA_itoa(get_levelcode(level), num);
     strcat(output, num);
     print_str(offset, line++, output, 128);
 
@@ -82,8 +83,9 @@ void level_select(unsigned char * menu_name) {
         if (code == get_levelcode(1))
             gameloop(option);
     */
-    option = menu(level_names, MAX_LEVEL, 10, 4, MenuModeLeft, 1);
-    gameloop(option);
+    option = menu(level_names, MAX_LEVEL+1, 10, 4, MenuModeLeft, 1);
+    if (option <= MAX_LEVEL)
+        gameloop(option);
 }
 
 void credits(const unsigned char * menu_name) {
@@ -104,6 +106,10 @@ void credits(const unsigned char * menu_name) {
             for (unsigned char wait=0; (wait < 10) && (!keypressed()); ++wait) waitForVBlank(); 
         }   
     }
+
+    line = 20;
+    strcpy(output, "Press a key to continue");
+    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line, output, 128);
 
     while(!keypressed()) waitForVBlank();
 }
