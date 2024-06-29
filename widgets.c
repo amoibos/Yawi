@@ -1,6 +1,7 @@
 #include "widgets.h"
 
-unsigned char menu(unsigned char **items, unsigned char amount, unsigned char start_line, unsigned char offset, MenuMode mode, _Bool numbers) {
+unsigned char menu(unsigned char **items, unsigned char amount, unsigned char start_line, unsigned char offset, 
+                    MenuMode mode, _Bool numbers, unsigned int * timer) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char num[3+1];
     unsigned char option = 0;
@@ -45,7 +46,11 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
         }
 
         _Bool selected = 0;
-        while(!keypressed()) waitForVBlank();
+        while(!keypressed()) {
+            waitForVBlank();
+            if ((timer != 0) && (((*timer)++) >= DEMO_START_AFTER) ) 
+                return selected + 1; 
+        }
         unsigned int key = readkey();
         switch (key) {
             case PORT_A_KEY_START: {

@@ -49,6 +49,13 @@ void displayOff(void);
 #endif
 
 #ifdef PLATFORM_SMS
+#define getKeysHeld SMS_setTile
+#elif PLATFORM_SG || PLATFORM_SC
+#define getKeysHeld SG_getKeysHeld
+#endif
+ 
+
+#ifdef PLATFORM_SMS
 #define displayOn SMS_displayOn
 #elif PLATFORM_SG || PLATFORM_SC
 #define displayOn SG_displayOn

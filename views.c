@@ -83,9 +83,9 @@ void level_select(unsigned char * menu_name) {
         if (code == get_levelcode(1))
             gameloop(option);
     */
-    option = menu(level_names, MAX_LEVEL+1, 10, 4, MenuModeLeft, 1);
+    option = menu(level_names, MAX_LEVEL+1, 10, 4, MenuModeLeft, 1, 0);
     if (option <= MAX_LEVEL)
-        gameloop(option);
+        gameloop(option, 0);
 }
 
 void credits(const unsigned char * menu_name) {
@@ -117,6 +117,7 @@ void credits(const unsigned char * menu_name) {
 void intro(char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char line;
+    unsigned int timer=0;
     
     do {
         load_font();
@@ -142,10 +143,10 @@ void intro(char * menu_name) {
         strcpy(output, VERSION);
         print_str(SCREEN_MAX_X - strlen(output), SCREEN_MAX_Y - 1, output, 128);
 
-        char option = menu(intro_items, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0);
+        char option = menu(intro_items, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0, &timer);
         switch (option) {
             case 1: {
-                gameloop(1);
+                gameloop(1, timer >= DEMO_START_AFTER);
                 break;
             }
             case 2: {

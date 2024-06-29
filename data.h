@@ -10,17 +10,17 @@
 #define VERSION VERSION_STRING
 #endif 
 
-#define MAX_MOTION_ITEMS ((20))
+//#define MAX_MOTION_ITEMS ((20))
 #define MAX_TELEPORTER ((5))
 
 #define TITLE_LINE ((0))
 
-#define PROGRESS_LINE ((21))
+#define PROGRESS_LINE ((1))
 #define STATUS_LINE ((22))
 #define INFO_LINE ((23))
 
 #define LEVEL_HEIGHT ((18))
-#define OFFSET_MAP_Y ((2))
+#define OFFSET_MAP_Y ((3))
 #define OFFSET_MAP_X ((0))
 
 
@@ -66,7 +66,8 @@ typedef enum eDirection {
     DirectionUp,
     DirectionLeft,
     DirectionDown, 
-    DirectionUndefined
+    DirectionUndefined,
+    DirectionExit
 } Direction;
 
 typedef enum eStatus {
@@ -81,7 +82,33 @@ typedef struct tPosition {
     signed char y;
 } Position;
 
-//Position steps[4] = { (0, -1), (0, 1), (-1, 0), (1, 0)};
+#define DEMO_START_AFTER ((50*90))
+#define COUNTER_STOPPED ((-1))
+#define DEMO_ABORT ((-2))
+
+#define MAX_MOVE_DELAY ((5))
+
+#define MAX_STEP_SEQUENCE 64
+static const unsigned char level01_step_sequence[MAX_STEP_SEQUENCE] = { DirectionUp, 
+                                DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,
+                                DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,
+                                DirectionUp,DirectionUp, 
+                                DirectionRight,DirectionRight,DirectionRight,
+                                DirectionDown,DirectionDown,
+                                DirectionUp,DirectionUp,DirectionUp,
+                                DirectionLeft,
+                                DirectionUp,
+                                DirectionLeft,DirectionLeft,DirectionLeft,DirectionLeft,DirectionLeft,DirectionLeft,
+                                DirectionUp,DirectionUp,DirectionUp,
+                                DirectionLeft,DirectionLeft,
+                                DirectionUp,DirectionUp,
+                                DirectionLeft,DirectionLeft,
+                                DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,
+                                DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,
+                                DirectionLeft,DirectionLeft,DirectionLeft
+                            };
+
+
 
 typedef struct leveldata_t {
     unsigned char name[25+1];
@@ -110,7 +137,7 @@ static unsigned char * level_names[MAX_LEVEL+1] = {
     "Nature of the Beast",
     "Devil\'s Despair",
     "Shrouded Glory",
-    "..."
+    ".."
 };
 
 #define MAX_INTRO_ITEMS ((3))

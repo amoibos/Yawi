@@ -17,7 +17,7 @@ long get_levelcode(unsigned char level);
 void update_statusline(Leveldata * level); 
 void setup_level(Leveldata * level);
 _Bool is_pushing_object(Leveldata * level, Direction dir);
-void gameloop(unsigned char curr_level);
+void gameloop(unsigned char curr_level, unsigned char demo_mode);
 signed int get_checked_tile(signed char x, signed char y);
 void check_for_changes(Position * motion_objects, Position * source);
 

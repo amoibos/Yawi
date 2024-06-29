@@ -7,6 +7,7 @@ unsigned char strlen(const unsigned char * str) {
 }
 
 /*FIXME: hopefully the result is never above 127*/
+/*
 signed char strpos(const unsigned char * search, const unsigned char * content, const unsigned char start) {
 	unsigned char i, j, check;
     signed char result=-1;
@@ -35,6 +36,7 @@ signed char strpos(const unsigned char * search, const unsigned char * content, 
 	}
 	return result;
 }
+*/
 
 void SEGA_itoa(long value, unsigned char * sp) {
     long q, r;
@@ -92,13 +94,14 @@ unsigned char* strcat(unsigned char * dest, const unsigned char * src) {
 	return rdest;
 }
 
+/*
 signed char strcmp(const char * str1, const char * str2) {
 	while(*str1 && (*str1 == *str2)) {
 		++str1;
 		++str2;
 	}
 	return *(const unsigned char*)str1 - *(const unsigned char*)str2;
-}
+} */ 
 /*
 void strncpy(unsigned char* dst, const unsigned char* src, const unsigned char amount) {
 	unsigned char i = 0;
@@ -124,7 +127,7 @@ unsigned char upcase(const unsigned char c) {
 
 }	
 
-unsigned char *strchr(const unsigned char *s, const unsigned char ch) {
+const unsigned char *strchr(const unsigned char *s, const unsigned char ch) {
 	for (; *s != '\0'; ++s)
   		if (*s == ch)
     		return s;
@@ -132,19 +135,20 @@ unsigned char *strchr(const unsigned char *s, const unsigned char ch) {
 	return 0;
 }
 
-
+/*
 unsigned char is_alpha(const unsigned char mark) {
 	return 	(mark >= 0x41) && (mark <= 0x5A) ||
 			(mark >= 0x61) && (mark <= 0x7A); 
-}
+}*/
 
-long long pow(long long base, int ex) {
+/*long long pow(long long base, int ex) {
 	long long result = base;
 	for(int i = 0; i < ex; ++i)
 		result *= base;
 	return result;
-}
+} */
 
+/*
 float str_to_float(const unsigned char  * arr) {
     int i,j,flag;
     float val;
@@ -173,7 +177,7 @@ float str_to_float(const unsigned char  * arr) {
     val = val*pow(10,j);
     return val;
 }
-
+*/ 
 // used in ftoa
 /*
 int itoa_s(int value, char *buf) {
@@ -223,16 +227,17 @@ unsigned char * ftoa(float value, int decimals, unsigned char * buf) {
 */
 
 // WARNING: capitalize source string! 
+
 unsigned char * to_upper(unsigned char * string) {
 	unsigned char *temp;
 	for (temp = string; *temp; ++temp)
 		*temp = (char)upcase(*temp);
 	return string;
 }
-
+/*
 unsigned char is_digit(const unsigned char ch) {
 	return (ch >= '0') && (ch <= '9');
-}
+}*/
 /*
 unsigned char * sprint(unsigned char * buffer, unsigned char * format, unsigned char **strings, long  * numbersInt, float * numbersFloat) {
     unsigned char * str;
