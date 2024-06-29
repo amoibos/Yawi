@@ -20,6 +20,7 @@ void deathscreen(unsigned char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char line=20;
 
+    print_title(GAME_NAME " - GAME OVER");
     while(!keypressed()) waitForVBlank();
     load_font();
     clear_screen();

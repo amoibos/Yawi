@@ -10,7 +10,7 @@
 #define VERSION VERSION_STRING
 #endif 
 
-//#define MAX_MOTION_ITEMS ((20))
+#define MAX_MOTION_ITEMS ((20))
 #define MAX_TELEPORTER ((5))
 
 #define TITLE_LINE ((0))

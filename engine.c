@@ -172,10 +172,12 @@ void update_statusline(Leveldata * level) {
     print_str(0, INFO_LINE, output, 128);
 }
 
-void print_title(void) {
+void print_title(const unsigned char * title) {
+    unsigned char output[32+1];
 
+    strcpy(output, title);
     clear_line(TITLE_LINE);
-    print_str(13, TITLE_LINE, GAME_NAME, 0);
+    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, TITLE_LINE, title, 128);
 }
 
 void setup_level(Leveldata * level) {
@@ -188,7 +190,7 @@ void setup_level(Leveldata * level) {
     level->gold = 0;
     level->status = StatusAlive;
 
-    print_title();
+    print_title(GAME_NAME);
 
     strcat(output, "Level: "); 
     strcat(output, level->name);
@@ -287,6 +289,43 @@ _Bool is_pushing_object(Leveldata * level, Direction dir) {
     return precondition && postcondition;
 }
 
+signed char get_first_motion(Position * motion_objects, _Bool exist) {
+
+    for (unsigned char pos=0; pos < MAX_MOTION_ITEMS; ++pos)
+        if (exist) {
+            if (motion_objects[pos].x != -1) 
+                return pos;
+            
+        } else if (motion_objects[pos].x == -1)
+            return pos;
+    return -1;
+}
+
+signed char get_motion_position(Position * motion_objects, Position * movable) {
+
+    for (unsigned char pos=0; pos < MAX_MOTION_ITEMS; ++pos)
+        if ((motion_objects[pos].x == movable->x) && 
+            (motion_objects[pos].y == movable->y))             
+            return pos;
+    return -1;    
+}
+
+signed char add_motion(Position * motion_objects, Position * item) {
+    signed char slot;
+    
+    //check if it is already in this list
+    slot = get_motion_position(motion_objects, item);
+    if (slot != -1)
+        return slot;
+   
+    slot = get_first_motion(motion_objects, 0); 
+    if (slot > -1) {
+        motion_objects[slot].x = item->x;
+        motion_objects[slot].y = item->y;   
+    }
+    return slot;
+}
+
 signed int get_checked_tile(signed char x, signed char y) {
     
     if (!is_within(x, y))
@@ -298,24 +337,25 @@ signed int get_checked_tile(signed char x, signed char y) {
 void gravitation(Position * motion_objects, Leveldata * level) {
     
     while (level->status != StatusDied) {
+        signed char pos = get_first_motion(motion_objects, 1); 
         //no motion found then everything is done
-        if (motion_objects->x == -1) 
+        if (pos == -1) 
             break;
         
-        //Position * current_Motion;
-        //current_Motion = motion_objects;
+        Position * current_Motion;
+        current_Motion = &motion_objects[pos];
 
         Position dest, src;
-        src.x = motion_objects->x, src.y = motion_objects->y; 
-        signed int falling_item = get_checked_tile(motion_objects->x, motion_objects->y);
+        src.x = current_Motion->x, src.y = current_Motion->y; 
+        signed int falling_item = get_checked_tile(current_Motion->x, current_Motion->y);
         switch (falling_item) {
             case ROCK_UP_SYMBOL:    case ROCK_DOWN_SYMBOL:
             case ROCK_LEFT_SYMBOL:  case ROCK_RIGHT_SYMBOL: {
                 Position diff;
                 //compute destination coordinates
                 diff = rock_fall_direction(falling_item);
-                dest.x = motion_objects->x + diff.x;
-                dest.y = motion_objects->y + diff.y;
+                dest.x = current_Motion->x + diff.x;
+                dest.y = current_Motion->y + diff.y;
                 
                 //check if falling ends here 
                 signed int dest_item = get_checked_tile(dest.x, dest.y);
@@ -325,7 +365,7 @@ void gravitation(Position * motion_objects, Leveldata * level) {
                     (!is_within(dest.x, dest.y))
                     ) {
                     //reached boundary
-                    motion_objects->x = -1;
+                    current_Motion->x = -1;
                     print_tile(src.x, src.y, falling_item);
                     check_for_changes(motion_objects, &src); 
                     continue;
@@ -334,8 +374,8 @@ void gravitation(Position * motion_objects, Leveldata * level) {
                 switch (dest_item) {
                     case EMPTY_SYMBOL:
                     case PEBBLE_SYMBOL: { //continue falling
-                        motion_objects->x = dest.x;
-                        motion_objects->y = dest.y;
+                        current_Motion->x = dest.x;
+                        current_Motion->y = dest.y;
                         print_tile(dest.x, dest.y, falling_item);
                         //check_for_changes(motion_objects, dest);  
                         break;   
@@ -350,11 +390,11 @@ void gravitation(Position * motion_objects, Leveldata * level) {
                     case BOMB3_SYMBOL: case BOMB4_SYMBOL:
                     case TANK_SYMBOL: {
                         //explosion
-                        motion_objects->x = -1;
+                        current_Motion->x = -1;
                         break;
                     } 
                     default: {
-                        motion_objects->x = -1;
+                        current_Motion->x = -1;
                         break;
                     }
                 } //switch (dest_item) {
@@ -379,7 +419,7 @@ void check_for_changes(Position * motion_objects, Position * source) {
                 case ROCK_UP_SYMBOL: {
                     motion.x = x, motion.y = y;
                     if (get_checked_tile(motion.x, motion.y - 1) == EMPTY_SYMBOL) {
-                        motion_objects->x = motion.x, motion_objects->y = motion.y;
+                        add_motion(motion_objects, &motion);
                         return;
                     }
                     break;   
@@ -387,7 +427,7 @@ void check_for_changes(Position * motion_objects, Position * source) {
                 case ROCK_DOWN_SYMBOL: {
                     motion.x = x, motion.y = y;
                     if (get_checked_tile(motion.x, motion.y + 1) == EMPTY_SYMBOL) {
-                        motion_objects->x = motion.x, motion_objects->y = motion.y;
+                        add_motion(motion_objects, &motion);
                         return;
                     }
                     break;     
@@ -395,7 +435,7 @@ void check_for_changes(Position * motion_objects, Position * source) {
                 case ROCK_LEFT_SYMBOL: {
                     motion.x = x, motion.y = y;
                     if (get_checked_tile(motion.x - 1, motion.y) == EMPTY_SYMBOL) {
-                        motion_objects->x = motion.x, motion_objects->y = motion.y;
+                        add_motion(motion_objects, &motion);
                         return;
                     }
                     break;   
@@ -403,7 +443,7 @@ void check_for_changes(Position * motion_objects, Position * source) {
                 case ROCK_RIGHT_SYMBOL: {
                     motion.x = x, motion.y = y;
                     if (get_checked_tile(motion.x + 1, motion.y) == EMPTY_SYMBOL) {
-                        motion_objects->x = motion.x, motion_objects->y = motion.y;
+                        add_motion(motion_objects, &motion);
                         return;
                     }
                     break;   
@@ -486,13 +526,15 @@ void gameloop(unsigned char curr_level, unsigned char demo_mode) {
     unsigned char delay=MAX_MOVE_DELAY;
 
     // history of all objects which were activated by user action like releasing stones
-    Position motion_objects;
+    Position motion_objects[MAX_MOTION_ITEMS];
 
     load_font();
     clear_screen();  
     if (load_leveldata(curr_level, &level)) {
         setup_level(&level);
-        motion_objects.x = -1;   
+        for (char n=0; n < MAX_MOTION_ITEMS; ++n) {
+            motion_objects[n].x = -1;   
+        }
 
         while ( (level.status != StatusDied) &&  (level.status != StatusCompleted)) {
             dir = get_input(&demo_mode, &demo_pos, &delay);
@@ -573,8 +615,8 @@ void gameloop(unsigned char curr_level, unsigned char demo_mode) {
                 print_tile(level.x, level.y, PLAYER1_SYMBOL);
 
                 update_statusline(&level);
-                check_for_changes(&motion_objects, &dest);
-                gravitation(&motion_objects, &level); 
+                check_for_changes(motion_objects, &dest);
+                gravitation(motion_objects, &level); 
             }
             waitForVBlank();        
         }
