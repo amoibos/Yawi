@@ -1,5 +1,10 @@
 #include "widgets.h"
 
+
+unsigned char * decrypt(unsigned char * text) {
+
+}
+
 unsigned char menu(unsigned char **items, unsigned char amount, unsigned char start_line, unsigned char offset, 
                     MenuMode mode, _Bool numbers, unsigned int * timer) {
     unsigned char output[SCREEN_MAX_X+1];

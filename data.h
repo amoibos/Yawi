@@ -1,7 +1,6 @@
 #ifndef DATA_H
 #define DATA_H
 
-//#define GAME_NAME (("Yawi"))
 #define VERSION_STRING "v0.7"
 
 #ifdef DEMO
@@ -10,7 +9,10 @@
 #define VERSION VERSION_STRING
 #endif 
 
-#define MAX_MOTION_ITEMS ((20))
+// array of Position which stores next items
+// that should be processed
+#define MAX_EXPLOSIVE_ITEM ((10))
+#define MAX_MOTION_ITEMS ((10))
 #define MAX_TELEPORTER ((5))
 
 #define TITLE_LINE ((0))
@@ -32,15 +34,15 @@
 #define TELEPORTER_SYMBOL (('#'))
 
 
-#define BOMB1_SYMBOL (('X'))
-#define BOMB2_SYMBOL (('W'))
-#define BOMB3_SYMBOL (('Y'))
-#define BOMB4_SYMBOL (('Z'))
+#define EXPLOSIVEX_SYMBOL (('X'))
+#define EXPLOSIVEW_SYMBOL (('W'))
+#define EXPLOSIVEY_SYMBOL (('Y'))
+#define EXPLOSIVEZ_SYMBOL (('Z'))
 
 #define TANK_SYMBOL (('B'))
 
-#define BOMBS_SYMBOL "XWYZB"
-
+#define EXPLOSIVE_SYMBOLS "XWYZB"
+#define ROCK_SYMBOLS "<>^v"
 
 #define SOMETHING6_SYMBOL (('o'))
 #define THORNS_SYMBOL (('&'))
@@ -57,16 +59,16 @@
 
 #define EMPTY_SYMBOL ((' '))
 
-#define BARRIER_SYMBOL (("&+|-%~"))
-#define MOVABLE_SYMBOL (("<>^vBoWXYZ"))
-#define BLOCKING_SYMBOL (("<>^v:$")) 
+#define BARRIER_SYMBOLS (("&+|-%~"))
+#define MOVABLE_SYMBOLS (("<>^vBoWXYZ"))
+#define BLOCKING_SYMBOLS (("<>^v:$")) 
 
 typedef enum eDirection {
+    DirectionUndefined,
     DirectionRight,
     DirectionUp,
     DirectionLeft,
     DirectionDown, 
-    DirectionUndefined,
     DirectionExit
 } Direction;
 

@@ -7,10 +7,10 @@ void endscreen(unsigned char * menu_name) {
     load_font();
     clear_screen();
     strcpy(output, menu_name);
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, 1, output, 128);
+    print_str(CENTER(output), 1, output, 128);
     
     strcpy(output, "Congrats");
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line, output, 128);
+    print_str(CENTER(output), line, output, 128);
 
     while(!keypressed()) waitForVBlank();
 
@@ -25,10 +25,10 @@ void deathscreen(unsigned char * menu_name) {
     load_font();
     clear_screen();
     strcpy(output, menu_name);
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, TITLE_LINE + 1, output, 128);
+    print_str(CENTER(output), TITLE_LINE + 1, output, 128);
     
     strcpy(output, "Try it again");
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line, output, 128);
+    print_str(CENTER(output), line, output, 128);
 
     while(!keypressed()) waitForVBlank();
 }
@@ -39,12 +39,14 @@ void next_level(unsigned char * menu_name, unsigned char level) {
     unsigned char line=2;
     const unsigned char offset=5;
 
+    displayOff();
     load_font();
     clear_screen();
+    displayOn();
     strcpy(output, menu_name);
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, TITLE_LINE + 1, output, 128);
+    print_str(CENTER(output), TITLE_LINE + 1, output, 128);
     strcpy(output, "Try the next one!");
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line++, output, 128);
+    print_str(CENTER(output), line++, output, 128);
 
     line = 10;
     strcpy(output, "Level: "); 
@@ -59,7 +61,7 @@ void next_level(unsigned char * menu_name, unsigned char level) {
 
     line = 20;
     strcpy(output, "Press a key to continue");
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line, output, 128);
+    print_str(CENTER(output), line, output, 128);
 
     while(!keypressed()) waitForVBlank();
 }
@@ -70,11 +72,11 @@ void level_select(unsigned char * menu_name) {
     unsigned char line=5;
     char option;
 
-    
+    displayOff();
     load_font();
     clear_screen();
     strcpy(output, menu_name);
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2 , TITLE_LINE + 1, output, 128);
+    print_str(CENTER(output), TITLE_LINE + 1, output, 128);
     strcpy(output, "Level code: ");
     print_str(offset, line, output, 128);
     /*
@@ -84,6 +86,7 @@ void level_select(unsigned char * menu_name) {
         if (code == get_levelcode(1))
             gameloop(option);
     */
+    displayOn();
     option = menu(level_names, MAX_LEVEL+1, 10, 4, MenuModeLeft, 1, 0);
     if (option <= MAX_LEVEL)
         gameloop(option, 0);
@@ -93,14 +96,16 @@ void credits(const unsigned char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char line=5;
 
+    displayOff();
     load_font();
     clear_screen();
+    displayOn();
     strcpy(output, menu_name);
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, TITLE_LINE + 1, output, 128);
+    print_str(CENTER(output), TITLE_LINE + 1, output, 128);
 
     for (unsigned char entry=0; entry < CREDIT_NAMES_MAX; ++entry) {
         strcpy(output, credits_names[entry]);
-        unsigned center = SCREEN_MAX_X / 2 - strlen(output) / 2;
+        unsigned center = CENTER(output);
 
         for (unsigned char pos=0; pos < strlen(output); ++pos) {
             print_tile(center++, line + entry, 128 + output[pos]);
@@ -110,7 +115,7 @@ void credits(const unsigned char * menu_name) {
 
     line = 20;
     strcpy(output, "Press a key to continue");
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line, output, 128);
+    print_str(CENTER(output), line, output, 128);
 
     while(!keypressed()) waitForVBlank();
 }
@@ -121,18 +126,19 @@ void intro(char * menu_name) {
     unsigned int timer=0;
     
     do {
+        displayOff();
         load_font();
         clear_screen();
 
         
         strcpy(output, menu_name);
-        print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, TITLE_LINE + 1, output, 0);
+        print_str(CENTER(output), TITLE_LINE + 1, output, 0);
 
         line=2;
         strcpy(output, "Written by Darktrym");
-        print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line++, output, 128);
+        print_str(CENTER(output), line++, output, 128);
         strcpy(output, "in 2024");
-        print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, line++, output, 128);
+        print_str(CENTER(output), line++, output, 128);
 
         print_img(  city__tiles__bin, city__tiles__bin_size,
                     city__palette__bin, city__palette__bin_size,
@@ -143,7 +149,7 @@ void intro(char * menu_name) {
 
         strcpy(output, VERSION);
         print_str(SCREEN_MAX_X - strlen(output), SCREEN_MAX_Y - 1, output, 128);
-
+        displayOn();
         char option = menu(intro_items, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0, &timer);
         switch (option) {
             case 1: {

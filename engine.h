@@ -15,7 +15,7 @@ _Bool in_field(const signed char x, const signed char y);
 _Bool is_border(const signed char x, const signed char y);
 long get_levelcode(const unsigned char level);
 void update_statusline(Leveldata * level); 
-void print_title(const unsigned char * title);
+void print_title(unsigned char * title);
 void setup_level(Leveldata * level);
 _Bool is_pushing_object(Leveldata * level, Direction dir);
 void gameloop(unsigned char curr_level, unsigned char demo_mode);

@@ -8,6 +8,8 @@
 #include "engine.h"
 #include "widgets.h"
 
+#define CENTER(x) SCREEN_MAX_X / 2 - strlen(x) / 2
+
 void endscreen(const unsigned char * menu_name);
 void deathscreen(const unsigned char * menu_name);
 void next_level(const unsigned char * menu_name, char level);

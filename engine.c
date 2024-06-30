@@ -104,7 +104,7 @@ char load_leveldata(const char no, Leveldata * level) {
 
             //todo: checks if data is too short or too long 
             print_tile(x, y, *data);
-            if ((strchr(BARRIER_SYMBOL, *data) != 0) && !(first_char))
+            if ((strchr(BARRIER_SYMBOLS, *data) != 0) && !(first_char))
                 first_char = *data;
             ++data;
         }
@@ -134,7 +134,7 @@ _Bool is_border(const signed char x, const signed char y) {
     unsigned int brick = get_tile(x, y); 
    
     
-    return strchr(BARRIER_SYMBOL, (unsigned char)brick) != 0;
+    return strchr(BARRIER_SYMBOLS, (unsigned char)brick) != 0;
 }
 
 /*
@@ -172,12 +172,18 @@ void update_statusline(Leveldata * level) {
     print_str(0, INFO_LINE, output, 128);
 }
 
-void print_title(const unsigned char * title) {
+void print_title(unsigned char * title) {
     unsigned char output[32+1];
 
-    strcpy(output, title);
     clear_line(TITLE_LINE);
-    print_str(SCREEN_MAX_X / 2 - strlen(output) / 2, TITLE_LINE, title, 128);
+    strcpy(output, title);
+    unsigned char x = CENTER(output);
+    if (strlen(title) > strlen(GAME_NAME)) {
+        print_str(x, TITLE_LINE, title, 128);
+    }
+    output[strlen(GAME_NAME)] = 0;
+    print_str(x, TITLE_LINE, output, 0);
+   
 }
 
 void setup_level(Leveldata * level) {
@@ -199,22 +205,26 @@ void setup_level(Leveldata * level) {
     update_statusline(level);
 }
 
-Position rock_fall_direction(unsigned int tile) {
+Position fall_direction(unsigned int tile) {
     Position dir;
 
     switch (tile) {
+        case EXPLOSIVEZ_SYMBOL:
         case ROCK_UP_SYMBOL: {
             dir.x = 0, dir.y = -1;
             return dir;
         }
+        case EXPLOSIVEX_SYMBOL:
         case ROCK_DOWN_SYMBOL: {
             dir.x = 0, dir.y = 1;
             return dir;
         }
+        case EXPLOSIVEY_SYMBOL:
         case ROCK_LEFT_SYMBOL: {
             dir.x = -1, dir.y = 0;
             return dir;
         }
+        case EXPLOSIVEW_SYMBOL:
         case ROCK_RIGHT_SYMBOL: {
             dir.x = 1, dir.y = 0;
             return dir;
@@ -270,10 +280,10 @@ _Bool is_pushing_object(Leveldata * level, Direction dir) {
         (item == ROCK_RIGHT_SYMBOL)     && (dir != DirectionLeft)   ||
         (item == ROCK_UP_SYMBOL)        && (dir != DirectionDown)   ||
         (item == ROCK_DOWN_SYMBOL)      && (dir != DirectionUp)     ||
-        (item == BOMB1_SYMBOL)          && (dir != DirectionUp)     ||
-        (item == BOMB2_SYMBOL)          && (dir != DirectionLeft)   ||
-        (item == BOMB3_SYMBOL)          && (dir != DirectionRight)  ||
-        (item == BOMB4_SYMBOL)          && (dir != DirectionDown);
+        (item == EXPLOSIVEX_SYMBOL)     && (dir != DirectionUp)     ||
+        (item == EXPLOSIVEW_SYMBOL)     && (dir != DirectionLeft)   ||
+        (item == EXPLOSIVEY_SYMBOL)     && (dir != DirectionRight)  ||
+        (item == EXPLOSIVEZ_SYMBOL)     && (dir != DirectionDown);
 
     //check if is space behind the movable object
     //but first check boundaries
@@ -349,19 +359,22 @@ void gravitation(Position * motion_objects, Leveldata * level) {
         src.x = current_Motion->x, src.y = current_Motion->y; 
         signed int falling_item = get_checked_tile(current_Motion->x, current_Motion->y);
         switch (falling_item) {
+            case EXPLOSIVEW_SYMBOL:case EXPLOSIVEX_SYMBOL:
+            case EXPLOSIVEY_SYMBOL:case EXPLOSIVEZ_SYMBOL:
             case ROCK_UP_SYMBOL:    case ROCK_DOWN_SYMBOL:
             case ROCK_LEFT_SYMBOL:  case ROCK_RIGHT_SYMBOL: {
                 Position diff;
                 //compute destination coordinates
-                diff = rock_fall_direction(falling_item);
+                diff = fall_direction(falling_item);
                 dest.x = current_Motion->x + diff.x;
                 dest.y = current_Motion->y + diff.y;
                 
                 //check if falling ends here 
                 signed int dest_item = get_checked_tile(dest.x, dest.y);
                 if  (
-                    (strchr(BLOCKING_SYMBOL, dest_item) != 0) ||
-                    (strchr(BARRIER_SYMBOL, dest_item) != 0) ||
+                    (strchr(BLOCKING_SYMBOLS, dest_item) != 0) ||
+                    (strchr(BARRIER_SYMBOLS, dest_item) != 0) ||
+                    (strchr(EXPLOSIVE_SYMBOLS,falling_item) != 0) ||
                     (!is_within(dest.x, dest.y))
                     ) {
                     //reached boundary
@@ -386,8 +399,18 @@ void gravitation(Position * motion_objects, Leveldata * level) {
                         level->status = StatusDied;
                         continue;
                     }
-                    case BOMB1_SYMBOL: case BOMB2_SYMBOL:
-                    case BOMB3_SYMBOL: case BOMB4_SYMBOL:
+                    
+                    case EXPLOSIVEX_SYMBOL: 
+                    case EXPLOSIVEW_SYMBOL:
+                    case EXPLOSIVEY_SYMBOL:
+                    case EXPLOSIVEZ_SYMBOL: {
+                        if (strchr(ROCK_SYMBOLS, falling_item) != 0) {
+                            //explosion    
+                        }
+
+                        current_Motion->x = -1;
+                        break;   
+                    } 
                     case TANK_SYMBOL: {
                         //explosion
                         current_Motion->x = -1;
@@ -408,6 +431,9 @@ void gravitation(Position * motion_objects, Leveldata * level) {
         check_for_changes(motion_objects, &src); 
     }
 }
+
+
+
 
 void check_for_changes(Position * motion_objects, Position * source) {
     Position motion;
@@ -498,7 +524,7 @@ Direction get_input(unsigned char* demo_mode, unsigned char * demo_pos, unsigned
     
     // used for demo mode
     if (*demo_mode) {
-        if ((dir >= DirectionRight) && (dir <= DirectionDown)) {
+        if ((dir > DirectionUndefined) && (dir < DirectionExit)) {
             //stop demo or stop counter before start of demo
             *demo_mode = 0;
         } else if (*demo_pos < MAX_STEP_SEQUENCE)
@@ -552,7 +578,7 @@ void gameloop(unsigned char curr_level, unsigned char demo_mode) {
                 if (is_border(dest.x, dest.y)) 
                     continue;
                 
-                if (strchr(MOVABLE_SYMBOL, item) != 0) {
+                if (strchr(MOVABLE_SYMBOLS, item) != 0) {
                     if (is_pushing_object(&level, dir)) {
                         moved_stone = 1;
                         source.x = level.x, source.y = level.y;
@@ -572,7 +598,7 @@ void gameloop(unsigned char curr_level, unsigned char demo_mode) {
                         if ((dest.x = level.teleport[n].x) &&
                             (dest.y = level.teleport[n].y) ) {
                                 // set player nearby teleporter, search right, up, left then down
-                                for (unsigned int dir=DirectionRight; dir < DirectionUndefined; ++dir) {
+                                for (unsigned int dir=DirectionRight; dir <= DirectionDown; ++dir) {
                                     diffs = get_diff_position(dir);
                                     if (get_tile(diffs.x + level.teleport[n].x, 
                                                  diffs.y + level.teleport[n].y) == EMPTY_SYMBOL) {
