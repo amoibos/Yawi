@@ -130,7 +130,6 @@ void intro(char * menu_name) {
         load_font();
         clear_screen();
 
-        
         strcpy(output, menu_name);
         print_str(CENTER(output), TITLE_LINE + 1, output, 0);
 
@@ -143,14 +142,15 @@ void intro(char * menu_name) {
         print_img(  city__tiles__bin, city__tiles__bin_size,
                     city__palette__bin, city__palette__bin_size,
                     256, 96, 0, 8); 
-        for(char y=20; y < 24; ++y)
+
+        line=20;
+        for(unsigned char y=line; y < 24; ++y)
             print_str(0, y, "                                ", 128);
         
-
         strcpy(output, VERSION);
         print_str(SCREEN_MAX_X - strlen(output), SCREEN_MAX_Y - 1, output, 128);
         displayOn();
-        char option = menu(intro_items, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0, &timer);
+        unsigned char option = menu(intro_items, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0, &timer);
         switch (option) {
             case 1: {
                 gameloop(1, timer >= DEMO_START_AFTER);
@@ -181,7 +181,7 @@ void print_img( const unsigned char *tiledata, unsigned int tile_length,
     loadTiles(tiledata, start_img_tiles, tile_length);
     loadPalette(colordata, start_img_tiles, color_length); 
     
-    int tileno = 0;
+    unsigned int tileno = 0;
     for (unsigned char y=top; y < top + height / 8; ++y) {
         for(unsigned char x=left; x < left + width / 8; ++x) {
             print_tile(x, y, tileno + start_img_tiles);
