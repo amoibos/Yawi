@@ -483,18 +483,10 @@ void check_for_changes(Position * motion_objects, Position * source) {
 }
 
 
-Direction get_input(unsigned char* demo_mode, unsigned char * demo_pos, unsigned char * delay) {
+Direction get_input(unsigned char* demo_mode, unsigned char * demo_pos) {
     Direction dir=DirectionUndefined;
-
-    unsigned char aborted=0;
-    for (unsigned char wait=0; wait < 2+*delay; ++wait) {
-        if (getKeysHeld()) {
-            if (++aborted >= 2)
-                break;
-        }
-        waitForVBlank();
-    }
-          
+     
+    if (getKeysHeld())      
     switch (readkey()) {
         case PORT_A_KEY_LEFT: {
             dir = DirectionLeft;
@@ -531,20 +523,11 @@ Direction get_input(unsigned char* demo_mode, unsigned char * demo_pos, unsigned
             dir = level01_step_sequence[(*demo_pos)++]; //max demo sequence reached
     }
 
-    //control acceleration
-    if (aborted) {
-        if (*delay > 0)
-            --(*delay);
-    } else //if (*delay < MAX_MOVE_DELAY)
-        *delay = MAX_MOVE_DELAY;  
-
-    for (unsigned char wait=0; wait < 2; ++wait) waitForVBlank();     
-
     return dir;
 }
 
 void gameloop(unsigned char curr_level, unsigned char demo_mode) {
-    Direction dir;
+    Direction dir, prev_dir;
     Leveldata level;
     unsigned char found;
     _Bool moved_stone=0;
@@ -553,6 +536,7 @@ void gameloop(unsigned char curr_level, unsigned char demo_mode) {
 
     // history of all objects which were activated by user action like releasing stones
     Position motion_objects[MAX_MOTION_ITEMS];
+    dir = prev_dir = DirectionUndefined;
 
     load_font();
     clear_screen();  
@@ -563,7 +547,16 @@ void gameloop(unsigned char curr_level, unsigned char demo_mode) {
         }
 
         while ( (level.status != StatusDied) &&  (level.status != StatusCompleted)) {
-            dir = get_input(&demo_mode, &demo_pos, &delay);
+            for(unsigned char wait=0; wait < 10; ++wait) 
+                if (((wait % 2)==0) && getKeysHeld())
+                    break;
+                else
+                    waitForVBlank();
+            prev_dir = dir;
+            dir = get_input(&demo_mode, &demo_pos);
+            for(unsigned char wait=0; wait < ((prev_dir != dir) ? 10 : 5); ++wait) 
+                 waitForVBlank();
+            prev_dir = dir;
             if (dir == DirectionExit)
                 return;
 
