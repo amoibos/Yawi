@@ -1,6 +1,8 @@
 #include "engine.h"
 
 void load_font(void) {
+
+    mapROMBank(BANK_FONT);   
     load_ascii_tiles(0);
     load_ascii_tiles(256);
     load_ascii_tiles(512);    
@@ -13,7 +15,7 @@ char load_leveldata(const char no, Leveldata * level) {
         return 0;
     }
 
-    //mapROMBank(no);
+    mapROMBank(BANK_LEVELS);
     switch (no) {
         case  1: {
             data = level01_dat;
@@ -115,6 +117,8 @@ char load_leveldata(const char no, Leveldata * level) {
         print_tile(x, OFFSET_MAP_Y - 1, first_char);
         print_tile(x, LEVEL_HEIGHT + OFFSET_MAP_Y, first_char);
     }
+
+    mapROMBank(BANK_FONT);
     return 1;
 }
 
@@ -186,6 +190,28 @@ void print_title(unsigned char * title) {
    
 }
 
+void print_playtime() {
+    unsigned char output[15];
+    unsigned char playtime[10];
+
+    SEGA_itoa(seconds, playtime);
+    
+    strcpy(output, "Time: ");
+    strcat(output, playtime);
+    strcat(output, "s");
+    print_str(SCREEN_MAX_X - 10, INFO_LINE, output, 128);
+}
+
+void timer() {
+
+    if (timer_enabled) {
+        if (++fps >= 60) {
+            ++seconds;
+            fps = 0;
+        }
+    }
+}
+
 void setup_level(Leveldata * level) {
     unsigned char output[32+1];
 
@@ -197,12 +223,14 @@ void setup_level(Leveldata * level) {
     level->status = StatusAlive;
 
     print_title(GAME_NAME);
+    clear_line(PROGRESS_LINE);
 
     strcat(output, "Level: "); 
     strcat(output, level->name);
     clear_line(STATUS_LINE);
     print_str(0, STATUS_LINE, output, 128);
     update_statusline(level);
+    seconds = 0;
 }
 
 Position fall_direction(unsigned int tile) {
@@ -546,7 +574,9 @@ void gameloop(unsigned char curr_level, unsigned char demo_mode) {
             motion_objects[n].x = -1;   
         }
 
+        timer_enabled = 1;
         while ( (level.status != StatusDied) &&  (level.status != StatusCompleted)) {
+            print_playtime();
             for(unsigned char wait=0; wait < 10; ++wait) 
                 if (((wait % 2)==0) && getKeysHeld())
                     break;
@@ -637,7 +667,7 @@ void gameloop(unsigned char curr_level, unsigned char demo_mode) {
                 check_for_changes(motion_objects, &dest);
                 gravitation(motion_objects, &level); 
             }
-            waitForVBlank();        
+            waitForVBlank();  
         }
     }
     if (level.status == StatusCompleted)

@@ -74,9 +74,13 @@ void displayOff(void);
 #endif 
 
 #ifdef PLATFORM_SMS
-#define mapROMBank SMS_mapROMBank
+#define mapROMBank(x) SMS_mapROMBank(x)
 #elif PLATFORM_SG || PLATFORM_SC
-#define mapROMBank SG_mapROMBank
+	#ifdef ALLOW_MAPPER
+		#define mapROMBank(x) SG_mapROMBank(x)
+	#else
+		#define mapROMBank(x)
+	#endif
 #endif 
 
 #ifdef PLATFORM_SMS

@@ -1,0 +1,9 @@
+*.sym
+*.asm
+*.lst
+*.noi
+*.map
+*.lk
+*.ihx
+Yawi.S*
+*.rel

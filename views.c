@@ -178,6 +178,7 @@ void print_img( const unsigned char *tiledata, unsigned int tile_length,
                 const unsigned int width, const unsigned int height, const unsigned char left, const unsigned char top) {
     const unsigned int start_img_tiles = 256; 
 
+    mapROMBank(BANK_GFX); 
     loadTiles(tiledata, start_img_tiles, tile_length);
     loadPalette(colordata, start_img_tiles, color_length); 
     
@@ -187,5 +188,5 @@ void print_img( const unsigned char *tiledata, unsigned int tile_length,
             print_tile(x, y, tileno + start_img_tiles);
             ++tileno;
         }
-    }
+    } 
 }

@@ -4,7 +4,7 @@ call :setESC
 REM set output=yawi
 for %%I in (.) do set output=%%~nxI
 
-set TARGET_PLATFORM="SG" 
+set TARGET_PLATFORM="SC" 
 
 call compile
 call play

@@ -2,16 +2,17 @@
 
 
 unsigned char * decrypt(unsigned char * text) {
-
+    return text;
 }
 
 unsigned char menu(unsigned char **items, unsigned char amount, unsigned char start_line, unsigned char offset, 
                     MenuMode mode, _Bool numbers, unsigned int * timer) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char num[3+1];
-    unsigned char option = 0;
+    unsigned char option=0;
     signed char previous=-1;
     
+    mapROMBank(BANK_FONT);
     while(1) {
         char line = start_line; 
         
@@ -87,6 +88,7 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
 unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, unsigned char size, InputType input_type) {
     const unsigned char * valid_chars;
 
+    mapROMBank(BANK_FONT);
     switch(input_type) {
         case InputTypeNumerical: {
             valid_chars = NUMERIC;

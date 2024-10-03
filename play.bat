@@ -5,7 +5,7 @@ REM set output=yawi
 for %%I in (.) do set output=%%~nxI
 
 
-set TARGET_PLATFORM="SG" 
+set TARGET_PLATFORM="SC" 
 
 set command=echo.
 if %TARGET_PLATFORM% == "SMS" 	  set command=call run %output% %TARGET_PLATFORM%

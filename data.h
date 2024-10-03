@@ -1,7 +1,13 @@
 #ifndef DATA_H
 #define DATA_H
 
-#define VERSION_STRING "v0.7"
+#define BANK_FONT 1
+#define BANK_LEVELS 2
+#define BANK_GFX 3
+#define BANK_AUDIO 4
+
+
+#define VERSION_STRING "v0.8"
 
 #ifdef DEMO
 #define VERSION "DEMO " VERSION_STRING
@@ -125,9 +131,15 @@ typedef struct leveldata_t {
     unsigned char teleport_found;
 } Leveldata;
 
+#ifdef DEMO
+#define MAX_LEVEL ((1))
+#else
 #define MAX_LEVEL ((12))
+#endif
+
 static unsigned char * level_names[MAX_LEVEL+1] = {
     "Darkness Falls",
+#ifndef DEMO    
     "Lateral Thinking",
     "Explosively Simple",
     "Question of Substance",
@@ -139,6 +151,7 @@ static unsigned char * level_names[MAX_LEVEL+1] = {
     "Nature of the Beast",
     "Devil\'s Despair",
     "Shrouded Glory",
+#endif
     ".."
 };
 
