@@ -183,8 +183,8 @@ void print_img( const unsigned char *tiledata, unsigned int tile_length,
     loadPalette(colordata, start_img_tiles, color_length); 
     
     unsigned int tileno = 0;
-    for (unsigned char y=top; y < top + height / 8; ++y) {
-        for(unsigned char x=left; x < left + width / 8; ++x) {
+    for (unsigned char y=top; y < top + (height >> 3); ++y) {
+        for(unsigned char x=left; x < left + (width >> 3); ++x) {
             print_tile(x, y, tileno + start_img_tiles);
             ++tileno;
         }

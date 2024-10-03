@@ -32,7 +32,7 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
                 to_upper(output);
 
             if (mode == MenuModeCenter)
-                offset =  SCREEN_MAX_X / 2 - strlen(output) / 2;
+                offset =  (SCREEN_MAX_X >> 1) - (strlen(output) >> 1);
             else if (mode == MenuModeLeft)
                 ;      
 
@@ -43,11 +43,8 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
                 output[0] = 0;
                 if (n + 1 < 10)
                     strcat(output, "0");
-                SEGA_itoa(n + 1, num);        
-                
-                strcat(output, num);
-                strcat(output, ".");
-                print_str(offset + strlen("> "), line, output, 0);
+                       
+                print_str(offset + strlen("> "), line, strcat(strcat(output, SEGA_itoa(n + 1, num)), "."), 0);
             }   
         }
 
@@ -116,7 +113,7 @@ unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, 
         while (!keypressed) ;
         //slow down key processing
         for (unsigned char i=0; i < 5; ++i)
-                waitForVBlank();
+            waitForVBlank();
         key = readkey();
         switch(key) {
            case PORT_A_KEY_2: {

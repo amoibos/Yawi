@@ -2,8 +2,10 @@
 
 unsigned char strlen(const unsigned char * str) {
 	const char *s;
+
 	for (s = str; *s; ++s) ;
-	return s - str;
+	
+    return s - str;
 }
 
 /*FIXME: hopefully the result is never above 127*/
@@ -38,10 +40,11 @@ signed char strpos(const unsigned char * search, const unsigned char * content, 
 }
 */
 
-void SEGA_itoa(long value, unsigned char * sp) {
+unsigned char* SEGA_itoa(long value, unsigned char * sp) {
     long q, r;
     unsigned char *start;
     unsigned char t, sign = value < 0;
+    unsigned char *dest = sp;
 
     start = sp;
     
@@ -70,6 +73,7 @@ void SEGA_itoa(long value, unsigned char * sp) {
         *start++ = *sp;
         *sp-- = t;
     }
+    return dest;
 }
 
 long SEGA_atoi(unsigned char * str) {
@@ -108,8 +112,12 @@ void strncpy(unsigned char* dst, const unsigned char* src, const unsigned char a
 	while(i++ != amount && (*dst++ = *src++));
 }*/
 
-void strcpy(unsigned char* dst, const unsigned char* src) {
-	while(*dst++ = *src++);
+unsigned char* strcpy(unsigned char* dest, const unsigned char* src) {
+	unsigned char* rdest = dest;
+
+    while(*dest++ = *src++);
+
+    return rdest;
 }
 
 unsigned char upcase(const unsigned char c) {
@@ -226,13 +234,13 @@ unsigned char * ftoa(float value, int decimals, unsigned char * buf) {
 } 
 */
 
-// WARNING: capitalize source string! 
+// WARNING: capitalize src! 
 
-unsigned char * to_upper(unsigned char * string) {
+unsigned char * to_upper(unsigned char * src) {
 	unsigned char *temp;
-	for (temp = string; *temp; ++temp)
+	for (temp = src; *temp; ++temp)
 		*temp = (char)upcase(*temp);
-	return string;
+	return src;
 }
 /*
 unsigned char is_digit(const unsigned char ch) {

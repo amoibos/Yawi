@@ -159,16 +159,10 @@ long get_levelcode(const unsigned char level) {
     printing status line
 */
 void update_statusline(Leveldata * level) {
-    unsigned char output[32+1];
+    unsigned char output[SCREEN_MAX_X+1];
     unsigned char numstr[10+1];
 
-    output[0] = 0;
-    numstr[0] = 0;
-    
-    strcat(output, "Gold:    "); 
-    SEGA_itoa(level->gold, numstr); 
-    strcat(output, numstr);
-    strcat(output, " / ");
+    strcat(strcat(strcpy(output, "Gold:    "), SEGA_itoa(level->gold, numstr)),  " / ");
     SEGA_itoa(level->max_gold, numstr); 
     strcat(output, numstr);
     
@@ -177,7 +171,7 @@ void update_statusline(Leveldata * level) {
 }
 
 void print_title(unsigned char * title) {
-    unsigned char output[32+1];
+    unsigned char output[SCREEN_MAX_X+1];
 
     clear_line(TITLE_LINE);
     strcpy(output, title);
@@ -190,20 +184,17 @@ void print_title(unsigned char * title) {
    
 }
 
-void print_playtime() {
-    unsigned char output[15];
-    unsigned char playtime[10];
-
-    SEGA_itoa(seconds, playtime);
+void print_playtime(void) {
+    unsigned char output[5];
     
-    strcpy(output, "Time: ");
-    strcat(output, playtime);
-    strcat(output, "s");
-    print_str(SCREEN_MAX_X - 10, INFO_LINE, output, 128);
+    print_str(SCREEN_MAX_X - strlen(output), INFO_LINE, strcat(SEGA_itoa(seconds, output), "s"), 0);
 }
 
-void timer() {
 
+/*
+    count fps to get the play time
+*/
+void timer(void) {
     if (timer_enabled) {
         if (++fps >= 60) {
             ++seconds;
@@ -213,10 +204,8 @@ void timer() {
 }
 
 void setup_level(Leveldata * level) {
-    unsigned char output[32+1];
+    unsigned char output[SCREEN_MAX_X+1];
 
-    output[0] = 0;
-    
     level->x = level->start_x;
     level->y = level->start_y;
     level->gold = 0;
@@ -225,10 +214,8 @@ void setup_level(Leveldata * level) {
     print_title(GAME_NAME);
     clear_line(PROGRESS_LINE);
 
-    strcat(output, "Level: "); 
-    strcat(output, level->name);
     clear_line(STATUS_LINE);
-    print_str(0, STATUS_LINE, output, 128);
+    print_str(0, STATUS_LINE, strcat(strcpy(output, "Level: "), level->name), 128);
     update_statusline(level);
     seconds = 0;
 }
@@ -667,7 +654,7 @@ void gameloop(unsigned char curr_level, unsigned char demo_mode) {
                 check_for_changes(motion_objects, &dest);
                 gravitation(motion_objects, &level); 
             }
-            waitForVBlank();  
+            //waitForVBlank();  
         }
     }
     if (level.status == StatusCompleted)

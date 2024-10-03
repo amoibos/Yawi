@@ -33,7 +33,7 @@ void load_ascii_tiles(int position) {
 #endif
 
 #if defined(PLATFORM_SG) || defined(PLATFORM_SC) || defined(PLATFORM_SMS)
-void print_tile(unsigned char x, unsigned char y, unsigned int tileno) {   
+inline void print_tile(unsigned char x, unsigned char y, unsigned int tileno) {   
     setNextTileatXY(x, y);
     setTile(tileno);
 }
@@ -43,8 +43,7 @@ void print_str(unsigned char x, unsigned char y, char *str, int offset) {
     for(; *str; ++str) {
         if (x >= SCREEN_MAX_X)
             ++y, x=0;
-        print_tile(x, y, *str + offset);
-        ++x;
+        print_tile(x++, y, *str + offset);
     }
 }
 
@@ -58,7 +57,6 @@ void print_num(unsigned char x, unsigned char y, long num, int offset) {
     for(; *str; ++str) {
         if (x >= SCREEN_MAX_X)
             ++y, x=0;
-        print_tile(x, y, *str + offset);
-        ++x;
+        print_tile(x++, y, *str + offset);
     }
 }
