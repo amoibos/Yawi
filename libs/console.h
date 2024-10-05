@@ -79,7 +79,7 @@ void displayOff(void);
 	#ifdef ALLOW_MAPPER
 		#define mapROMBank(x) SG_mapROMBank(x)
 	#else
-		#define mapROMBank(x)
+		#define mapROMBank(x)	/**/
 	#endif
 #endif 
 

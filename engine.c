@@ -2,7 +2,7 @@
 
 void load_font(void) {
 
-    mapROMBank(BANK_FONT);   
+    //mapROMBank(BANK_FONT);   
     load_ascii_tiles(0);
     load_ascii_tiles(256);
     load_ascii_tiles(512);    
@@ -15,7 +15,7 @@ char load_leveldata(const char no, Leveldata * level) {
         return 0;
     }
 
-    mapROMBank(BANK_LEVELS);
+    //mapROMBank(BANK_LEVELS);
     switch (no) {
         case  1: {
             data = level01_dat;
@@ -87,7 +87,7 @@ char load_leveldata(const char no, Leveldata * level) {
     }
     
     level->max_gold = 0;
-    level->teleport_found = 0; 
+    level->teleports_found = 0; 
     unsigned char first_char=0;
     for(unsigned char y=OFFSET_MAP_Y; y < LEVEL_HEIGHT + OFFSET_MAP_Y; ++y) {
         for(unsigned char x=OFFSET_MAP_X; x < SCREEN_MAX_X + OFFSET_MAP_X; ++x) {
@@ -98,10 +98,10 @@ char load_leveldata(const char no, Leveldata * level) {
             } else if (*data == GOLD_SYMBOL) {
                 level->max_gold++;
             } else if ((*data == TELEPORTER_SYMBOL) && 
-                       (level->teleport_found < MAX_TELEPORTER) ) {
-                level->teleport[level->teleport_found].x = x;
-                level->teleport[level->teleport_found].y = y;
-                ++level->teleport_found;
+                       (level->teleports_found < MAX_TELEPORTER) ) {
+                level->teleport[level->teleports_found].x = x;
+                level->teleport[level->teleports_found].y = y;
+                ++level->teleports_found;
             }
 
             //todo: checks if data is too short or too long 
@@ -118,7 +118,7 @@ char load_leveldata(const char no, Leveldata * level) {
         print_tile(x, LEVEL_HEIGHT + OFFSET_MAP_Y, first_char);
     }
 
-    mapROMBank(BANK_FONT);
+    //mapROMBank(BANK_FONT);
     return 1;
 }
 
@@ -162,7 +162,7 @@ void update_statusline(Leveldata * level) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char numstr[10+1];
 
-    strcat(strcat(strcpy(output, "Gold:    "), SEGA_itoa(level->gold, numstr)),  " / ");
+    strcat(strcat(strcpy(output, GOLD), SEGA_itoa(level->gold, numstr)),  " / ");
     SEGA_itoa(level->max_gold, numstr); 
     strcat(output, numstr);
     
@@ -170,6 +170,10 @@ void update_statusline(Leveldata * level) {
     print_str(0, INFO_LINE, output, 128);
 }
 
+
+/*
+    showing game title during playing
+*/
 void print_title(unsigned char * title) {
     unsigned char output[SCREEN_MAX_X+1];
 
@@ -184,12 +188,25 @@ void print_title(unsigned char * title) {
    
 }
 
+
+/*
+    displaying play time
+*/
 void print_playtime(void) {
     unsigned char output[5];
     
-    print_str(SCREEN_MAX_X - strlen(output), INFO_LINE, strcat(SEGA_itoa(seconds, output), "s"), 0);
+    if (current_location == LocationInGame) {
+        print_str(SCREEN_MAX_X - strlen(output), INFO_LINE, strcat(SEGA_itoa(seconds, output), "s"), 0);
+    }
 }
 
+void reset_time(signed char timer_on) {
+    if ((timer_on >= 0) && (timer_on <= 1))
+        timer_enabled = timer_on;
+
+    fps = 0;
+    seconds = 0;
+}
 
 /*
     count fps to get the play time
@@ -215,9 +232,9 @@ void setup_level(Leveldata * level) {
     clear_line(PROGRESS_LINE);
 
     clear_line(STATUS_LINE);
-    print_str(0, STATUS_LINE, strcat(strcpy(output, "Level: "), level->name), 128);
+    print_str(0, STATUS_LINE, strcat(strcpy(output, LEVEL), level->name), 128);
     update_statusline(level);
-    seconds = 0;
+    reset_time(1);
 }
 
 Position fall_direction(unsigned int tile) {
@@ -447,9 +464,6 @@ void gravitation(Position * motion_objects, Leveldata * level) {
     }
 }
 
-
-
-
 void check_for_changes(Position * motion_objects, Position * source) {
     Position motion;
 
@@ -497,8 +511,7 @@ void check_for_changes(Position * motion_objects, Position * source) {
         }
 }
 
-
-Direction get_input(unsigned char* demo_mode, unsigned char * demo_pos) {
+Direction get_input(_Bool* demo_mode, unsigned char * demo_pos) {
     Direction dir=DirectionUndefined;
      
     if (getKeysHeld())      
@@ -541,7 +554,7 @@ Direction get_input(unsigned char* demo_mode, unsigned char * demo_pos) {
     return dir;
 }
 
-void gameloop(unsigned char curr_level, unsigned char demo_mode) {
+void gameloop(unsigned char curr_level, _Bool demo_mode) {
     Direction dir, prev_dir;
     Leveldata level;
     unsigned char found;
@@ -561,7 +574,8 @@ void gameloop(unsigned char curr_level, unsigned char demo_mode) {
             motion_objects[n].x = -1;   
         }
 
-        timer_enabled = 1;
+        current_location = LocationInGame;
+        reset_time(1);
         while ( (level.status != StatusDied) &&  (level.status != StatusCompleted)) {
             print_playtime();
             for(unsigned char wait=0; wait < 10; ++wait) 
@@ -604,7 +618,7 @@ void gameloop(unsigned char curr_level, unsigned char demo_mode) {
                 found = 0;
                 //when entered teleport field, find other teleport
                 if (item == TELEPORTER_SYMBOL) {
-                    for (unsigned char n=0; (n < level.teleport_found) && (!found); ++n) {
+                    for (unsigned char n=0; (n < level.teleports_found) && (!found); ++n) {
                         if ((dest.x = level.teleport[n].x) &&
                             (dest.y = level.teleport[n].y) ) {
                                 // set player nearby teleporter, search right, up, left then down
@@ -612,7 +626,7 @@ void gameloop(unsigned char curr_level, unsigned char demo_mode) {
                                     diffs = get_diff_position(dir);
                                     if (get_tile(diffs.x + level.teleport[n].x, 
                                                  diffs.y + level.teleport[n].y) == EMPTY_SYMBOL) {
-                                        found = (n + 1) % level.teleport_found;
+                                        found = (n + 1) % level.teleports_found;
                                         dest.x = level.teleport[found].x + diffs.x;
                                         dest.y = level.teleport[found].y + diffs.y; 
                                         break;   
@@ -630,7 +644,7 @@ void gameloop(unsigned char curr_level, unsigned char demo_mode) {
                         if (curr_level == MAX_LEVEL) {
                             level.status = StatusCompleted;
                         } else {
-                            next_level("Not hard enough?", ++curr_level);
+                            next_level(NOT_HARD, ++curr_level);
                             load_leveldata(curr_level, &level);
                             setup_level(&level);
                             continue;      
@@ -638,7 +652,7 @@ void gameloop(unsigned char curr_level, unsigned char demo_mode) {
                     } else //not collected all gold 
                         continue;
                 } else {
-                    for (unsigned char n=0; n < level.teleport_found; ++n) {
+                    for (unsigned char n=0; n < level.teleports_found; ++n) {
                         if ((level.x == level.teleport[n].x) &&
                             (level.y == level.teleport[n].y)) 
                             found = 1;
@@ -658,7 +672,7 @@ void gameloop(unsigned char curr_level, unsigned char demo_mode) {
         }
     }
     if (level.status == StatusCompleted)
-        endscreen("Congratulations");
+        endscreen(CONGRATULATIONS);
     else if (level.status == StatusDied)
-        deathscreen("Mission failed"); 
+        deathscreen(MISSION_FAIL); 
 }

@@ -1,19 +1,19 @@
 #include "widgets.h"
 
-
 unsigned char * decrypt(unsigned char * text) {
     return text;
 }
 
 unsigned char menu(unsigned char **items, unsigned char amount, unsigned char start_line, unsigned char offset, 
-                    MenuMode mode, _Bool numbers, unsigned int * timer) {
+                    MenuMode mode, _Bool ShowNumbers) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char num[3+1];
     unsigned char option=0;
     signed char previous=-1;
+    unsigned char selected = 0;
     
-    mapROMBank(BANK_FONT);
-    while(1) {
+    //mapROMBank(BANK_FONT);
+    while(!selected) {
         char line = start_line; 
         
         for (unsigned char n=0; n < amount; ++n) {
@@ -25,7 +25,7 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
                 output[0] = '>';
                 
             }
-            if (numbers)
+            if (ShowNumbers)
                 strcat(output, "   ");
             strcat(output, items[n]);
             if (option == n)
@@ -39,7 +39,7 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
             line = start_line + n;
             print_str(offset, line, output, 128);
             
-            if (numbers) {
+            if (ShowNumbers) {
                 output[0] = 0;
                 if (n + 1 < 10)
                     strcat(output, "0");
@@ -48,12 +48,15 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
             }   
         }
 
-        _Bool selected = 0;
         while(!keypressed()) {
-            waitForVBlank();
-            if ((timer != 0) && (((*timer)++) >= DEMO_START_AFTER) ) 
-                return selected + 1; 
+            waitForVBlank(); 
+            
+            if ((current_location == LocationIntro) && (seconds >= DEMO_START_AFTER)) {
+                selected = 1;
+                break; 
+            }
         }
+        
         unsigned int key = readkey();
         switch (key) {
             case PORT_A_KEY_START: {
@@ -76,8 +79,6 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
                 break;
             }
         }
-        if (selected)
-            break;
     }
     return option + 1;
 }
@@ -85,7 +86,7 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
 unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, unsigned char size, InputType input_type) {
     const unsigned char * valid_chars;
 
-    mapROMBank(BANK_FONT);
+    //mapROMBank(BANK_FONT);
     switch(input_type) {
         case InputTypeNumerical: {
             valid_chars = NUMERIC;

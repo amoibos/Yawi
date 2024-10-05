@@ -151,7 +151,7 @@ call print_phase Linking..
 set command=echo.
 if %TARGET_PLATFORM% == "SMS" 		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sms.rel city.rel font.rel levels.rel console.rel strings.rel engine.rel views.rel widgets.rel %mainentry%.rel src/SMSlib.rel
 if %TARGET_PLATFORM% == "SG"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 -Wl-b_BANK1=0x18000 -Wl-b_BANK2=0x28000 -Wl-b_BANK3=0x38000 -Wl-b_BANK4=0x48000 crt0/crt0_sg.rel src/SGlib.rel console.rel strings.rel engine.rel views.rel widgets.rel %mainentry%.rel font.rel levels.rel city.rel audio.rel
-if %TARGET_PLATFORM% == "SC"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel src/SGlib.rel console.rel strings.rel engine.rel views.rel widgets.rel %mainentry%.rel font.rel levels.rel city.rel audio.rel 
+if %TARGET_PLATFORM% == "SC"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel src/SGlib.rel console.rel strings.rel engine.rel views.rel widgets.rel %mainentry%.rel font.rel levels.rel city.rel audio.rel
 REM --print-search-dirs
 REM if %TARGET_PLATFORM% == "WINDOWS" %compiler% %FLAGS% -LC:\PDCurses\wincon -lcurses -o %output% %mainentry%.o assets.o SMScompat.o strings.o 
 if %TARGET_PLATFORM% == "WINDOWS"	set command=%compiler% %FLAGS% -o %output% %mainentry%.o assets.o SMScompat.o strings.o -lncurses 
