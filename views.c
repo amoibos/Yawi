@@ -64,7 +64,10 @@ void next_level(unsigned char * menu_name, unsigned char level) {
     strcpy(output, PRESS_TO_CONT);
     print_str(CENTER(output), line, output, 128);
 
-    while(!keypressed()) waitForVBlank();
+    while(!keypressed()) {
+        PSGFrame();
+        waitForVBlank();
+    }
 }
 
 void level_select(unsigned char * menu_name) {
@@ -103,6 +106,7 @@ void credits(const unsigned char * menu_name) {
     load_font();
     clear_screen();
     displayOn();
+    PSGPlay(mountain_psg);
     strcpy(output, menu_name);
     print_str(CENTER(output), TITLE_LINE + 1, output, 128);
 
@@ -120,7 +124,11 @@ void credits(const unsigned char * menu_name) {
     strcpy(output, PRESS_TO_CONT);
     print_str(CENTER(output), line, output, 128);
 
-    while(!keypressed()) waitForVBlank();
+    while(!keypressed()) {
+        PSGFrame();
+        waitForVBlank();
+    }
+    PSGStop(); 
 }
 
 void intro(char * menu_name) {

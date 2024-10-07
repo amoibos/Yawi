@@ -1,7 +1,6 @@
 #ifndef DATA_H
 #define DATA_H
 
-//#include "engine.h"
 #include "localization.h"
 
 #define BANK_FONT                   ((1))

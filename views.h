@@ -8,6 +8,9 @@
 #include "engine.h"
 #include "widgets.h"
 
+#include "PSGlib/PSGlib.h"
+#include "assets/audio.h"
+
 #define CENTER(x) ((SCREEN_MAX_X >> 1) - (strlen(x) >> 1))
 
 void endscreen(const unsigned char * menu_name);

@@ -2,11 +2,11 @@
 #define CONSOLE_H
 
 #ifdef PLATFORM_SMS
-#include "../src/SMSlib.h"
+#include "../SMSlib/SMSlib.h"
 #endif
 
 #ifdef PLATFORM_SG
-#include "../src/SGlib.h"
+#include "../SGlib/SGlib.h"
 #include "../assets/font.h"
 #endif
 
