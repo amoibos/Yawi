@@ -20,19 +20,32 @@ _Bool is_border(const signed char x, const signed char y);
 long get_levelcode(const unsigned char level);
 void update_statusline(Leveldata * level); 
 void print_title(unsigned char * title);
+void reset_sprites(void);
 void setup_level(Leveldata * level);
+unsigned int get_default_tile(unsigned char x, unsigned char y);
 _Bool is_pushing_object(Leveldata * level, Direction dir);
+void wait(unsigned char duration);
 void gameloop(unsigned char curr_level, _Bool demo_mode);
+void add_sprite(unsigned char x, unsigned char y);
 signed int get_checked_tile(signed char x, signed char y);
 void check_for_changes(Position * motion_objects, Position * source);
 void timer(void);
 void print_playtime(void); 
 void reset_time(signed char timer_on);
 
+extern Location current_location;
 
+/* timer functions */
 extern char timer_enabled;
 extern unsigned int seconds;
 extern unsigned char fps;
-extern Location current_location;
+
+
+/* sprite handling */
+extern void animate_quarterly(void);
+extern unsigned char animation_frame;
+extern signed int all_sprites[MAX_SPRITE];
+extern unsigned char sprites_no;
+extern _Bool animation_refresh;
 
 #endif

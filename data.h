@@ -35,7 +35,8 @@
 
 
 #define EXIT_SYMBOL                 (('E'))
-#define PLAYER1_SYMBOL              (('@'))
+#define PLAYER1_SYMBOL_LEFT         (('@'))
+#define PLAYER1_SYMBOL_RIGHT        (('A'))
 #define PLAYER2_SYMBOL              (('O'))
 #define GOLD_SYMBOL                 (('$'))
 //level 1-12 do not use this
@@ -193,5 +194,8 @@ typedef enum eInputType {
 
 #define MAX_LEVELCODE_FACTOR        ((5))
 
+#define MAX_SPRITE                  ((32))
+
+#define FRAME_RATE                  ((60))
 
 #endif

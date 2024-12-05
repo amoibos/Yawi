@@ -33,7 +33,7 @@ void load_ascii_tiles(int position) {
 #endif
 
 #if defined(PLATFORM_SG) || defined(PLATFORM_SC) || defined(PLATFORM_SMS)
-inline void print_tile(unsigned char x, unsigned char y, unsigned int tileno) {   
+void print_tile(unsigned char x, unsigned char y, unsigned int tileno) {   
     setNextTileatXY(x, y);
     setTile(tileno);
 }

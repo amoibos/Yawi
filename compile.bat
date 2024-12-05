@@ -4,8 +4,8 @@ call :setESC
 REM set output=yawi
 for %%I in (.) do set output=%%~nxI
 
-set DEMOFLAG=-D DEMO
-REM set DEMOFLAG=
+REM set DEMOFLAG=-D DEMO
+set DEMOFLAG=
 
 set TARGET_PLATFORM="SC" 
 REM set TARGET_PLATFORM="WINDOWS" 
@@ -49,9 +49,9 @@ if %TARGET_PLATFORM% == "SC"  set command=%res2src% assets/levels assets/levels
 call print_exec %command%
 if not %ERRORLEVEL% == 0 goto error
 
-if %TARGET_PLATFORM% == "SMS" set command=%res2src% assets/city assets/city
-if %TARGET_PLATFORM% == "SG"  set command=%res2src% assets/city assets/city
-if %TARGET_PLATFORM% == "SC"  set command=%res2src% assets/city assets/city
+if %TARGET_PLATFORM% == "SMS" set command=%res2src% assets/images assets/images
+if %TARGET_PLATFORM% == "SG"  set command=%res2src% assets/images assets/images
+if %TARGET_PLATFORM% == "SC"  set command=%res2src% assets/images assets/images
 
 call print_exec %command%
 if not %ERRORLEVEL% == 0 goto error
@@ -84,6 +84,9 @@ if not %ERRORLEVEL% == 0 goto error
 call print_exec %compiler% %FLAGS% -c -mz80 engine.c
 if not %ERRORLEVEL% == 0 goto error
 
+call print_exec %compiler% %FLAGS% -c -mz80 animation.c
+if not %ERRORLEVEL% == 0 goto error
+
 call print_exec %compiler% %FLAGS% -c -mz80 widgets.c
 if not %ERRORLEVEL% == 0 goto error
 
@@ -107,7 +110,7 @@ if not %ERRORLEVEL% == 0 goto error
 call print_exec %compiler% %FLAGS% -c -mz80 assets/levels.c
 if not %ERRORLEVEL% == 0 goto error
 
-call print_exec %compiler% %FLAGS% -c -mz80 assets/city.c
+call print_exec %compiler% %FLAGS% -c -mz80 assets/images.c
 if not %ERRORLEVEL% == 0 goto error
 
 call print_exec %compiler% %FLAGS% -c -mz80 assets/audio.c
@@ -149,9 +152,9 @@ if not %ERRORLEVEL% == 0 goto error
 call print_phase Linking..
 
 set command=echo.
-if %TARGET_PLATFORM% == "SMS" 		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sms.rel city.rel font.rel levels.rel console.rel strings.rel engine.rel views.rel widgets.rel %mainentry%.rel SMSlib/SMSlib.rel
-if %TARGET_PLATFORM% == "SG"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 -Wl-b_BANK1=0x18000 -Wl-b_BANK2=0x28000 -Wl-b_BANK3=0x38000 -Wl-b_BANK4=0x48000 crt0/crt0_sg.rel PSGlib/PSGlib.rel SGlib/SGlib.rel console.rel strings.rel engine.rel views.rel widgets.rel %mainentry%.rel font.rel levels.rel city.rel audio.rel
-if %TARGET_PLATFORM% == "SC"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel PSGlib/PSGlib.rel SGlib/SGlib.rel console.rel strings.rel engine.rel views.rel widgets.rel %mainentry%.rel font.rel levels.rel city.rel audio.rel
+if %TARGET_PLATFORM% == "SMS" 		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sms.rel images.rel font.rel levels.rel console.rel strings.rel engine.rel views.rel widgets.rel %mainentry%.rel SMSlib/SMSlib.rel
+if %TARGET_PLATFORM% == "SG"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 -Wl-b_BANK1=0x18000 -Wl-b_BANK2=0x28000 -Wl-b_BANK3=0x38000 -Wl-b_BANK4=0x48000 crt0/crt0_sg.rel PSGlib/PSGlib.rel SGlib/SGlib.rel console.rel strings.rel engine.rel animation.rel views.rel widgets.rel %mainentry%.rel font.rel levels.rel images.rel audio.rel
+if %TARGET_PLATFORM% == "SC"  		set command=%compiler% %FLAGS% -o %output%.ihx -mz80 --no-std-crt0 --data-loc 0xC000 crt0/crt0_sg.rel PSGlib/PSGlib.rel SGlib/SGlib.rel console.rel strings.rel engine.rel animation.rel views.rel widgets.rel %mainentry%.rel font.rel levels.rel images.rel audio.rel
 REM --print-search-dirs
 REM if %TARGET_PLATFORM% == "WINDOWS" %compiler% %FLAGS% -LC:\PDCurses\wincon -lcurses -o %output% %mainentry%.o assets.o SMScompat.o strings.o 
 if %TARGET_PLATFORM% == "WINDOWS"	set command=%compiler% %FLAGS% -o %output% %mainentry%.o assets.o SMScompat.o strings.o -lncurses 

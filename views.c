@@ -32,6 +32,10 @@ void deathscreen(unsigned char * menu_name) {
     strcpy(output, TRY_IT);
     print_str(CENTER(output), line, output, 128);
 
+    print_img(  cemetry__tiles__bin, cemetry__tiles__bin_size,
+                cemetry__palette__bin, cemetry__palette__bin_size,
+                256, 96, 0, 8); 
+
     while(!keypressed()) waitForVBlank();
 }
 

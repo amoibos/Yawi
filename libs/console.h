@@ -101,6 +101,11 @@ void displayOff(void);
 #define waitForVBlank SG_waitForVBlank 
 #endif 
 
+#ifdef PLATFORM_SMS 
+#define setFrameInterruptHandler SMS_setFrameInterruptHandler    
+#elif PLATFORM_SG || PLATFORM_SC
+#define setFrameInterruptHandler SG_setFrameInterruptHandler
+#endif
 
 
 void print_tile(unsigned char x, unsigned char y, unsigned int tileno);

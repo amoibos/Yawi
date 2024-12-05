@@ -1,11 +1,26 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#include "data.h"
 #include "location.h"
 
+// for pausing the timer and animation
 char timer_enabled;
+// counting passed seconds
 unsigned int seconds;
+// helper for counting seconds;
 unsigned char fps;
+//player position
 Location current_location;
+
+// current animation frame for a sprite
+unsigned char animation_frame;
+// save tile index where the sprite is located
+signed int all_sprites[MAX_SPRITE];
+// update sprite state
+_Bool animation_refresh;
+// current number of sprites
+unsigned char sprites_no;
+
 
 #endif

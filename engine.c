@@ -16,6 +16,7 @@ char load_leveldata(const char no, Leveldata * level) {
     }
 
     //mapROMBank(BANK_LEVELS);
+    reset_sprites();
     switch (no) {
         case  1: {
             data = level01_dat;
@@ -93,7 +94,7 @@ char load_leveldata(const char no, Leveldata * level) {
         for(unsigned char x=OFFSET_MAP_X; x < SCREEN_MAX_X + OFFSET_MAP_X; ++x) {
             // skip control characters, 
             while (*data < ' ') data++;
-            if (*data == PLAYER1_SYMBOL) {
+            if (*data == PLAYER1_SYMBOL_LEFT) {
                 level->start_x = x, level->start_y = y;    
             } else if (*data == GOLD_SYMBOL) {
                 level->max_gold++;
@@ -102,6 +103,8 @@ char load_leveldata(const char no, Leveldata * level) {
                 level->teleport[level->teleports_found].x = x;
                 level->teleport[level->teleports_found].y = y;
                 ++level->teleports_found;
+            } else if (*data == EXIT_SYMBOL) {
+                add_sprite(x, y);
             }
 
             //todo: checks if data is too short or too long 
@@ -135,8 +138,7 @@ _Bool is_border(const signed char x, const signed char y) {
     if (!is_within(x, y))
         return 1;    
 
-    unsigned int brick = get_tile(x, y); 
-   
+    unsigned int brick = get_default_tile(x, y); 
     
     return strchr(BARRIER_SYMBOLS, (unsigned char)brick) != 0;
 }
@@ -185,6 +187,11 @@ void print_title(unsigned char * title) {
     }
     output[strlen(GAME_NAME)] = 0;
     print_str(x, TITLE_LINE, output, 0);
+    
+    add_sprite(x++, TITLE_LINE);
+    add_sprite(x++, TITLE_LINE);
+    add_sprite(x++, TITLE_LINE);
+    add_sprite(x++, TITLE_LINE);
    
 }
 
@@ -206,6 +213,7 @@ void reset_time(signed char timer_on) {
 
     fps = 0;
     seconds = 0;
+    animation_frame = 0;
 }
 
 /*
@@ -213,13 +221,29 @@ void reset_time(signed char timer_on) {
 */
 void timer(void) {
     if (timer_enabled) {
-        if (++fps >= 60) {
+        if (++fps == FRAME_RATE) {
             ++seconds;
             fps = 0;
         }
     }
+
+    if (timer_enabled && seconds)
+        animation_refresh = ((fps + 1) % (FRAME_RATE / 4) == 0);  
 }
 
+
+void reset_sprites(void) {
+
+    animation_frame = 0;
+    for(unsigned char pos=0; pos < MAX_SPRITE; ++pos) 
+        all_sprites[pos] = -1;
+    sprites_no = 0;
+    animation_refresh = 0; 
+}
+
+/*
+    reset level state, build screen elements
+*/
 void setup_level(Leveldata * level) {
     unsigned char output[SCREEN_MAX_X+1];
 
@@ -237,6 +261,9 @@ void setup_level(Leveldata * level) {
     reset_time(1);
 }
 
+/*
+    map based on tile number the direction when gravity is active
+*/
 Position fall_direction(unsigned int tile) {
     Position dir;
 
@@ -268,6 +295,9 @@ Position fall_direction(unsigned int tile) {
     }
 }
 
+/*
+    compute difference for x and y axis based on given direction enum
+*/
 Position get_diff_position(Direction dir) {
     Position pos;
 
@@ -295,6 +325,15 @@ Position get_diff_position(Direction dir) {
     return pos;
 }
 
+
+unsigned int get_default_tile(unsigned char x, unsigned char y) {
+    //TODO when it is also a sprite in animation then return sprite 0
+    return get_tile(x, y);
+}
+
+/*
+    return if object is pushable in that direction
+*/
 _Bool is_pushing_object(Leveldata * level, Direction dir) {
     Position diffs;
     Position dest, neighbour;
@@ -303,8 +342,8 @@ _Bool is_pushing_object(Leveldata * level, Direction dir) {
     diffs = get_diff_position(dir);
     dest.x = level->x + diffs.x;
     dest.y = level->y + diffs.y;
-    neighbour.x = level->x + 2 * diffs.x;
-    neighbour.y = level->y + 2 * diffs.y;
+    neighbour.x = level->x + (diffs.x << 1);
+    neighbour.y = level->y + (diffs.y << 1);
     item = get_tile(dest.x, dest.y); 
 
     _Bool precondition = 
@@ -331,6 +370,13 @@ _Bool is_pushing_object(Leveldata * level, Direction dir) {
     return precondition && postcondition;
 }
 
+/*
+    start of helper function for continue a motion  
+*/
+
+/*
+  check if object is already in motion list  
+*/
 signed char get_first_motion(Position * motion_objects, _Bool exist) {
 
     for (unsigned char pos=0; pos < MAX_MOTION_ITEMS; ++pos)
@@ -343,6 +389,9 @@ signed char get_first_motion(Position * motion_objects, _Bool exist) {
     return -1;
 }
 
+/*
+  lookup function for active motions
+*/
 signed char get_motion_position(Position * motion_objects, Position * movable) {
 
     for (unsigned char pos=0; pos < MAX_MOTION_ITEMS; ++pos)
@@ -352,6 +401,9 @@ signed char get_motion_position(Position * motion_objects, Position * movable) {
     return -1;    
 }
 
+/*
+    add object to motion list
+*/
 signed char add_motion(Position * motion_objects, Position * item) {
     signed char slot;
     
@@ -368,12 +420,31 @@ signed char add_motion(Position * motion_objects, Position * item) {
     return slot;
 }
 
+/*
+    end of helper function for moving objects
+*/
+
+
+
+/*
+    save sprite
+*/
+void add_sprite(unsigned char x, unsigned char y) {
+
+    if (sprites_no < MAX_SPRITE)
+        all_sprites[sprites_no] = ((signed int)(sprites_no << 10)) | (x << 5) | y;
+    ++sprites_no;
+}
+
+/*
+    return tile at given position with respecting borders
+*/
 signed int get_checked_tile(signed char x, signed char y) {
     
     if (!is_within(x, y))
         return -1;
 
-    return get_tile(x, y);       
+    return get_default_tile(x, y);       
 }
 
 void gravitation(Position * motion_objects, Leveldata * level) {
@@ -425,7 +496,7 @@ void gravitation(Position * motion_objects, Leveldata * level) {
                         //check_for_changes(motion_objects, dest);  
                         break;   
                     }
-                    case PLAYER1_SYMBOL: {
+                    case PLAYER1_SYMBOL_LEFT: case PLAYER1_SYMBOL_RIGHT:{
                         print_tile(src.x, src.y, EMPTY_SYMBOL);
                         print_tile(dest.x, dest.y, falling_item);
                         level->status = StatusDied;
@@ -554,6 +625,11 @@ Direction get_input(_Bool* demo_mode, unsigned char * demo_pos) {
     return dir;
 }
 
+void wait(unsigned char duration) {
+    for(unsigned char wait=0; wait < duration; ++wait) 
+        waitForVBlank();    
+}
+
 void gameloop(unsigned char curr_level, _Bool demo_mode) {
     Direction dir, prev_dir;
     Leveldata level;
@@ -561,6 +637,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
     _Bool moved_stone=0;
     unsigned char demo_pos=0;
     unsigned char delay=MAX_MOVE_DELAY;
+    unsigned char player_figure = PLAYER1_SYMBOL_LEFT;
 
     // history of all objects which were activated by user action like releasing stones
     Position motion_objects[MAX_MOTION_ITEMS];
@@ -578,15 +655,16 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
         reset_time(1);
         while ( (level.status != StatusDied) &&  (level.status != StatusCompleted)) {
             print_playtime();
-            for(unsigned char wait=0; wait < 10; ++wait) 
-                if (((wait % 2)==0) && getKeysHeld())
-                    break;
-                else
-                    waitForVBlank();
+            if (animation_refresh) 
+                animate_quarterly();
+          
             prev_dir = dir;
             dir = get_input(&demo_mode, &demo_pos);
-            for(unsigned char wait=0; wait < ((prev_dir != dir) ? 10 : 5); ++wait) 
-                 waitForVBlank();
+            if (dir != DirectionUndefined)
+                wait((prev_dir != dir) ? 10 : 5);
+            if ((prev_dir != DirectionUndefined) && (dir == DirectionUndefined))
+                wait(10);
+
             prev_dir = dir;
             if (dir == DirectionExit)
                 return;
@@ -596,7 +674,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                 Position dest, neighbour, diffs, source;
                 diffs = get_diff_position(dir);
                 dest.x = diffs.x + level.x, dest.y = diffs.y + level.y;
-                unsigned int item = get_tile(dest.x, dest.y);
+                unsigned int item = get_default_tile(dest.x, dest.y);
 
                 // walk against a wall, nothing happen
                 if (is_border(dest.x, dest.y)) 
@@ -606,9 +684,10 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                     if (is_pushing_object(&level, dir)) {
                         moved_stone = 1;
                         source.x = level.x, source.y = level.y;
-                        neighbour.x = source.x + 2 * diffs.x;
-                        neighbour.y = source.y + 2 * diffs.y; 
-                        unsigned int pushed = get_tile(dest.x, dest.y);
+                        neighbour.x = source.x + (diffs.x << 1);
+                        neighbour.y = source.y + (diffs.y << 1); 
+                        unsigned int pushed = get_default_tile(dest.x, dest.y);
+
                         //check_for_changes(motion_objects, source, neighbour);
                         print_tile(neighbour.x, neighbour.y, pushed);
                     } else //walk against object but way is occupied, nothing happen
@@ -624,7 +703,8 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                                 // set player nearby teleporter, search right, up, left then down
                                 for (unsigned int dir=DirectionRight; dir <= DirectionDown; ++dir) {
                                     diffs = get_diff_position(dir);
-                                    if (get_tile(diffs.x + level.teleport[n].x, 
+                                    
+                                    if (get_default_tile(diffs.x + level.teleport[n].x, 
                                                  diffs.y + level.teleport[n].y) == EMPTY_SYMBOL) {
                                         found = (n + 1) % level.teleports_found;
                                         dest.x = level.teleport[found].x + diffs.x;
@@ -662,13 +742,16 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
 
                 level.x = dest.x;
                 level.y = dest.y;
-                print_tile(level.x, level.y, PLAYER1_SYMBOL);
+                if (dir == DirectionRight)
+                    player_figure = PLAYER1_SYMBOL_RIGHT;
+                else if (dir == DirectionLeft)
+                    player_figure = PLAYER1_SYMBOL_LEFT;
+                print_tile(level.x, level.y, player_figure);
 
                 update_statusline(&level);
                 check_for_changes(motion_objects, &dest);
                 gravitation(motion_objects, &level); 
-            }
-            //waitForVBlank();  
+            } 
         }
     }
     if (level.status == StatusCompleted)
