@@ -158,6 +158,24 @@ static const unsigned char * level_names[MAX_LEVEL+1] = {
     ".."
 };
 
+typedef enum eMainMenu {
+    MainMenuUndefined,
+    MainMenuNewGame,
+    MainMenuLevelSelect,
+    MainMenuCredits
+} MainMenu;
+
+typedef enum eScreens {
+    ScreenUndefined,
+    ScreenIntro,
+    ScreenIngame,
+    ScreenNextLevel,
+    ScreenDeath,
+    ScreenCongratulation,
+    ScreenLevelSelect,
+    ScreenCredits
+} Screens;
+
 #define MAX_INTRO_ITEMS ((3))
 static const unsigned char * intro_items[MAX_INTRO_ITEMS] = {
     MAIN_MENU_ITEM1,
@@ -171,6 +189,12 @@ static const unsigned char * credits_names[CREDIT_NAMES_MAX] = {
     CREDITS_LINE02,
     CREDITS_LINE03
 };
+
+typedef struct sSpriteData {
+    unsigned char x;
+    unsigned char y;
+    signed char index;
+} SpriteData;
 
 typedef enum eMenuMode {
     MenuModeUndefined,

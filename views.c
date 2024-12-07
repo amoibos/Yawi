@@ -22,21 +22,35 @@ void deathscreen(unsigned char * menu_name) {
     unsigned char line=20;
 
     current_location = LocationDeathscreen;
-    print_title(GAME_NAME GAME_OVER);
-    while(!keypressed()) waitForVBlank();
     load_font();
     clear_screen();
+    reset_sprites();
     strcpy(output, menu_name);
     print_str(CENTER(output), TITLE_LINE + 1, output, 128);
     
+    //add bat
+    print_tile(CENTER(output) + strlen(output) + 2, TITLE_LINE + 1, 3);
+    add_sprite(CENTER(output) + strlen(output) + 2, TITLE_LINE + 1);
+
+
     strcpy(output, TRY_IT);
     print_str(CENTER(output), line, output, 128);
 
+   
     print_img(  cemetry__tiles__bin, cemetry__tiles__bin_size,
                 cemetry__palette__bin, cemetry__palette__bin_size,
-                256, 96, 0, 8); 
+                256, 96, 0, 8);  
 
-    while(!keypressed()) waitForVBlank();
+    for(unsigned char y=line; y < SCREEN_MAX_Y; ++y)
+        print_str(0, y, "                                ", 128);
+
+    print_str(CENTER(output), line + 2, output, 128);
+
+    while(!keypressed()) {
+        if (animation_refresh) 
+            animate_quarterly(ScreenDeath);
+        waitForVBlank();
+    }        
 }
 
 void next_level(unsigned char * menu_name, unsigned char level) {
@@ -159,7 +173,7 @@ void intro(char * menu_name) {
                     256, 96, 0, 8); 
 
         line=20;
-        for(unsigned char y=line; y < 24; ++y)
+        for(unsigned char y=line; y < SCREEN_MAX_Y; ++y)
             print_str(0, y, "                                ", 128);
         
         strcpy(output, VERSION);
@@ -168,15 +182,15 @@ void intro(char * menu_name) {
         reset_time(1);
         unsigned char option = menu(intro_items, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0);
         switch (option) {
-            case 1: {
+            case (unsigned char) MainMenuNewGame: {
                 gameloop(1, seconds >= DEMO_START_AFTER);
                 break;
             }
-            case 2: {
+            case (unsigned char) MainMenuLevelSelect: {
                 level_select(LEVEL_SELECT);
                 break;
             }
-            case 3: {
+            case (unsigned char) MainMenuCredits: {
                 credits(CREDITS);
                 break;
             }

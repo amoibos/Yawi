@@ -228,7 +228,12 @@ void timer(void) {
     }
 
     if (timer_enabled && seconds)
-        animation_refresh = ((fps + 1) % (FRAME_RATE / 4) == 0);  
+        animation_refresh = ((fps + 1) % (FRAME_RATE / 4) == 0); 
+
+    if (audio_enabled) {
+        PSGSFXFrame();
+        PSGFrame(); 
+    } 
 }
 
 
@@ -327,8 +332,25 @@ Position get_diff_position(Direction dir) {
 
 
 unsigned int get_default_tile(unsigned char x, unsigned char y) {
-    //TODO when it is also a sprite in animation then return sprite 0
-    return get_tile(x, y);
+    signed int tile=-1;
+
+    for(unsigned char pos=0; pos < sprites_no; ++pos)
+        if (all_sprites[pos] != -1) {
+            SpriteData sprite;
+            sprite = get_sprite_data(all_sprites[pos]);
+            unsigned char sprite_x = sprite.x;
+            unsigned char sprite_y = sprite.y;
+            signed char sprite_index = sprite.index;
+
+            if ((sprite_x == x) && (sprite_y == y)) {
+                tile = INGAME_SPRITE[sprite_index][sprite_index];
+                break;
+            }
+        }
+
+    if (tile == -1)
+        tile = get_tile(x, y); 
+    return tile;
 }
 
 /*
@@ -499,6 +521,7 @@ void gravitation(Position * motion_objects, Leveldata * level) {
                     case PLAYER1_SYMBOL_LEFT: case PLAYER1_SYMBOL_RIGHT:{
                         print_tile(src.x, src.y, EMPTY_SYMBOL);
                         print_tile(dest.x, dest.y, falling_item);
+                        PSGPlayNoRepeat(death_psg);
                         level->status = StatusDied;
                         continue;
                     }
@@ -634,6 +657,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
     Direction dir, prev_dir;
     Leveldata level;
     unsigned char found;
+    _Bool status_refresh=0;
     _Bool moved_stone=0;
     unsigned char demo_pos=0;
     unsigned char delay=MAX_MOVE_DELAY;
@@ -653,10 +677,15 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
 
         current_location = LocationInGame;
         reset_time(1);
-        while ( (level.status != StatusDied) &&  (level.status != StatusCompleted)) {
+        while ( (level.status != StatusDied) && (level.status != StatusCompleted)) {
             print_playtime();
             if (animation_refresh) 
-                animate_quarterly();
+                animate_quarterly(ScreenIngame);
+
+            if (audio_enabled) {
+                PSGSFXFrame();
+                PSGFrame(); 
+            } 
           
             prev_dir = dir;
             dir = get_input(&demo_mode, &demo_pos);
@@ -716,14 +745,21 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                     }
                 } else if (item == GOLD_SYMBOL) {
                     ++level.gold;
+                    if (audio_enabled) {
+                        PSGPlayNoRepeat(coin_psg);
+                        status_refresh = 1;
+                        //PSGSFXPlay(coin_psg, 0);
+                    }
                 } else if (item == THORNS_SYMBOL) {
                     level.status = StatusDied;
+                    PSGPlayNoRepeat(death_psg);
                     continue;
                 } else if (item == EXIT_SYMBOL) {
                     if (level.gold >= level.max_gold) {
                         if (curr_level == MAX_LEVEL) {
                             level.status = StatusCompleted;
                         } else {
+                            PSGPlayNoRepeat(warp_psg);
                             next_level(NOT_HARD, ++curr_level);
                             load_leveldata(curr_level, &level);
                             setup_level(&level);
@@ -748,14 +784,25 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                     player_figure = PLAYER1_SYMBOL_LEFT;
                 print_tile(level.x, level.y, player_figure);
 
-                update_statusline(&level);
+                if (status_refresh) {
+                    update_statusline(&level);
+                     status_refresh = 0;
+                }
                 check_for_changes(motion_objects, &dest);
-                gravitation(motion_objects, &level); 
-            } 
+                gravitation(motion_objects, &level);
+            }
         }
     }
+    /*if (audio_enabled) {
+        PSGSFXStop();
+        PSGStop(); 
+    }*/
+
     if (level.status == StatusCompleted)
         endscreen(CONGRATULATIONS);
-    else if (level.status == StatusDied)
-        deathscreen(MISSION_FAIL); 
+    else if (level.status == StatusDied) {
+        print_title(GAME_NAME GAME_OVER);
+        while(!keypressed()) waitForVBlank();
+        deathscreen(MISSION_FAIL);    
+    }
 }

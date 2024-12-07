@@ -42,10 +42,14 @@ extern unsigned char fps;
 
 
 /* sprite handling */
-extern void animate_quarterly(void);
+extern SpriteData get_sprite_data(signed int data);
+extern void animate_quarterly(Screens screen);
 extern unsigned char animation_frame;
 extern signed int all_sprites[MAX_SPRITE];
 extern unsigned char sprites_no;
 extern _Bool animation_refresh;
+
+extern _Bool audio_enabled;
+extern unsigned char INGAME_SPRITE[5][4];
 
 #endif

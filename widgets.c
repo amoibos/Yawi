@@ -11,6 +11,7 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
     unsigned char option=0;
     signed char previous=-1;
     unsigned char selected = 0;
+    _Bool user_choice = 0;
     
     //mapROMBank(BANK_FONT);
     while(!selected) {
@@ -51,13 +52,15 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
         while(!keypressed()) {
             waitForVBlank(); 
             
-            if ((current_location == LocationIntro) && (seconds >= DEMO_START_AFTER)) {
+            if ((current_location == LocationIntro) && (seconds >= DEMO_START_AFTER) && (user_choice == 0)) {
                 selected = 1;
                 break; 
             }
         }
         
         unsigned int key = readkey();
+        if (key != 0)
+            user_choice = 1;
         switch (key) {
             case PORT_A_KEY_START: {
                 selected = 1;

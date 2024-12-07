@@ -22,5 +22,7 @@ _Bool animation_refresh;
 // current number of sprites
 unsigned char sprites_no;
 
+_Bool audio_enabled=1;
+
 
 #endif
