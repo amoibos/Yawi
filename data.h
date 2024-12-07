@@ -68,7 +68,7 @@
 
 #define EMPTY_SYMBOL                ((' '))
 
-#define BARRIER_SYMBOLS             (("&+|-%~"))
+#define BARRIER_SYMBOLS             (("+|-%~"))
 #define MOVABLE_SYMBOLS             (("<>^vBoWXYZ"))
 #define BLOCKING_SYMBOLS            (("<>^v:$")) 
 
