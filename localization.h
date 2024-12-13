@@ -38,9 +38,13 @@
 #define LEVEL_NAME11	"Devil\'s Despair"
 #define LEVEL_NAME12	"Shrouded Glory"
 
-#define CREDITS_LINE01	"Daniel aka Darktrym"
-#define CREDITS_LINE02	""
-#define CREDITS_LINE03	""
+#define CREDITS_LINE01	"Darktrym"
+#define CREDITS_LINE02	"Sverx for DevkitSMS and suppport"
+#define CREDITS_LINE03	"Smspower.org - We \003 8Bit SEGA"
+#define CREDITS_LINE04	""
+
+#define CREDITS_THANKS	"Thanks to.."
+#define CREDITS_DEVS	"Developers:"
 
 #endif
 

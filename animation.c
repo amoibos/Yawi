@@ -38,6 +38,7 @@ void animate_quarterly(Screens screen) {
 					break;
 				}
 				case ScreenCredits: {
+					print_tile(sprite_x, sprite_y, CREDITS_SPRITE[sprite_index][animation_frame] + 128);
 					break;
 				}
 				case ScreenNextLevel: {

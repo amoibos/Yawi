@@ -46,6 +46,7 @@ void deathscreen(unsigned char * menu_name) {
 
     print_str(CENTER(output), line + 2, output, 128);
 
+    //animation loop and waiting for key pressed
     while(!keypressed()) {
         if (animation_refresh) 
             animate_quarterly(ScreenDeath);
@@ -124,27 +125,56 @@ void credits(const unsigned char * menu_name) {
     load_font();
     clear_screen();
     displayOn();
-    PSGPlay(mountain_psg);
+    
+    if (audio_enabled) {
+        PSGPlay(mountain_psg);
+    }
+
     strcpy(output, menu_name);
     print_str(CENTER(output), TITLE_LINE + 1, output, 128);
 
     for (unsigned char entry=0; entry < CREDIT_NAMES_MAX; ++entry) {
         unsigned center = CENTER(strcpy(output, credits_names[entry]));
 
+        switch(entry) { 
+            case 0: {   
+                        print_str(0, line, CREDITS_DEVS, 128);
+                        line+=2;
+                        break;
+                    }
+
+            case 1: {   
+                        line+=2;
+                        print_str(0, line++, CREDITS_THANKS, 128);
+                        break;
+                    }        
+            default: 
+                break;
+        }
+    
         for (unsigned char pos=0; pos < strlen(output); ++pos) {
             print_tile(center++, line + entry, 128 + output[pos]);
             for (unsigned char wait=0; (wait < 10) && (!keypressed()); ++wait) 
                 waitForVBlank(); 
-        }   
+        }
+        ++line;   
     }
 
     line = 20;
     strcpy(output, PRESS_TO_CONT);
     print_str(CENTER(output), line, output, 128);
 
-    while(!keypressed()) {
-        waitForVBlank();
+    //add blinking continue text
+    for (unsigned char pos=0; pos < strlen(output); ++pos) {
+        add_animation(CENTER(output) + pos, line);        
     }
+
+    // animation loop
+    while(!keypressed()) {
+        if (animation_refresh) 
+            animate_quarterly(ScreenCredits);
+        waitForVBlank();
+    }     
 
     if (audio_enabled) {
         PSGStop(); 

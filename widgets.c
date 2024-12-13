@@ -45,7 +45,7 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
                 if (n + 1 < 10)
                     strcat(output, "0");
                        
-                print_str(offset + strlen("> "), line, strcat(strcat(output, SEGA_itoa(n + 1, num)), "."), 0);
+                print_str(offset + strlen("> "), line, strcat(strcat(output, SEGA_itoa(n + 1, num)), "."), 128);
             }   
         }
 
