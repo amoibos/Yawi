@@ -9,7 +9,7 @@
 #define BANK_AUDIO                  ((4))
 
 
-#define VERSION_STRING              "0.8"
+#define VERSION_STRING              "0.9"
 
 #ifdef DEMO
 #define VERSION                     "DEMO " VERSION_STRING
@@ -36,7 +36,14 @@
 
 #define EXIT_SYMBOL                 (('E'))
 #define PLAYER1_SYMBOL_LEFT         (('@'))
+#define PLAYER1_SYMBOL_LEFT_BODY    ((PLAYER1_SYMBOL_LEFT + 3))
+#define PLAYER1_SYMBOL_LEFT_REST    ((PLAYER1_SYMBOL_LEFT_BODY + 6))
 #define PLAYER1_SYMBOL_RIGHT        (('A'))
+#define PLAYER1_SYMBOL_RIGHT_BODY   ((PLAYER1_SYMBOL_RIGHT + 3))
+#define PLAYER1_SYMBOL_RIGHT_REST   ((PLAYER1_SYMBOL_RIGHT_BODY + 6))
+
+
+
 #define PLAYER2_SYMBOL              (('O'))
 #define GOLD_SYMBOL                 (('$'))
 //level 1-12 do not use this
@@ -46,7 +53,9 @@
 #define EXPLOSIVEX_SYMBOL           (('X'))
 #define EXPLOSIVEW_SYMBOL           (('W'))
 #define EXPLOSIVEY_SYMBOL           (('Y'))
+//unused in original level set
 #define EXPLOSIVEZ_SYMBOL           (('Z'))
+
 
 #define TANK_SYMBOL                 (('B'))
 

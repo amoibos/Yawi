@@ -9,6 +9,7 @@ SMS_EMBED_SDSC_HEADER_AUTO_DATE_16KB(1, 0, Darktrym, Yawi, "puzzle game")
 
 void main(void) {
     displayOn();
+    SG_setSpriteMode(0);
     setFrameInterruptHandler(timer);
     intro(GAME_NAME);
 }

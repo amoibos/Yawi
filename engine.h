@@ -26,7 +26,7 @@ unsigned int get_default_tile(unsigned char x, unsigned char y);
 _Bool is_pushing_object(Leveldata * level, Direction dir);
 void wait(unsigned char duration);
 void gameloop(unsigned char curr_level, _Bool demo_mode);
-void add_sprite(unsigned char x, unsigned char y);
+void add_animation(unsigned char x, unsigned char y);
 signed int get_checked_tile(signed char x, signed char y);
 void check_for_changes(Position * motion_objects, Position * source);
 void timer(void);
@@ -50,6 +50,7 @@ extern unsigned char sprites_no;
 extern _Bool animation_refresh;
 
 extern _Bool audio_enabled;
+extern unsigned char previous_fps_seqment;
 extern unsigned char INGAME_SPRITE[5][4];
 
 #endif

@@ -30,7 +30,7 @@ void deathscreen(unsigned char * menu_name) {
     
     //add bat
     print_tile(CENTER(output) + strlen(output) + 2, TITLE_LINE + 1, 3);
-    add_sprite(CENTER(output) + strlen(output) + 2, TITLE_LINE + 1);
+    add_animation(CENTER(output) + strlen(output) + 2, TITLE_LINE + 1);
 
 
     strcpy(output, TRY_IT);
@@ -143,10 +143,13 @@ void credits(const unsigned char * menu_name) {
     print_str(CENTER(output), line, output, 128);
 
     while(!keypressed()) {
-        PSGFrame();
         waitForVBlank();
     }
-    PSGStop(); 
+
+    if (audio_enabled) {
+        PSGStop(); 
+        PSGSFXStop();
+    }
 }
 
 void intro(char * menu_name) {

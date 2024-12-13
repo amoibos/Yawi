@@ -23,6 +23,7 @@ _Bool animation_refresh;
 unsigned char sprites_no;
 
 _Bool audio_enabled=1;
+unsigned char previous_fps_seqment=0;
 
 
 #endif

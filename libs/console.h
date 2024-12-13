@@ -107,6 +107,30 @@ void displayOff(void);
 #define setFrameInterruptHandler SG_setFrameInterruptHandler
 #endif
 
+#ifdef PLATFORM_SMS 
+#define initSprites SMS_initSprites    
+#elif PLATFORM_SG || PLATFORM_SC
+#define initSprites SG_initSprites
+#endif
+
+#ifdef PLATFORM_SMS 
+#define addSprite SMS_addSprite    
+#elif PLATFORM_SG || PLATFORM_SC
+#define addSprite SG_addSprite
+#endif
+
+#ifdef PLATFORM_SMS 
+#define finalizeSprites SMS_finalizeSprites  
+#elif PLATFORM_SG || PLATFORM_SC
+#define finalizeSprites SG_finalizeSprites
+#endif
+
+#ifdef PLATFORM_SMS 
+#define copySpritestoSAT SMS_copySpritestoSAT    
+#elif PLATFORM_SG || PLATFORM_SC
+#define copySpritestoSAT SG_copySpritestoSAT
+#endif
+
 
 void print_tile(unsigned char x, unsigned char y, unsigned int tileno);
 void print_str(unsigned char x, unsigned char y, char *str, int offset);

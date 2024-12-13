@@ -104,7 +104,7 @@ char load_leveldata(const char no, Leveldata * level) {
                 level->teleport[level->teleports_found].y = y;
                 ++level->teleports_found;
             } else if (*data == EXIT_SYMBOL) {
-                add_sprite(x, y);
+                add_animation(x, y);
             }
 
             //todo: checks if data is too short or too long 
@@ -188,11 +188,10 @@ void print_title(unsigned char * title) {
     output[strlen(GAME_NAME)] = 0;
     print_str(x, TITLE_LINE, output, 0);
     
-    add_sprite(x++, TITLE_LINE);
-    add_sprite(x++, TITLE_LINE);
-    add_sprite(x++, TITLE_LINE);
-    add_sprite(x++, TITLE_LINE);
-   
+    add_animation(x++, TITLE_LINE);
+    add_animation(x++, TITLE_LINE);
+    add_animation(x++, TITLE_LINE);
+    add_animation(x++, TITLE_LINE);
 }
 
 
@@ -214,12 +213,15 @@ void reset_time(signed char timer_on) {
     fps = 0;
     seconds = 0;
     animation_frame = 0;
+    previous_fps_seqment = 0;
 }
 
 /*
     count fps to get the play time
 */
 void timer(void) {
+    unsigned fps_segment;
+
     if (timer_enabled) {
         if (++fps == FRAME_RATE) {
             ++seconds;
@@ -227,8 +229,14 @@ void timer(void) {
         }
     }
 
-    if (timer_enabled && seconds)
-        animation_refresh = ((fps + 1) % (FRAME_RATE / 4) == 0); 
+    if (timer_enabled && seconds) {
+        fps_segment = (fps + 1) / (FRAME_RATE / 8);
+        if (previous_fps_seqment != fps_segment) {
+            animation_refresh = 1;
+            previous_fps_seqment = fps_segment;
+        } else
+            animation_refresh = 0;
+    }
 
     if (audio_enabled) {
         PSGSFXFrame();
@@ -449,9 +457,9 @@ signed char add_motion(Position * motion_objects, Position * item) {
 
 
 /*
-    save sprite
+    save pseudo sprite
 */
-void add_sprite(unsigned char x, unsigned char y) {
+void add_animation(unsigned char x, unsigned char y) {
 
     if (sprites_no < MAX_SPRITE)
         all_sprites[sprites_no] = ((signed int)(sprites_no << 10)) | (x << 5) | y;
@@ -653,6 +661,16 @@ void wait(unsigned char duration) {
         waitForVBlank();    
 }
 
+void extend_player_sprite(unsigned char player_figure, Leveldata *level) {
+
+    initSprites();    
+    addSprite((level->x << 3), (level->y << 3)-1, (player_figure == PLAYER1_SYMBOL_LEFT) ? 0 : 1, SG_COLOR_LIGHT_RED);
+    addSprite((level->x << 3), (level->y << 3)-1, (player_figure == PLAYER1_SYMBOL_LEFT) ? 2 : 3, SG_COLOR_GRAY); 
+    finalizeSprites();
+    waitForVBlank();
+    copySpritestoSAT(); 
+}
+
 void gameloop(unsigned char curr_level, _Bool demo_mode) {
     Direction dir, prev_dir;
     Leveldata level;
@@ -668,29 +686,33 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
     dir = prev_dir = DirectionUndefined;
 
     load_font();
-    clear_screen();  
+    clear_screen();
+    
+    SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY   * 8, 0, 8);
+    SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_RIGHT_BODY  * 8, 1, 8);
+    SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_LEFT_REST   * 8, 2, 8);
+    SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_RIGHT_REST  * 8, 3, 8);
+    
     if (load_leveldata(curr_level, &level)) {
         setup_level(&level);
+        extend_player_sprite(player_figure, &level);
         for (char n=0; n < MAX_MOTION_ITEMS; ++n) {
             motion_objects[n].x = -1;   
         }
-
         current_location = LocationInGame;
         reset_time(1);
         while ( (level.status != StatusDied) && (level.status != StatusCompleted)) {
-            print_playtime();
-            if (animation_refresh) 
+            //TODO: why animation is stopped when pressed a key but time goes on?
+            if (animation_refresh) {
+                print_playtime();
                 animate_quarterly(ScreenIngame);
-
-            if (audio_enabled) {
-                PSGSFXFrame();
-                PSGFrame(); 
-            } 
-          
-            prev_dir = dir;
+            }
+            
             dir = get_input(&demo_mode, &demo_pos);
-            if (dir != DirectionUndefined)
-                wait((prev_dir != dir) ? 10 : 5);
+            if (dir != DirectionUndefined) {
+                wait((prev_dir != dir) ? 10-2 : 5-2);
+              //  animation_refresh = 1; 
+            }
             if ((prev_dir != DirectionUndefined) && (dir == DirectionUndefined))
                 wait(10);
 
@@ -699,7 +721,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                 return;
 
             if (dir != DirectionUndefined) {
-                //dest: next position, neighbour position afternext 
+                //dest: next position, neighbour position afternext
                 Position dest, neighbour, diffs, source;
                 diffs = get_diff_position(dir);
                 dest.x = diffs.x + level.x, dest.y = diffs.y + level.y;
@@ -783,7 +805,8 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                 else if (dir == DirectionLeft)
                     player_figure = PLAYER1_SYMBOL_LEFT;
                 print_tile(level.x, level.y, player_figure);
-
+                extend_player_sprite(player_figure, &level);
+              
                 if (status_refresh) {
                     update_statusline(&level);
                      status_refresh = 0;
