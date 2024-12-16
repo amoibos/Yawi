@@ -10,8 +10,12 @@ char timer_enabled;
 unsigned int seconds;
 // helper for counting seconds;
 unsigned char fps;
+//sum of level records
+unsigned int totaltime=0;
 //player position
 Location current_location;
+//current level state
+Leveldata level;
 
 // current animation frame for a sprite
 unsigned char animation_frame;

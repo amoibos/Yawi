@@ -45,6 +45,7 @@ void animate_quarterly(Screens screen) {
 					break;
 				}
 				case ScreenCongratulation: {
+					print_tile(sprite_x, sprite_y, CREDITS_SPRITE[sprite_index][animation_frame] + 128);
 					break;
 				}
 				case ScreenLevelSelect: {
@@ -54,14 +55,55 @@ void animate_quarterly(Screens screen) {
 					//print_num(25, 0, INGAME_SPRITE[sprite_index][animation_frame], 128);
 					print_tile(sprite_x, sprite_y, INGAME_SPRITE[sprite_index][animation_frame]);	
 					break;
-					}
+				}
 				case ScreenDeath: {
 					//print_num(25, 0, DEATH_SPRITE[sprite_index][animation_frame], 128);
 					print_tile(sprite_x, sprite_y, DEATH_SPRITE[sprite_index][animation_frame]);	
 					break;
 					}
+				default:
+					break;
 			}
-			
+			//waitForVBlank();
 		}
 		waitForVBlank();
+}
+
+
+void update_sprites_falling(void) {
+    for(unsigned char pos=0; pos < MAX_SPRITE; ++pos) {
+        unsigned char idx;
+
+        idx = pos << 2;
+        unsigned char y =       SpriteTable[idx + OFFSET_SPRITE_Y];
+        unsigned char x =       SpriteTable[idx + OFFSET_SPRITE_X];
+        unsigned char tile =    SpriteTable[idx + OFFSET_SPRITE_TILE];
+        unsigned char attr =    SpriteTable[idx + OFFSET_SPRITE_ATTR];
+
+        if (SpriteTable[idx +  OFFSET_SPRITE_Y] < (SCREEN_MAX_Y << 3))
+            SpriteTable[idx +  OFFSET_SPRITE_Y] += 3;
+        
+        finalizeSprites();
+        waitForVBlank();
+        copySpritestoSAT(); 
+        waitForVBlank();
+    } 
+}
+
+void add_ball_sprite(void) {
+
+    for(unsigned char pos=0; pos < MAX_SPRITE; ++pos) 
+        SG_loadSpritePatterns(font__tiles__bin + BALL_SYMBOL * 8, pos, 8);
+}
+
+void init_sprite_position(void) {
+
+    initSprites();       
+    for(unsigned char row=0; row < MAX_SPRITE / MAX_SPRITE_PER_LINE; ++row) 
+        for(unsigned char column=0; column < MAX_SPRITE_PER_LINE; ++column) {
+            unsigned char pos = row * MAX_SPRITE_PER_LINE + column;
+            unsigned char sprite_pos_x = (column << 6) - 1 + ((row % 2) == 0 ? 0 : MAX_SPRITE_PER_LINE << 3);
+            unsigned char sprite_pos_y = row << 4;
+            addSprite(sprite_pos_x, sprite_pos_y, pos, ((pos % 16) < 2 ? 15 : (pos % 16)));
+    } 
 }

@@ -7,6 +7,9 @@ extern const unsigned char	death_psg[];
 extern const unsigned char	explosion_psg[];
 #define				explosion_psg_size 31
 
+extern const unsigned char	forelise_psg[];
+#define				forelise_psg_size 740
+
 extern const unsigned char	mountain_psg[];
 #define				mountain_psg_size 545
 

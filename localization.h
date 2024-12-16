@@ -24,6 +24,7 @@
 #define MAIN_MENU_ITEM1	"New Game"
 #define MAIN_MENU_ITEM2	"Level Select"
 #define MAIN_MENU_ITEM3	"Credits"
+#define MAIN_MENU_ITEM4	"Congratulation"
 
 #define LEVEL_NAME01	"Darkness Falls"
 #define LEVEL_NAME02	"Lateral Thinking"
@@ -40,7 +41,7 @@
 
 #define CREDITS_LINE01	"Darktrym"
 #define CREDITS_LINE02	"Sverx for DevkitSMS and suppport"
-#define CREDITS_LINE03	"Smspower.org - We \003 8Bit SEGA"
+#define CREDITS_LINE03	"Smspower.org - We \x03 8Bit SEGA"
 #define CREDITS_LINE04	""
 
 #define CREDITS_THANKS	"Thanks to.."

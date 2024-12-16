@@ -1,23 +1,50 @@
 #include "views.h"
 
-void endscreen(unsigned char * menu_name) {
+
+
+void congratulation_screen(unsigned char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char line=20;
-
+    
     current_location = LocationEndscreen;
     load_font();
     clear_screen();
+    reset_sprites();
     strcpy(output, menu_name);
     print_str(CENTER(output), 1, output, 128);
     
-    strcpy(output, CONGRATULATIONS);
-    print_str(CENTER(output), line, output, 128);
+    if (audio_enabled) {
+        PSGPlay(forelise_psg);
+    }
 
-    while(!keypressed()) waitForVBlank();
+    //add blinking continue text
+    strcpy(output, PRESS_TO_CONT);
+    for (unsigned char pos=0; pos < strlen(output); ++pos) {
+        add_animation(CENTER(output) + pos, line);        
+    }
 
+    init_sprite_position();
+    add_ball_sprite();
+
+    // animation loop
+    while(!keypressed()) {
+
+        if (animation_refresh) {
+            animate_quarterly(ScreenCongratulation);
+            update_sprites_falling();
+        }
+        waitForVBlank();
+    }     
+
+    if (audio_enabled) {
+        PSGStop(); 
+        PSGSFXStop();
+    }
+      
+    clear_sprites();
 }
 
-void deathscreen(unsigned char * menu_name) {
+void death_screen(unsigned char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char line=20;
 
@@ -32,11 +59,9 @@ void deathscreen(unsigned char * menu_name) {
     print_tile(CENTER(output) + strlen(output) + 2, TITLE_LINE + 1, 3);
     add_animation(CENTER(output) + strlen(output) + 2, TITLE_LINE + 1);
 
-
     strcpy(output, TRY_IT);
     print_str(CENTER(output), line, output, 128);
 
-   
     print_img(  cemetry__tiles__bin, cemetry__tiles__bin_size,
                 cemetry__palette__bin, cemetry__palette__bin_size,
                 256, 96, 0, 8);  
@@ -54,7 +79,7 @@ void deathscreen(unsigned char * menu_name) {
     }        
 }
 
-void next_level(unsigned char * menu_name, unsigned char level) {
+void next_level_screen(unsigned char * menu_name, unsigned char level) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char num[10+1];
     unsigned char line=2;
@@ -89,7 +114,7 @@ void next_level(unsigned char * menu_name, unsigned char level) {
     }
 }
 
-void level_select(unsigned char * menu_name) {
+void level_select_screen(unsigned char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
     const unsigned char offset=5;
     unsigned char line=5;
@@ -116,7 +141,7 @@ void level_select(unsigned char * menu_name) {
         gameloop(option, 0);
 }
 
-void credits(const unsigned char * menu_name) {
+void credits_screen(const unsigned char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char line=5;
 
@@ -124,6 +149,7 @@ void credits(const unsigned char * menu_name) {
     displayOff();
     load_font();
     clear_screen();
+    reset_sprites();
     displayOn();
     
     if (audio_enabled) {
@@ -182,7 +208,7 @@ void credits(const unsigned char * menu_name) {
     }
 }
 
-void intro(char * menu_name) {
+void intro_screen(char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char line;
     
@@ -195,11 +221,11 @@ void intro(char * menu_name) {
         strcpy(output, menu_name);
         print_str(CENTER(output), TITLE_LINE + 1, output, 0);
 
-        line=2;
+        line=2+1;
         strcpy(output, WRITTEN_BY);
         print_str(CENTER(output), line++, output, 128);
-        strcpy(output, IN_YEAR);
-        print_str(CENTER(output), line++, output, 128);
+        //strcpy(output, IN_YEAR);
+        //print_str(CENTER(output), line++, output, 128);
 
         print_img(  city__tiles__bin, city__tiles__bin_size,
                     city__palette__bin, city__palette__bin_size,
@@ -213,6 +239,7 @@ void intro(char * menu_name) {
         print_str(SCREEN_MAX_X - strlen(output), SCREEN_MAX_Y - 1, output, 128);
         displayOn();
         reset_time(1);
+
         unsigned char option = menu(intro_items, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0);
         switch (option) {
             case (unsigned char) MainMenuNewGame: {
@@ -220,11 +247,15 @@ void intro(char * menu_name) {
                 break;
             }
             case (unsigned char) MainMenuLevelSelect: {
-                level_select(LEVEL_SELECT);
+                level_select_screen(LEVEL_SELECT);
                 break;
             }
             case (unsigned char) MainMenuCredits: {
-                credits(CREDITS);
+                credits_screen(CREDITS);
+                break;
+            }
+            case (unsigned char) MainMenuCongratulation: {
+                congratulation_screen(CONGRATULATIONS);
                 break;
             }
             default: {

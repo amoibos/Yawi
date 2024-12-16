@@ -8,7 +8,7 @@ void load_font(void) {
     load_ascii_tiles(512);    
 }
 
-char load_leveldata(const char no, Leveldata * level) {
+char load_leveldata(const char no) {
     const unsigned char * data;
     
     if ( (no < 1) || (no > MAX_LEVEL)) {
@@ -20,89 +20,89 @@ char load_leveldata(const char no, Leveldata * level) {
     switch (no) {
         case  1: {
             data = level01_dat;
-            strcpy(level->name, level_names[no - 1]);
+            strcpy(level.name, level_names[no - 1]);
             break;
         }  
 #ifndef DEMO
         case  2: {
             data = level02_dat;
-            strcpy(level->name, level_names[no - 1]);
+            strcpy(level.name, level_names[no - 1]);
             break;
         } 
         case  3: {
             data = level03_dat;
-            strcpy(level->name, level_names[no - 1]);
+            strcpy(level.name, level_names[no - 1]);
             break;
         } 
         case  4: {
             data = level04_dat;
-            strcpy(level->name, level_names[no - 1]);
+            strcpy(level.name, level_names[no - 1]);
             break;
         } 
         case  5: {
             data = level05_dat;
-            strcpy(level->name, level_names[no - 1]);
+            strcpy(level.name, level_names[no - 1]);
             break;
         } 
         case  6: {
             data = level06_dat;
-            strcpy(level->name, level_names[no - 1]);
+            strcpy(level.name, level_names[no - 1]);
             break;
         } 
         case  7: {
             data = level07_dat;
-            strcpy(level->name, level_names[no - 1]);
+            strcpy(level.name, level_names[no - 1]);
             break;
         } 
         case  8: {
             data = level08_dat;
-            strcpy(level->name, level_names[no - 1]);
+            strcpy(level.name, level_names[no - 1]);
             break;
         } 
         case  9: {
             data = level09_dat;
-            strcpy(level->name, level_names[no - 1]);
+            strcpy(level.name, level_names[no - 1]);
             break;
         } 
         case 10: {
             data = level10_dat;
-            strcpy(level->name, level_names[no - 1]);
+            strcpy(level.name, level_names[no - 1]);
             break;
         } 
         case 11: {
             data = level11_dat;
-            strcpy(level->name, level_names[no - 1]);
+            strcpy(level.name, level_names[no - 1]);
             break;
         } 
         case 12: {
             data = level12_dat;
-            strcpy(level->name, level_names[no - 1]);
+            strcpy(level.name, level_names[no - 1]);
             break;
         } 
 #endif               
        default: {
             data = level01_dat;
-            strcpy(level->name, level_names[1]);
+            strcpy(level.name, level_names[1]);
             break;
         }         
     }
     
-    level->max_gold = 0;
-    level->teleports_found = 0; 
+    level.max_gold = 0;
+    level.teleports_found = 0; 
     unsigned char first_char=0;
     for(unsigned char y=OFFSET_MAP_Y; y < LEVEL_HEIGHT + OFFSET_MAP_Y; ++y) {
         for(unsigned char x=OFFSET_MAP_X; x < SCREEN_MAX_X + OFFSET_MAP_X; ++x) {
             // skip control characters, 
             while (*data < ' ') data++;
             if (*data == PLAYER1_SYMBOL_LEFT) {
-                level->start_x = x, level->start_y = y;    
+                level.x = x, level.y = y;    
             } else if (*data == GOLD_SYMBOL) {
-                level->max_gold++;
+                level.max_gold++;
             } else if ((*data == TELEPORTER_SYMBOL) && 
-                       (level->teleports_found < MAX_TELEPORTER) ) {
-                level->teleport[level->teleports_found].x = x;
-                level->teleport[level->teleports_found].y = y;
-                ++level->teleports_found;
+                       (level.teleports_found < MAX_TELEPORTER) ) {
+                level.teleport[level.teleports_found].x = x;
+                level.teleport[level.teleports_found].y = y;
+                ++level.teleports_found;
             } else if (*data == EXIT_SYMBOL) {
                 add_animation(x, y);
             }
@@ -146,7 +146,7 @@ _Bool is_border(const signed char x, const signed char y) {
 /*
     compute level select code    
 */
-long get_levelcode(const unsigned char level) {
+long get_levelcode(unsigned char level) {
     long code=0;
 
     signed char factors[MAX_LEVELCODE_FACTOR] = {2, 3, 5, -2, 4};
@@ -160,15 +160,15 @@ long get_levelcode(const unsigned char level) {
 /*
     printing status line
 */
-void update_statusline(Leveldata * level) {
+void update_statusline(void) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char numstr[10+1];
 
-    strcat(strcat(strcpy(output, GOLD), SEGA_itoa(level->gold, numstr)),  " / ");
-    SEGA_itoa(level->max_gold, numstr); 
+    strcat(strcat(strcpy(output, GOLD), SEGA_itoa(level.gold, numstr)),  " / ");
+    SEGA_itoa(level.max_gold, numstr); 
     strcat(output, numstr);
     
-    clear_line(INFO_LINE);
+    //clear_line(INFO_LINE);
     print_str(0, INFO_LINE, output, 128);
 }
 
@@ -241,7 +241,7 @@ void timer(void) {
     if (audio_enabled) {
         PSGSFXFrame();
         PSGFrame(); 
-    } 
+    }
 }
 
 
@@ -257,20 +257,20 @@ void reset_sprites(void) {
 /*
     reset level state, build screen elements
 */
-void setup_level(Leveldata * level) {
+void setup_level(void) {
     unsigned char output[SCREEN_MAX_X+1];
 
-    level->x = level->start_x;
-    level->y = level->start_y;
-    level->gold = 0;
-    level->status = StatusAlive;
+    //level.x = level.start_x;
+    //level.y = level.start_y;
+    level.gold = 0;
+    level.status = StatusAlive;
 
     print_title(GAME_NAME);
     clear_line(PROGRESS_LINE);
 
     clear_line(STATUS_LINE);
-    print_str(0, STATUS_LINE, strcat(strcpy(output, LEVEL), level->name), 128);
-    update_statusline(level);
+    print_str(0, STATUS_LINE, strcat(strcpy(output, LEVEL), level.name), 128);
+    update_statusline();
     reset_time(1);
 }
 
@@ -364,16 +364,16 @@ unsigned int get_default_tile(unsigned char x, unsigned char y) {
 /*
     return if object is pushable in that direction
 */
-_Bool is_pushing_object(Leveldata * level, Direction dir) {
+_Bool is_pushing_object(Direction dir) {
     Position diffs;
     Position dest, neighbour;
     unsigned int item;
 
     diffs = get_diff_position(dir);
-    dest.x = level->x + diffs.x;
-    dest.y = level->y + diffs.y;
-    neighbour.x = level->x + (diffs.x << 1);
-    neighbour.y = level->y + (diffs.y << 1);
+    dest.x = level.x + diffs.x;
+    dest.y = level.y + diffs.y;
+    neighbour.x = level.x + (diffs.x << 1);
+    neighbour.y = level.y + (diffs.y << 1);
     item = get_tile(dest.x, dest.y); 
 
     _Bool precondition = 
@@ -477,9 +477,9 @@ signed int get_checked_tile(signed char x, signed char y) {
     return get_default_tile(x, y);       
 }
 
-void gravitation(Position * motion_objects, Leveldata * level) {
+void gravitation(Position * motion_objects) {
     
-    while (level->status != StatusDied) {
+    while (level.status != StatusDied) {
         signed char pos = get_first_motion(motion_objects, 1); 
         //no motion found then everything is done
         if (pos == -1) 
@@ -530,7 +530,7 @@ void gravitation(Position * motion_objects, Leveldata * level) {
                         print_tile(src.x, src.y, EMPTY_SYMBOL);
                         print_tile(dest.x, dest.y, falling_item);
                         PSGPlayNoRepeat(death_psg);
-                        level->status = StatusDied;
+                        level.status = StatusDied;
                         continue;
                     }
                     
@@ -657,23 +657,42 @@ Direction get_input(_Bool* demo_mode, unsigned char * demo_pos) {
 }
 
 void wait(unsigned char duration) {
-    for(unsigned char wait=0; wait < duration; ++wait) 
+
+    for(unsigned char wait=0; wait < duration; ++wait) {
+        timer();
         waitForVBlank();    
+    }
 }
 
-void extend_player_sprite(unsigned char player_figure, Leveldata *level) {
+void clear_sprites(void) {
+    initSprites();
+    finalizeSprites();
+    waitForVBlank();
+    copySpritestoSAT();
+    waitForVBlank(); 
+}
+
+void extend_player_sprite(unsigned char player_figure) {
 
     initSprites();    
-    addSprite((level->x << 3), (level->y << 3)-1, (player_figure == PLAYER1_SYMBOL_LEFT) ? 0 : 1, SG_COLOR_LIGHT_RED);
-    addSprite((level->x << 3), (level->y << 3)-1, (player_figure == PLAYER1_SYMBOL_LEFT) ? 2 : 3, SG_COLOR_GRAY); 
+    addSprite((level.x << 3), (level.y << 3)-1, (player_figure == PLAYER1_SYMBOL_LEFT) ? 0 : 1, SG_COLOR_LIGHT_RED);
+    addSprite((level.x << 3), (level.y << 3)-1, (player_figure == PLAYER1_SYMBOL_LEFT) ? 2 : 3, SG_COLOR_GRAY); 
     finalizeSprites();
     waitForVBlank();
     copySpritestoSAT(); 
 }
 
+void add_player_sprite(void) {
+
+    SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY   * 8, 0, 8);
+    SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_RIGHT_BODY  * 8, 1, 8);
+    SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_LEFT_REST   * 8, 2, 8);
+    SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_RIGHT_REST  * 8, 3, 8); 
+}
+
+
 void gameloop(unsigned char curr_level, _Bool demo_mode) {
     Direction dir, prev_dir;
-    Leveldata level;
     unsigned char found;
     _Bool status_refresh=0;
     _Bool moved_stone=0;
@@ -688,14 +707,12 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
     load_font();
     clear_screen();
     
-    SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY   * 8, 0, 8);
-    SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_RIGHT_BODY  * 8, 1, 8);
-    SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_LEFT_REST   * 8, 2, 8);
-    SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_RIGHT_REST  * 8, 3, 8);
-    
-    if (load_leveldata(curr_level, &level)) {
-        setup_level(&level);
-        extend_player_sprite(player_figure, &level);
+    add_player_sprite();
+    if (load_leveldata(curr_level)) {
+        setup_level();
+        if (curr_level < 2)
+            totaltime = 0;
+        extend_player_sprite(player_figure);
         for (char n=0; n < MAX_MOTION_ITEMS; ++n) {
             motion_objects[n].x = -1;   
         }
@@ -703,18 +720,20 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
         reset_time(1);
         while ( (level.status != StatusDied) && (level.status != StatusCompleted)) {
             //TODO: why animation is stopped when pressed a key but time goes on?
+            
+            print_playtime();
             if (animation_refresh) {
-                print_playtime();
+                //print_playtime();
                 animate_quarterly(ScreenIngame);
             }
             
             dir = get_input(&demo_mode, &demo_pos);
             if (dir != DirectionUndefined) {
-                wait((prev_dir != dir) ? 10-2 : 5-2);
-              //  animation_refresh = 1; 
+                wait((prev_dir != dir) ? 10-2 : 2-2);
             }
-            if ((prev_dir != DirectionUndefined) && (dir == DirectionUndefined))
+            if ((prev_dir != DirectionUndefined) && (dir == DirectionUndefined)) {
                 wait(10);
+            }
 
             prev_dir = dir;
             if (dir == DirectionExit)
@@ -732,7 +751,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                     continue;
                 
                 if (strchr(MOVABLE_SYMBOLS, item) != 0) {
-                    if (is_pushing_object(&level, dir)) {
+                    if (is_pushing_object(dir)) {
                         moved_stone = 1;
                         source.x = level.x, source.y = level.y;
                         neighbour.x = source.x + (diffs.x << 1);
@@ -769,8 +788,8 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                     ++level.gold;
                     if (audio_enabled) {
                         PSGPlayNoRepeat(coin_psg);
-                        status_refresh = 1;
                         //PSGSFXPlay(coin_psg, 0);
+                        status_refresh = 1;
                     }
                 } else if (item == THORNS_SYMBOL) {
                     level.status = StatusDied;
@@ -778,13 +797,14 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                     continue;
                 } else if (item == EXIT_SYMBOL) {
                     if (level.gold >= level.max_gold) {
+                        totaltime += seconds;
                         if (curr_level == MAX_LEVEL) {
                             level.status = StatusCompleted;
                         } else {
                             PSGPlayNoRepeat(warp_psg);
-                            next_level(NOT_HARD, ++curr_level);
-                            load_leveldata(curr_level, &level);
-                            setup_level(&level);
+                            next_level_screen(NOT_HARD, ++curr_level);
+                            load_leveldata(curr_level);
+                            setup_level();
                             continue;      
                         }  
                     } else //not collected all gold 
@@ -805,27 +825,24 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                 else if (dir == DirectionLeft)
                     player_figure = PLAYER1_SYMBOL_LEFT;
                 print_tile(level.x, level.y, player_figure);
-                extend_player_sprite(player_figure, &level);
+                extend_player_sprite(player_figure);
               
                 if (status_refresh) {
-                    update_statusline(&level);
-                     status_refresh = 0;
+                    update_statusline();
+                    status_refresh = 0;
                 }
                 check_for_changes(motion_objects, &dest);
-                gravitation(motion_objects, &level);
+                gravitation(motion_objects);
             }
         }
     }
-    /*if (audio_enabled) {
-        PSGSFXStop();
-        PSGStop(); 
-    }*/
 
+    clear_sprites();
     if (level.status == StatusCompleted)
-        endscreen(CONGRATULATIONS);
+        congratulation_screen(CONGRATULATIONS);
     else if (level.status == StatusDied) {
         print_title(GAME_NAME GAME_OVER);
         while(!keypressed()) waitForVBlank();
-        deathscreen(MISSION_FAIL);    
+        death_screen(MISSION_FAIL);    
     }
 }

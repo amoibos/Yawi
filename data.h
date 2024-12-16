@@ -33,7 +33,6 @@
 #define OFFSET_MAP_Y                ((3))
 #define OFFSET_MAP_X                ((0))
 
-
 #define EXIT_SYMBOL                 (('E'))
 #define PLAYER1_SYMBOL_LEFT         (('@'))
 #define PLAYER1_SYMBOL_LEFT_BODY    ((PLAYER1_SYMBOL_LEFT + 3))
@@ -42,13 +41,10 @@
 #define PLAYER1_SYMBOL_RIGHT_BODY   ((PLAYER1_SYMBOL_RIGHT + 3))
 #define PLAYER1_SYMBOL_RIGHT_REST   ((PLAYER1_SYMBOL_RIGHT_BODY + 6))
 
-
-
 #define PLAYER2_SYMBOL              (('O'))
 #define GOLD_SYMBOL                 (('$'))
 //level 1-12 do not use this
 #define TELEPORTER_SYMBOL           (('#'))
-
 
 #define EXPLOSIVEX_SYMBOL           (('X'))
 #define EXPLOSIVEW_SYMBOL           (('W'))
@@ -81,13 +77,19 @@
 #define MOVABLE_SYMBOLS             (("<>^vBoWXYZ"))
 #define BLOCKING_SYMBOLS            (("<>^v:$")) 
 
+#define BALL_SYMBOL                 (('\x07'))
+
 typedef enum eDirection {
     DirectionUndefined,
     DirectionRight,
     DirectionUp,
     DirectionLeft,
     DirectionDown, 
-    DirectionExit
+    DirectionExit,
+    DirectionNW,
+    DirectionNE,
+    DirectionSE,
+    DirectionSW
 } Direction;
 
 typedef enum eStatus {
@@ -134,8 +136,6 @@ typedef struct leveldata_t {
     unsigned char name[MAX_LEVEL_NAME];
     unsigned char gold;
     unsigned char max_gold;
-    signed char start_x;
-    signed char start_y;
     signed char x;
     signed char y;
     Status status;
@@ -171,7 +171,8 @@ typedef enum eMainMenu {
     MainMenuUndefined,
     MainMenuNewGame,
     MainMenuLevelSelect,
-    MainMenuCredits
+    MainMenuCredits,
+    MainMenuCongratulation
 } MainMenu;
 
 typedef enum eScreens {
@@ -185,11 +186,12 @@ typedef enum eScreens {
     ScreenCredits
 } Screens;
 
-#define MAX_INTRO_ITEMS ((3))
+#define MAX_INTRO_ITEMS ((4))
 static const unsigned char * intro_items[MAX_INTRO_ITEMS] = {
     MAIN_MENU_ITEM1,
     MAIN_MENU_ITEM2,
-    MAIN_MENU_ITEM3
+    MAIN_MENU_ITEM3,
+    MAIN_MENU_ITEM4
 };
 
 #define CREDIT_NAMES_MAX ((3))
@@ -229,6 +231,14 @@ typedef enum eInputType {
 
 #define MAX_SPRITE                  ((32))
 
+#define MAX_SPRITE_PER_LINE         ((4))
+
 #define FRAME_RATE                  ((60))
+
+#define OFFSET_SPRITE_Y             ((0))
+#define OFFSET_SPRITE_X             ((1))
+#define OFFSET_SPRITE_TILE          ((2))
+#define OFFSET_SPRITE_ATTR          ((3))
+
 
 #endif

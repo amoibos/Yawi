@@ -13,12 +13,12 @@
 
 #define CENTER(x) ((SCREEN_MAX_X >> 1) - (strlen(x) >> 1))
 
-void endscreen(const unsigned char * menu_name);
-void deathscreen(const unsigned char * menu_name);
-void next_level(const unsigned char * menu_name, char level);
-void level_select(const unsigned char * menu_name);
-void intro(const unsigned char * menu_name);
-void credits(const unsigned char * menu_name);
+void congratulation_screen(const unsigned char * menu_name);
+void death_screen(const unsigned char * menu_name);
+void next_level_screen(const unsigned char * menu_name, char level);
+void level_select_screen(const unsigned char * menu_name);
+void intro_screen(const unsigned char * menu_name);
+void credits_screen(const unsigned char * menu_name);
 void print_img(	const unsigned char *tiledata, const unsigned int tile_length, 
 				const unsigned char *colordata, const unsigned int color_length, 
 				const unsigned int width, const unsigned int height, const unsigned char left, const unsigned char top);
