@@ -12,7 +12,7 @@ unsigned char INGAME_SPRITE[5][4] = {
 };
 
 unsigned char DEATH_SPRITE[1][4] = {
-		/*#3*/		 {3, 4, 3, 4}
+		/*#3*/		 {3, 4, 5, 4}
 };
 
 

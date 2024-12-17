@@ -1,10 +1,10 @@
 #include "strings.h"
 
 unsigned char strlen(const unsigned char * str) {
-	const char *s;
+	const unsigned char *s;
 
 	for (s = str; *s; ++s) ;
-	
+
     return s - str;
 }
 
@@ -14,14 +14,14 @@ signed char strpos(const unsigned char * search, const unsigned char * content, 
 	unsigned char i, j, check;
     signed char result=-1;
 	unsigned char len_search = strlen(search);
-	unsigned char len_content = strlen(content);  
+	unsigned char len_content = strlen(content);
 
 	i = start;
 	if (
-        (len_search > len_content) || 
-        (*search == '\0') || 
+        (len_search > len_content) ||
+        (*search == '\0') ||
         (i > (len_content - 1))
-        ) 
+        )
         return result;
 
 	for(; i < len_content; ++i)	{
@@ -29,7 +29,7 @@ signed char strpos(const unsigned char * search, const unsigned char * content, 
 		for(j = 0; j < len_search; ++j)
 			if(content[i + j] == search[j])
 				++check;
-             
+
 		if(check == len_search) {
 			result = i;
 			break;
@@ -47,14 +47,14 @@ unsigned char* SEGA_itoa(long value, unsigned char * sp) {
     unsigned char *dest = sp;
 
     start = sp;
-    
-    if (sign) 
+
+    if (sign)
         value *= -1;
-    
+
     do {
         q = value / 10;
         r = value % 10;
-        
+
         if (q)
             value /= 10;
         else
@@ -76,12 +76,12 @@ unsigned char* SEGA_itoa(long value, unsigned char * sp) {
     return dest;
 }
 
-long SEGA_atoi(unsigned char * str) {
+long SEGA_atoi(const unsigned char * str) {
 	long k = 0;
     unsigned char start;
 
     start = *str;
-	while (*str) 
+	while (*str)
 	{
 		k = (k << 3) + (k << 1) + (*str) - '0';
 		++str;
@@ -94,7 +94,7 @@ unsigned char* strcat(unsigned char * dest, const unsigned char * src) {
 
 	while (*dest)	dest++;
 	while (*dest++ = *src++) ;
-	
+
 	return rdest;
 }
 
@@ -105,7 +105,7 @@ signed char strcmp(const char * str1, const char * str2) {
 		++str2;
 	}
 	return *(const unsigned char*)str1 - *(const unsigned char*)str2;
-} */ 
+} */
 /*
 void strncpy(unsigned char* dst, const unsigned char* src, const unsigned char amount) {
 	unsigned char i = 0;
@@ -121,19 +121,19 @@ unsigned char* strcpy(unsigned char* dest, const unsigned char* src) {
 }
 
 unsigned char upcase(const unsigned char c) {
-	
+
     if ((c >= 'A') && (c <='Z'))
         return c;
     else if ((c >= 'a') && (c <='z'))
         return c - 32;
-    else if ((c >= 'A' + 128) && (c <='Z' + 128))    
+    else if ((c >= 'A' + 128) && (c <='Z' + 128))
         return c;
     else if ((c >= 'a') && (c <='z'))
         return c - 32;
     else
         return c;
 
-}	
+}
 
 const unsigned char *strchr(const unsigned char *s, const unsigned char ch) {
 	for (; *s != '\0'; ++s)
@@ -146,7 +146,7 @@ const unsigned char *strchr(const unsigned char *s, const unsigned char ch) {
 /*
 unsigned char is_alpha(const unsigned char mark) {
 	return 	(mark >= 0x41) && (mark <= 0x5A) ||
-			(mark >= 0x61) && (mark <= 0x7A); 
+			(mark >= 0x61) && (mark <= 0x7A);
 }*/
 
 /*long long pow(long long base, int ex) {
@@ -175,9 +175,9 @@ float str_to_float(const unsigned char  * arr) {
 	            --j;
         }
         if (c == '.')
-        { 
-        	if (flag == 1) 
-        		return 0; 
+        {
+        	if (flag == 1)
+        		return 0;
         	flag=1;
         }
         ++i;
@@ -185,7 +185,7 @@ float str_to_float(const unsigned char  * arr) {
     val = val*pow(10,j);
     return val;
 }
-*/ 
+*/
 // used in ftoa
 /*
 int itoa_s(int value, char *buf) {
@@ -197,10 +197,10 @@ int itoa_s(int value, char *buf) {
         buf[index] = i+0x30;
         index++;
         return index;
-} 
+}
 
 unsigned char * ftoa(float value, int decimals, unsigned char * buf) {
-	unsigned int d;	
+	unsigned int d;
 	unsigned int index = 0;
 	// Handle negative values
 	if (value < 0) {
@@ -231,10 +231,10 @@ unsigned char * ftoa(float value, int decimals, unsigned char * buf) {
 	buf[index] = '\0';
 
   return buf;
-} 
+}
 */
 
-// WARNING: capitalize src! 
+// WARNING: capitalize src!
 
 unsigned char * to_upper(unsigned char * src) {
 	unsigned char *temp;
@@ -261,25 +261,25 @@ unsigned char * sprint(unsigned char * buffer, unsigned char * format, unsigned 
         if (format[format_pos] != '%') {
             buffer[buffer_pos++] = format[format_pos];
         } else if ((format[format_pos] == '%') && (format[format_pos+1] == '%')) {
-            buffer[buffer_pos++] = format[format_pos++];    
+            buffer[buffer_pos++] = format[format_pos++];
         } else {
             ++format_pos;
             switch (format[format_pos]) {
-                case 's': { 
+                case 's': {
                     str = *strings;
                     ++strings;
                     buffer[buffer_pos] = 0;
                     strcat(buffer, str);
                     break;
                 }
-                case 'd': { 
+                case 'd': {
                     integer = *numbersInt++;
                     buffer[buffer_pos] = 0;
                     SEGA_itoa(integer, temp);
                     strcat(buffer, temp);
                     break;
                 }
-                  case 'f': { 
+                  case 'f': {
                     real = *numbersFloat++;
                     buffer[buffer_pos] = 0;
                     ftoa(real, 10, temp);

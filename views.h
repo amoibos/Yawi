@@ -19,8 +19,8 @@ void next_level_screen(const unsigned char * menu_name, char level);
 void level_select_screen(const unsigned char * menu_name);
 void intro_screen(const unsigned char * menu_name);
 void credits_screen(const unsigned char * menu_name);
-void print_img(	const unsigned char *tiledata, const unsigned int tile_length, 
-				const unsigned char *colordata, const unsigned int color_length, 
+void print_img(	const unsigned char *tiledata, const unsigned int tile_length,
+				const unsigned char *colordata, const unsigned int color_length,
 				const unsigned int width, const unsigned int height, const unsigned char left, const unsigned char top);
 
 #endif

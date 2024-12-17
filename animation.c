@@ -24,8 +24,8 @@ void animate_quarterly(Screens screen) {
             unsigned char sprite_x = sprite.x;
             unsigned char sprite_y = sprite.y;
             signed char sprite_index = sprite.index;
-			
-#ifdef DEBUG 
+
+#ifdef DEBUG
 			print_num(0, 0, sprite_x, 128);
 			print_num(5, 0, sprite_y, 128);
 			print_num(10, 0, sprite_index, 128);
@@ -53,12 +53,12 @@ void animate_quarterly(Screens screen) {
 				}
 				case ScreenIngame: {
 					//print_num(25, 0, INGAME_SPRITE[sprite_index][animation_frame], 128);
-					print_tile(sprite_x, sprite_y, INGAME_SPRITE[sprite_index][animation_frame]);	
+					print_tile(sprite_x, sprite_y, INGAME_SPRITE[sprite_index][animation_frame]);
 					break;
 				}
 				case ScreenDeath: {
 					//print_num(25, 0, DEATH_SPRITE[sprite_index][animation_frame], 128);
-					print_tile(sprite_x, sprite_y, DEATH_SPRITE[sprite_index][animation_frame]);	
+					print_tile(sprite_x, sprite_y, DEATH_SPRITE[sprite_index][animation_frame]);
 					break;
 					}
 				default:
@@ -80,30 +80,31 @@ void update_sprites_falling(void) {
         unsigned char tile =    SpriteTable[idx + OFFSET_SPRITE_TILE];
         unsigned char attr =    SpriteTable[idx + OFFSET_SPRITE_ATTR];
 
-        if (SpriteTable[idx +  OFFSET_SPRITE_Y] < (SCREEN_MAX_Y << 3))
-            SpriteTable[idx +  OFFSET_SPRITE_Y] += 3;
-        
-        finalizeSprites();
-        waitForVBlank();
-        copySpritestoSAT(); 
-        waitForVBlank();
-    } 
+        if (SpriteTable[idx +  OFFSET_SPRITE_Y] < (SCREEN_MAX_RES_Y))
+            SpriteTable[idx +  OFFSET_SPRITE_Y] += 1;
+
+
+    }
+    finalizeSprites();
+    waitForVBlank();
+    copySpritestoSAT();
+    waitForVBlank();
 }
 
 void add_ball_sprite(void) {
 
-    for(unsigned char pos=0; pos < MAX_SPRITE; ++pos) 
+    for(unsigned char pos=0; pos < MAX_SPRITE; ++pos)
         SG_loadSpritePatterns(font__tiles__bin + BALL_SYMBOL * 8, pos, 8);
 }
 
 void init_sprite_position(void) {
 
-    initSprites();       
-    for(unsigned char row=0; row < MAX_SPRITE / MAX_SPRITE_PER_LINE; ++row) 
+    initSprites();
+    for(unsigned char row=0; row < MAX_SPRITE / MAX_SPRITE_PER_LINE; ++row)
         for(unsigned char column=0; column < MAX_SPRITE_PER_LINE; ++column) {
             unsigned char pos = row * MAX_SPRITE_PER_LINE + column;
             unsigned char sprite_pos_x = (column << 6) - 1 + ((row % 2) == 0 ? 0 : MAX_SPRITE_PER_LINE << 3);
             unsigned char sprite_pos_y = row << 4;
             addSprite(sprite_pos_x, sprite_pos_y, pos, ((pos % 16) < 2 ? 15 : (pos % 16)));
-    } 
+    }
 }

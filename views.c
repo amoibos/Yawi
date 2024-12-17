@@ -1,26 +1,39 @@
 #include "views.h"
+#include "libs/strings.h"
+#include "localization.h"
 
-
-
-void congratulation_screen(unsigned char * menu_name) {
+void congratulation_screen(const unsigned char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
-    unsigned char line=20;
-    
+    unsigned char num[5+1];
+    unsigned char line=1;
+
     current_location = LocationEndscreen;
     load_font();
     clear_screen();
     reset_sprites();
     strcpy(output, menu_name);
-    print_str(CENTER(output), 1, output, 128);
-    
+    print_str(CENTER(output), line, output, 128);
+
+    line = 3;
+    output[0] = '\0';
+    SEGA_itoa(totaltime, num);
+    strcat(strcat(strcat(output, PLAY_TIME), num), "s");
+    print_str(0, line++, output, 128);
+
+    output[0] = '\0';
+    strcat(output, VERIFICATION);
+    print_str(0, line++, output, 128);
+
+
     if (audio_enabled) {
         PSGPlay(forelise_psg);
     }
 
     //add blinking continue text
+    line = 20;
     strcpy(output, PRESS_TO_CONT);
     for (unsigned char pos=0; pos < strlen(output); ++pos) {
-        add_animation(CENTER(output) + pos, line);        
+        add_animation(CENTER(output) + pos, line);
     }
 
     init_sprite_position();
@@ -34,17 +47,16 @@ void congratulation_screen(unsigned char * menu_name) {
             update_sprites_falling();
         }
         waitForVBlank();
-    }     
+    }
 
     if (audio_enabled) {
-        PSGStop(); 
+        PSGStop();
         PSGSFXStop();
     }
-      
     clear_sprites();
 }
 
-void death_screen(unsigned char * menu_name) {
+void death_screen(const unsigned char *menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char line=20;
 
@@ -54,7 +66,7 @@ void death_screen(unsigned char * menu_name) {
     reset_sprites();
     strcpy(output, menu_name);
     print_str(CENTER(output), TITLE_LINE + 1, output, 128);
-    
+
     //add bat
     print_tile(CENTER(output) + strlen(output) + 2, TITLE_LINE + 1, 3);
     add_animation(CENTER(output) + strlen(output) + 2, TITLE_LINE + 1);
@@ -64,7 +76,7 @@ void death_screen(unsigned char * menu_name) {
 
     print_img(  cemetry__tiles__bin, cemetry__tiles__bin_size,
                 cemetry__palette__bin, cemetry__palette__bin_size,
-                256, 96, 0, 8);  
+                SCREEN_MAX_RES_X, 96, 0, 8);
 
     for(unsigned char y=line; y < SCREEN_MAX_Y; ++y)
         print_str(0, y, "                                ", 128);
@@ -73,13 +85,13 @@ void death_screen(unsigned char * menu_name) {
 
     //animation loop and waiting for key pressed
     while(!keypressed()) {
-        if (animation_refresh) 
+        if (animation_refresh)
             animate_quarterly(ScreenDeath);
         waitForVBlank();
-    }        
+    }
 }
 
-void next_level_screen(unsigned char * menu_name, unsigned char level) {
+void next_level_screen(const unsigned char * menu_name, unsigned char level) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char num[10+1];
     unsigned char line=2;
@@ -95,10 +107,10 @@ void next_level_screen(unsigned char * menu_name, unsigned char level) {
     print_str(CENTER(output), line++, output, 128);
 
     line = 10;
-    strcpy(output, LEVEL); 
+    strcpy(output, LEVEL);
     strcat(output, level_names[level-1]);
     print_str(offset, line++, output, 128);
-    
+
     strcpy(output, LEVEL_CODE);
     SEGA_itoa(get_levelcode(level), num);
     strcat(output, num);
@@ -114,7 +126,7 @@ void next_level_screen(unsigned char * menu_name, unsigned char level) {
     }
 }
 
-void level_select_screen(unsigned char * menu_name) {
+void level_select_screen(const unsigned char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
     const unsigned char offset=5;
     unsigned char line=5;
@@ -130,7 +142,7 @@ void level_select_screen(unsigned char * menu_name) {
     print_str(offset, line, output, 128);
     /*
     input(strlen(output), line, output, SCREEN_MAX_X, InputTypeNumerical);
-    long code = SEGA_atoi(unsigned char * str) 
+    long code = SEGA_atoi(unsigned char * str)
     for (option=1; option <= MAX_LEVEL; ++option)
         if (code == get_levelcode(1))
             gameloop(option, 0);
@@ -151,7 +163,7 @@ void credits_screen(const unsigned char * menu_name) {
     clear_screen();
     reset_sprites();
     displayOn();
-    
+
     if (audio_enabled) {
         PSGPlay(mountain_psg);
     }
@@ -162,28 +174,28 @@ void credits_screen(const unsigned char * menu_name) {
     for (unsigned char entry=0; entry < CREDIT_NAMES_MAX; ++entry) {
         unsigned center = CENTER(strcpy(output, credits_names[entry]));
 
-        switch(entry) { 
-            case 0: {   
+        switch(entry) {
+            case 0: {
                         print_str(0, line, CREDITS_DEVS, 128);
                         line+=2;
                         break;
                     }
 
-            case 1: {   
+            case 1: {
                         line+=2;
                         print_str(0, line++, CREDITS_THANKS, 128);
                         break;
-                    }        
-            default: 
+                    }
+            default:
                 break;
         }
-    
+
         for (unsigned char pos=0; pos < strlen(output); ++pos) {
             print_tile(center++, line + entry, 128 + output[pos]);
-            for (unsigned char wait=0; (wait < 10) && (!keypressed()); ++wait) 
-                waitForVBlank(); 
+            for (unsigned char wait=0; (wait < 10) && (!keypressed()); ++wait)
+                waitForVBlank();
         }
-        ++line;   
+        ++line;
     }
 
     line = 20;
@@ -192,18 +204,18 @@ void credits_screen(const unsigned char * menu_name) {
 
     //add blinking continue text
     for (unsigned char pos=0; pos < strlen(output); ++pos) {
-        add_animation(CENTER(output) + pos, line);        
+        add_animation(CENTER(output) + pos, line);
     }
 
     // animation loop
     while(!keypressed()) {
-        if (animation_refresh) 
+        if (animation_refresh)
             animate_quarterly(ScreenCredits);
         waitForVBlank();
-    }     
+    }
 
     if (audio_enabled) {
-        PSGStop(); 
+        PSGStop();
         PSGSFXStop();
     }
 }
@@ -211,7 +223,7 @@ void credits_screen(const unsigned char * menu_name) {
 void intro_screen(char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char line;
-    
+
     do {
         current_location = LocationIntro;
         displayOff();
@@ -229,12 +241,12 @@ void intro_screen(char * menu_name) {
 
         print_img(  city__tiles__bin, city__tiles__bin_size,
                     city__palette__bin, city__palette__bin_size,
-                    256, 96, 0, 8); 
+                    256, 96, 0, 8);
 
         line=20;
         for(unsigned char y=line; y < SCREEN_MAX_Y; ++y)
             print_str(0, y, "                                ", 128);
-        
+
         strcpy(output, VERSION);
         print_str(SCREEN_MAX_X - strlen(output), SCREEN_MAX_Y - 1, output, 128);
         displayOn();
@@ -263,24 +275,24 @@ void intro_screen(char * menu_name) {
             }
         }
 
-            
+
      } while (1);
 }
 
-void print_img( const unsigned char *tiledata, unsigned int tile_length, 
-                const unsigned char *colordata, unsigned int color_length, 
+void print_img( const unsigned char *tiledata, unsigned int tile_length,
+                const unsigned char *colordata, unsigned int color_length,
                 const unsigned int width, const unsigned int height, const unsigned char left, const unsigned char top) {
-    const unsigned int start_img_tiles = 256; 
+    const unsigned int start_img_tiles = 256;
 
-    //mapROMBank(BANK_GFX); 
+    //mapROMBank(BANK_GFX);
     loadTiles(tiledata, start_img_tiles, tile_length);
-    loadPalette(colordata, start_img_tiles, color_length); 
-    
+    loadPalette(colordata, start_img_tiles, color_length);
+
     unsigned int tileno = 0;
     for (unsigned char y=top; y < top + (height >> 3); ++y) {
         for(unsigned char x=left; x < left + (width >> 3); ++x) {
             print_tile(x, y, tileno + start_img_tiles);
             ++tileno;
         }
-    } 
+    }
 }

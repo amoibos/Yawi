@@ -1,5 +1,5 @@
-python gfx2sg.py city.png
-python gfx2sg.py cemetry.png
+python ../../tools/gfx2sg.py city.png
+python ../../tools/gfx2sg.py cemetry.png
 copy /y "city (palette).bin" "../city (palette).bin"
 copy /y "city (tiles).bin" "../city (tiles).bin"
 

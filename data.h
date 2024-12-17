@@ -15,7 +15,7 @@
 #define VERSION                     "DEMO " VERSION_STRING
 #else
 #define VERSION                     VERSION_STRING
-#endif 
+#endif
 
 // array of positions which store next items
 // that should be investigate if it trigger something
@@ -48,14 +48,14 @@
 
 #define EXPLOSIVEX_SYMBOL           (('X'))
 #define EXPLOSIVEW_SYMBOL           (('W'))
-#define EXPLOSIVEY_SYMBOL           (('Y'))
+#define EXPLOSIVEV_SYMBOL           (('V'))
 //unused in original level set
 #define EXPLOSIVEZ_SYMBOL           (('Z'))
 
 
 #define TANK_SYMBOL                 (('B'))
 
-#define EXPLOSIVE_SYMBOLS           "XWYZB"
+#define EXPLOSIVE_SYMBOLS           "XWVZB"
 #define ROCK_SYMBOLS                "<>^v"
 
 #define SOMETHING6_SYMBOL           (('o'))
@@ -75,7 +75,7 @@
 
 #define BARRIER_SYMBOLS             (("+|-%~"))
 #define MOVABLE_SYMBOLS             (("<>^vBoWXYZ"))
-#define BLOCKING_SYMBOLS            (("<>^v:$")) 
+#define BLOCKING_SYMBOLS            (("<>^v:$"))
 
 #define BALL_SYMBOL                 (('\x07'))
 
@@ -84,7 +84,7 @@ typedef enum eDirection {
     DirectionRight,
     DirectionUp,
     DirectionLeft,
-    DirectionDown, 
+    DirectionDown,
     DirectionExit,
     DirectionNW,
     DirectionNE,
@@ -93,7 +93,7 @@ typedef enum eDirection {
 } Direction;
 
 typedef enum eStatus {
-    StatusUndefinied,    
+    StatusUndefinied,
     StatusAlive,
     StatusDied,
     StatusCompleted
@@ -111,10 +111,10 @@ typedef struct tPosition {
 #define MAX_MOVE_DELAY              ((5))
 
 #define MAX_STEP_SEQUENCE           ((64))
-static const unsigned char level01_step_sequence[MAX_STEP_SEQUENCE] = { DirectionUp, 
+static const unsigned char level01_step_sequence[MAX_STEP_SEQUENCE] = { DirectionUp,
                                 DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,
                                 DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,
-                                DirectionUp,DirectionUp, 
+                                DirectionUp,DirectionUp,
                                 DirectionRight,DirectionRight,DirectionRight,
                                 DirectionDown,DirectionDown,
                                 DirectionUp,DirectionUp,DirectionUp,
@@ -151,7 +151,7 @@ typedef struct leveldata_t {
 
 static const unsigned char * level_names[MAX_LEVEL+1] = {
     LEVEL_NAME01,
-#ifndef DEMO    
+#ifndef DEMO
     LEVEL_NAME02,
     LEVEL_NAME03,
     LEVEL_NAME04,

@@ -3,9 +3,9 @@
 
 #ifdef PLATFORM_SMS
 #include "../SMSlib/SMSlib.h"
-#endif
-
-#ifdef PLATFORM_SG
+//#endif
+#else
+//#ifdef PLATFORM_SG
 #include "../SGlib/SGlib.h"
 #include "../assets/font.h"
 #endif
@@ -14,8 +14,11 @@
 #include "../libs/strings.h"
 
 
-#define SCREEN_MAX_Y ((192 / 8))
-#define SCREEN_MAX_X ((256 / 8))
+#define SCREEN_MAX_RES_Y    ((192))
+#define SCREEN_MAX_RES_X    ((256))
+
+#define SCREEN_MAX_Y        ((24))
+#define SCREEN_MAX_X        ((32))
 
 void clear_screen(void);
 void clear_line(unsigned char line);
@@ -26,108 +29,107 @@ void displayOff(void);
 
 #ifdef PLATFORM_SMS
 #define loadTiles SMS_loadTiles
-#elif PLATFORM_SG || PLATFORM_SC
+#else //elif PLATFORM_SG || PLATFORM_SC
 #define loadTiles SG_loadTilePatterns
-#endif 
+#endif
 
 #ifdef PLATFORM_SMS
 #define loadTiles SMS_loadBGPalette
-#elif PLATFORM_SG || PLATFORM_SC
+#else //elif PLATFORM_SG || PLATFORM_SC
 #define loadPalette SG_loadTileColours
-#endif 
+#endif
 
 #ifdef PLATFORM_SMS
 #define setNextTileatXY SMS_setNextTileatXY
-#elif PLATFORM_SG || PLATFORM_SC
+#else //elif PLATFORM_SG || PLATFORM_SC
 #define setNextTileatXY SG_setNextTileatXY
-#endif 
+#endif
 
 #ifdef PLATFORM_SMS
 #define setTile SMS_setTile
-#elif PLATFORM_SG || PLATFORM_SC
+#else //elif PLATFORM_SG || PLATFORM_SC
 #define setTile SG_setTile
 #endif
 
 #ifdef PLATFORM_SMS
 #define getKeysHeld SMS_setTile
-#elif PLATFORM_SG || PLATFORM_SC
+#else //elif PLATFORM_SG || PLATFORM_SC
 #define getKeysHeld SG_getKeysHeld
 #endif
- 
 
 #ifdef PLATFORM_SMS
 #define displayOn SMS_displayOn
-#elif PLATFORM_SG || PLATFORM_SC
+#else //elif PLATFORM_SG || PLATFORM_SC
 #define displayOn SG_displayOn
-#endif 
+#endif
 
 #ifdef PLATFORM_SMS
 #define displayOff SMS_displayOff
-#elif PLATFORM_SG || PLATFORM_SC
+#else //elif PLATFORM_SG || PLATFORM_SC
 #define displayOff SG_displayOff
-#endif 
+#endif
 
 #ifdef PLATFORM_SMS
 #define get_tile SMS_getTileatXY
-#elif PLATFORM_SG || PLATFORM_SC
+#else //elif PLATFORM_SG || PLATFORM_SC
 #define get_tile SG_getTileatXY
-#endif 
+#endif
 
 #ifdef PLATFORM_SMS
 #define mapROMBank(x) SMS_mapROMBank(x)
-#elif PLATFORM_SG || PLATFORM_SC
+#else //elif PLATFORM_SG || PLATFORM_SC
 	#ifdef ALLOW_MAPPER
 		#define mapROMBank(x) SG_mapROMBank(x)
 	#else
 		#define mapROMBank(x)	/**/
 	#endif
-#endif 
+#endif
 
 #ifdef PLATFORM_SMS
-#define keypressed SMS_getKeysPressed 
-#elif PLATFORM_SG || PLATFORM_SC
+#define keypressed SMS_getKeysPressed
+#else //elif PLATFORM_SG || PLATFORM_SC
 #define keypressed SG_getKeysPressed
-#endif 
+#endif
 
 #ifdef PLATFORM_SMS
 #define readkey SMS_getKeysStatus
-#elif PLATFORM_SG || PLATFORM_SC
+#else //elif PLATFORM_SG || PLATFORM_SC
 #define readkey SG_getKeysStatus
-#endif 
+#endif
 
 #ifdef PLATFORM_SMS
-#define waitForVBlank SMS_waitForVBlank 
-#elif PLATFORM_SG || PLATFORM_SC
-#define waitForVBlank SG_waitForVBlank 
-#endif 
+#define waitForVBlank SMS_waitForVBlank
+#else //elif PLATFORM_SG || PLATFORM_SC
+#define waitForVBlank SG_waitForVBlank
+#endif
 
-#ifdef PLATFORM_SMS 
-#define setFrameInterruptHandler SMS_setFrameInterruptHandler    
-#elif PLATFORM_SG || PLATFORM_SC
+#ifdef PLATFORM_SMS
+#define setFrameInterruptHandler SMS_setFrameInterruptHandler
+#else //elif PLATFORM_SG || PLATFORM_SC
 #define setFrameInterruptHandler SG_setFrameInterruptHandler
 #endif
 
-#ifdef PLATFORM_SMS 
-#define initSprites SMS_initSprites    
-#elif PLATFORM_SG || PLATFORM_SC
+#ifdef PLATFORM_SMS
+#define initSprites SMS_initSprites
+#else //elif PLATFORM_SG || PLATFORM_SC
 #define initSprites SG_initSprites
 #endif
 
-#ifdef PLATFORM_SMS 
-#define addSprite SMS_addSprite    
-#elif PLATFORM_SG || PLATFORM_SC
+#ifdef PLATFORM_SMS
+#define addSprite SMS_addSprite
+#else //elif PLATFORM_SG || PLATFORM_SC
 #define addSprite SG_addSprite
 #endif
 
-#ifdef PLATFORM_SMS 
-#define finalizeSprites SMS_finalizeSprites  
-#elif PLATFORM_SG || PLATFORM_SC
+#ifdef PLATFORM_SMS
+#define finalizeSprites SMS_finalizeSprites
+#else //elif PLATFORM_SG || PLATFORM_SC
 #define finalizeSprites SG_finalizeSprites
 #endif
 
-#ifdef PLATFORM_SMS 
-#define copySpritestoSAT SMS_copySpritestoSAT    
-#elif PLATFORM_SG || PLATFORM_SC
+#ifdef PLATFORM_SMS
+#define copySpritestoSAT SMS_copySpritestoSAT
+#else //elif PLATFORM_SG || PLATFORM_SC
 #define copySpritestoSAT SG_copySpritestoSAT
 #endif
 

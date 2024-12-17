@@ -20,6 +20,8 @@
 #define GAME_OVER		" - GAME OVER"
 #define MISSION_FAIL	"Mission failed"
 #define NOT_HARD		"Not hard enough?"
+#define PLAY_TIME       "Play time: "
+#define VERIFICATION    "Verification: "
 
 #define MAIN_MENU_ITEM1	"New Game"
 #define MAIN_MENU_ITEM2	"Level Select"

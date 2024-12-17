@@ -4,6 +4,7 @@
 #include "data.h"
 #include "location.h"
 
+
 // for pausing the timer and animation
 char timer_enabled;
 // counting passed seconds
