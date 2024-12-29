@@ -60,7 +60,7 @@ extern unsigned char INGAME_SPRITE[5][4];
 
 extern unsigned char SpriteTable[MAX_SPRITE * 4];
 
-extern void init_sprite_position(void);
+extern void init_sprite_position(unsigned char color);
 extern void add_ball_sprite(void);
 extern void update_sprites_falling(void);
 

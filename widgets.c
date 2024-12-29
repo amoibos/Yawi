@@ -165,3 +165,42 @@ unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, 
 
     return buffer;
 }
+
+/*
+void print_img( const unsigned char *tiledata, unsigned int tile_length,
+                const unsigned char *colordata, unsigned int color_length,
+                const unsigned int width, const unsigned int height, const unsigned char left, const unsigned char top) {
+    const unsigned int start_img_tiles = 256;
+
+    //mapROMBank(BANK_GFX);
+    loadTiles(tiledata, start_img_tiles, tile_length);
+    loadPalette(colordata, start_img_tiles, color_length);
+
+    unsigned int tileno = 0;
+    for (unsigned char y=top; y < top + (height >> 3); ++y) {
+        for(unsigned char x=left; x < left + (width >> 3); ++x) {
+            print_tile(x, y, tileno + start_img_tiles);
+            ++tileno;
+        }
+    }
+}*/
+
+
+void print_img_compressed( const unsigned char *tiledata, unsigned int tile_length,
+                const unsigned char *colordata, unsigned int color_length,
+                const unsigned int width, const unsigned int height, const unsigned char left, const unsigned char top) {
+    const unsigned int start_img_tiles = 256;
+
+    //mapROMBank(BANK_GFX);
+    //loadTiles(tiledata, start_img_tiles, tile_length);
+    loadZX7compressedTiles(tiledata, start_img_tiles);
+    loadPalette(colordata, start_img_tiles, color_length);
+
+    unsigned int tileno = 0;
+    for (unsigned char y=top; y < top + (height >> 3); ++y) {
+        for(unsigned char x=left; x < left + (width >> 3); ++x) {
+            print_tile(x, y, tileno + start_img_tiles);
+            ++tileno;
+        }
+    }
+}

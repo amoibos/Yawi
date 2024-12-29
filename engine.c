@@ -95,7 +95,8 @@ char load_leveldata(const unsigned char no) {
             // skip control characters,
             while (*data < ' ') data++;
             if (*data == PLAYER1_SYMBOL_LEFT) {
-                level.x = x, level.y = y;
+                level.x = x;
+                level.y = y;
             } else if (*data == GOLD_SYMBOL) {
                 level.max_gold++;
             } else if ((*data == TELEPORTER_SYMBOL) &&
@@ -281,22 +282,26 @@ Position fall_direction(unsigned int tile) {
     Position dir;
 
     switch (tile) {
-        case EXPLOSIVEZ_SYMBOL:
+        case ROCKETU_SYMBOL:
+        case PLATFORMU_SYMBOL:    
         case ROCK_UP_SYMBOL: {
             dir.x = 0, dir.y = -1;
             return dir;
         }
-        case EXPLOSIVEX_SYMBOL:
+        case ROCKETD_SYMBOL:
+        case PLATFORMD_SYMBOL:    
         case ROCK_DOWN_SYMBOL: {
             dir.x = 0, dir.y = 1;
             return dir;
         }
-        case EXPLOSIVEV_SYMBOL:
+        case ROCKETL_SYMBOL:
+        case PLATFORML_SYMBOL:    
         case ROCK_LEFT_SYMBOL: {
             dir.x = -1, dir.y = 0;
             return dir;
         }
-        case EXPLOSIVEW_SYMBOL:
+        case ROCKETR_SYMBOL:
+        case PLATFORMR_SYMBOL:
         case ROCK_RIGHT_SYMBOL: {
             dir.x = 1, dir.y = 0;
             return dir;
@@ -381,10 +386,16 @@ _Bool is_pushing_object(Direction dir) {
         (item == ROCK_RIGHT_SYMBOL)     && (dir != DirectionLeft)   ||
         (item == ROCK_UP_SYMBOL)        && (dir != DirectionDown)   ||
         (item == ROCK_DOWN_SYMBOL)      && (dir != DirectionUp)     ||
-        (item == EXPLOSIVEX_SYMBOL)     && (dir != DirectionUp)     ||
-        (item == EXPLOSIVEW_SYMBOL)     && (dir != DirectionLeft)   ||
-        (item == EXPLOSIVEV_SYMBOL)     && (dir != DirectionRight)  ||
-        (item == EXPLOSIVEZ_SYMBOL)     && (dir != DirectionDown);
+        (item == ROCKETD_SYMBOL)        && (dir != DirectionUp)     ||
+        (item == ROCKETR_SYMBOL)        && (dir != DirectionLeft)   ||
+        (item == ROCKETL_SYMBOL)        && (dir != DirectionRight)  ||
+        (item == ROCKETU_SYMBOL)        && (dir != DirectionDown)   ||
+        (item == PLATFORMU_SYMBOL)                                  ||
+        (item == PLATFORMD_SYMBOL)                                  ||
+        (item == PLATFORML_SYMBOL)                                  ||
+        (item == PLATFORMR_SYMBOL)                                  
+
+        ;
 
     //check if is space behind the movable object
     //but first check boundaries
@@ -477,6 +488,17 @@ signed int get_checked_tile(signed char x, signed char y) {
     return get_default_tile(x, y);
 }
 
+
+_Bool destroyable(unsigned char x, unsigned char y) {
+    _Bool ret;
+
+    ret =   is_within(x, y) & 
+            get_default_tile(x, y) != WALL_UNDESTROY_SYMBOL &
+            1;
+
+    return ret;    
+}
+
 void gravitation(Position * motion_objects) {
 
     while (level.status != StatusDied) {
@@ -491,9 +513,14 @@ void gravitation(Position * motion_objects) {
         Position dest, src;
         src.x = current_Motion->x, src.y = current_Motion->y;
         signed int falling_item = get_checked_tile(current_Motion->x, current_Motion->y);
+        /*
+            original
+        */
         switch (falling_item) {
-            case EXPLOSIVEW_SYMBOL:case EXPLOSIVEX_SYMBOL:
-            case EXPLOSIVEV_SYMBOL:case EXPLOSIVEZ_SYMBOL:
+            case PLATFORMU_SYMBOL:  case PLATFORMD_SYMBOL:
+            case PLATFORML_SYMBOL:  case PLATFORMR_SYMBOL: 
+            case ROCKETU_SYMBOL:    case ROCKETD_SYMBOL:
+            case ROCKETL_SYMBOL:    case ROCKETR_SYMBOL:
             case ROCK_UP_SYMBOL:    case ROCK_DOWN_SYMBOL:
             case ROCK_LEFT_SYMBOL:  case ROCK_RIGHT_SYMBOL: {
                 Position diff;
@@ -534,19 +561,15 @@ void gravitation(Position * motion_objects) {
                         continue;
                     }
 
-                    case EXPLOSIVEX_SYMBOL:
-                    case EXPLOSIVEW_SYMBOL:
-                    case EXPLOSIVEV_SYMBOL:
-                    case EXPLOSIVEZ_SYMBOL: {
+                    case ROCKETU_SYMBOL:
+                    case ROCKETD_SYMBOL:
+                    case ROCKETL_SYMBOL:
+                    case ROCKETR_SYMBOL: {
                         if (strchr(ROCK_SYMBOLS, falling_item) != 0) {
                             //explosion
+                               
                         }
 
-                        current_Motion->x = -1;
-                        break;
-                    }
-                    case TANK_SYMBOL: {
-                        //explosion
                         current_Motion->x = -1;
                         break;
                     }
@@ -694,10 +717,14 @@ void extend_player_sprite(unsigned char player_figure, unsigned char current_x, 
 void add_player_sprite(void) {
 
     clear_sprites();
-    SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY   * 8, 0, 8);
-    SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_RIGHT_BODY  * 8, 1, 8);
-    SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_LEFT_REST   * 8, 2, 8);
-    SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_RIGHT_REST  * 8, 3, 8);
+    SG_loadZX7compressedSpritesTiles(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY/*   * 8*/, 0);
+    SG_loadZX7compressedSpritesTiles(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY/*   * 8*/, 1);
+    SG_loadZX7compressedSpritesTiles(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY/*   * 8*/, 2);
+    SG_loadZX7compressedSpritesTiles(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY/*   * 8*/, 3);
+    //SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY   * 8, 0, 8);
+    //SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_RIGHT_BODY  * 8, 1, 8);
+    //SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_LEFT_REST   * 8, 2, 8);
+    //SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_RIGHT_REST  * 8, 3, 8);
     addSprite((level.x << 3), (level.y << 3)-1, 0, SG_COLOR_LIGHT_RED);
     addSprite((level.x << 3), (level.y << 3)-1, 1, SG_COLOR_LIGHT_RED);
     addSprite((level.x << 3), (level.y << 3)-1, 2, SG_COLOR_GRAY);
@@ -721,7 +748,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
     load_font();
     clear_screen();
 
-    add_player_sprite();
+    //add_player_sprite();
     if (load_leveldata(curr_level)) {
         setup_level();
         if (curr_level < 2)
@@ -751,7 +778,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
 
             prev_dir = dir;
             if (dir == DirectionExit)
-                return;
+                break;
 
             if (dir != DirectionUndefined) {
                 //dest: next position, neighbour position afternext
@@ -767,13 +794,39 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                 if (strchr(MOVABLE_SYMBOLS, item) != 0) {
                     if (is_pushing_object(dir)) {
                         moved_stone = 1;
-                        source.x = level.x, source.y = level.y;
+                        source.x = level.x; source.y = level.y;
                         neighbour.x = source.x + (diffs.x << 1);
                         neighbour.y = source.y + (diffs.y << 1);
                         unsigned int pushed = get_default_tile(dest.x, dest.y);
 
-                        //check_for_changes(motion_objects, source, neighbour);
-                        print_tile(neighbour.x, neighbour.y, pushed);
+                        
+
+                        if (strchr(PLATFORM_SYMBOLS, item) != 0) {
+                            switch(dir) {
+                                case DirectionUp: {
+                                    print_tile(neighbour.x, neighbour.y, PLATFORMU_SYMBOL);
+                                    break;
+                                }
+                                case DirectionDown: {
+                                    print_tile(neighbour.x, neighbour.y, PLATFORMD_SYMBOL);
+                                    break;
+                                } 
+                                case DirectionLeft: {
+                                    print_tile(neighbour.x, neighbour.y, PLATFORML_SYMBOL);
+                                    break;
+                                }
+                                case DirectionRight: { 
+                                    print_tile(neighbour.x, neighbour.y, PLATFORMR_SYMBOL);
+                                    break;
+                                }   
+                            }
+                            Position motion;
+                            motion.x = neighbour.x; motion.y = neighbour.y; 
+                            add_motion(motion_objects, &motion);
+                        } else
+                            //check_for_changes(motion_objects, source, neighbour);
+                            print_tile(neighbour.x, neighbour.y, pushed);
+
                     } else //walk against object but way is occupied, nothing happen
                         continue;
                 }
@@ -805,7 +858,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                         //PSGSFXPlay(coin_psg, 0);
                         status_refresh = 1;
                     }
-                } else if (item == THORNS_SYMBOL) {
+                } else if (item == WATER_SYMBOL) {
                     level.status = StatusDied;
                     PSGPlayNoRepeat(death_psg);
                     continue;

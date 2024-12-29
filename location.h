@@ -2,13 +2,14 @@
 #define LOCATION_H
 
 typedef enum eLocation {
-    LocationUnknown,
-    LocationIntro,
-    LocationLevelSelect,
-    LocationInGame,
-    LocationCredits,
-    LocationEndscreen,
-    LocationDeathscreen
+    LocationUnknown
+    ,LocationIntro
+    ,LocationLevelSelect
+    ,LocationInGame
+    ,LocationHelp
+    ,LocationCredits
+    ,LocationEndscreen
+    ,LocationDeathscreen
 } Location;
 
 #endif

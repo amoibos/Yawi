@@ -27,7 +27,8 @@ void clear_line(unsigned char line)
 
 #if defined(PLATFORM_SG) || defined(PLATFORM_SC) || defined(PLATFORM_SMS)
 void load_ascii_tiles(int position) {
-    loadTiles(font__tiles__bin, position, font__tiles__bin_size);
+    //loadTiles(font__tiles__bin, position, font__tiles__bin_size);
+    loadZX7compressedTiles(font__tiles__bin, position);
     loadPalette(font__palette__bin, position, font__palette__bin_size); 
 }
 #endif

@@ -11,6 +11,7 @@
 #define WRITTEN_BY		"Written by Darktrym"
 #define IN_YEAR			"in 2024"
 #define LEVEL_SELECT	"Level Select"
+#define HELP			"Help"
 #define CREDITS 		"Credits"
 #define PRESS_TO_CONT	"Press a key to continue"
 #define LEVEL_CODE		"Level code: "
@@ -25,8 +26,9 @@
 
 #define MAIN_MENU_ITEM1	"New Game"
 #define MAIN_MENU_ITEM2	"Level Select"
-#define MAIN_MENU_ITEM3	"Credits"
-#define MAIN_MENU_ITEM4	"Congratulation"
+#define MAIN_MENU_ITEM3	"Help"
+#define MAIN_MENU_ITEM4	"Credits"
+//#define MAIN_MENU_ITEM4	"Congratulation"
 
 #define LEVEL_NAME01	"Darkness Falls"
 #define LEVEL_NAME02	"Lateral Thinking"

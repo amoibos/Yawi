@@ -97,7 +97,7 @@ void add_ball_sprite(void) {
         SG_loadSpritePatterns(font__tiles__bin + BALL_SYMBOL * 8, pos, 8);
 }
 
-void init_sprite_position(void) {
+void init_sprite_position(unsigned char color) {
 
     initSprites();
     for(unsigned char row=0; row < MAX_SPRITE / MAX_SPRITE_PER_LINE; ++row)
@@ -105,6 +105,12 @@ void init_sprite_position(void) {
             unsigned char pos = row * MAX_SPRITE_PER_LINE + column;
             unsigned char sprite_pos_x = (column << 6) - 1 + ((row % 2) == 0 ? 0 : MAX_SPRITE_PER_LINE << 3);
             unsigned char sprite_pos_y = row << 4;
-            addSprite(sprite_pos_x, sprite_pos_y, pos, ((pos % 16) < 2 ? 15 : (pos % 16)));
+            unsigned sprite_color;
+
+            if (color == 0)
+            	sprite_color = ((pos % 16) < 2 ? 15 : (pos % 16));
+            else
+            	sprite_color = color;
+            addSprite(sprite_pos_x, sprite_pos_y, pos, sprite_color);
     }
 }

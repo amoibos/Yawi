@@ -133,6 +133,11 @@ void displayOff(void);
 #define copySpritestoSAT SG_copySpritestoSAT
 #endif
 
+#ifdef PLATFORM_SMS
+#define loadZX7compressedTiles SMS_decompressZX7toVRAM
+#else //elif PLATFORM_SG || PLATFORM_SC
+#define loadZX7compressedTiles SG_loadZX7compressedBGTiles
+#endif
 
 void print_tile(unsigned char x, unsigned char y, unsigned int tileno);
 void print_str(unsigned char x, unsigned char y, char *str, int offset);

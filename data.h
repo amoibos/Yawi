@@ -41,25 +41,33 @@
 #define PLAYER1_SYMBOL_RIGHT_BODY   ((PLAYER1_SYMBOL_RIGHT + 3))
 #define PLAYER1_SYMBOL_RIGHT_REST   ((PLAYER1_SYMBOL_RIGHT_BODY + 6))
 
-#define PLAYER2_SYMBOL              (('O'))
+#define DOPPELGANGER_SYMBOL         (('O'))
 #define GOLD_SYMBOL                 (('$'))
 //level 1-12 do not use this
 #define TELEPORTER_SYMBOL           (('#'))
 
-#define EXPLOSIVEX_SYMBOL           (('X'))
-#define EXPLOSIVEW_SYMBOL           (('W'))
-#define EXPLOSIVEV_SYMBOL           (('V'))
+#define ROCKETL_SYMBOL              (('U'))
+#define ROCKETR_SYMBOL              (('W'))
 //unused in original level set
-#define EXPLOSIVEZ_SYMBOL           (('Z'))
+#define ROCKETD_SYMBOL              (('X'))
+#define ROCKETU_SYMBOL              (('V'))
 
+#define WALL_UNDESTROY_SYMBOL       (('~'))
+#define BLOCK_SYMBOL                (('B'))
 
-#define TANK_SYMBOL                 (('B'))
-
-#define EXPLOSIVE_SYMBOLS           "XWVZB"
+#define EXPLOSIVE_SYMBOLS           "UVWXB"
 #define ROCK_SYMBOLS                "<>^v"
 
-#define SOMETHING6_SYMBOL           (('o'))
-#define THORNS_SYMBOL               (('&'))
+// platforms with gravitation
+#define PLATFORMU_SYMBOL            (('l'))
+#define PLATFORMD_SYMBOL            (('m'))
+#define PLATFORML_SYMBOL            (('n'))
+#define PLATFORMR_SYMBOL            (('o'))
+
+#define PLATFORM_SYMBOLS            (("lmno"))
+
+//deadly water, do not enter
+#define WATER_SYMBOL                (('&'))
 
 //removable by player but also destroyable by falling rock
 #define PEBBLE_SYMBOL               (('.'))
@@ -74,9 +82,10 @@
 #define EMPTY_SYMBOL                ((' '))
 
 #define BARRIER_SYMBOLS             (("+|-%~"))
-#define MOVABLE_SYMBOLS             (("<>^vBoWXYZ"))
-#define BLOCKING_SYMBOLS            (("<>^v:$"))
+#define MOVABLE_SYMBOLS             (("<>^vBUVWXlmno"))
+#define BLOCKING_SYMBOLS            (("<>^v:$lmno"))
 
+// used for rain/ball slideshow
 #define BALL_SYMBOL                 (('\x07'))
 
 typedef enum eDirection {
@@ -86,10 +95,7 @@ typedef enum eDirection {
     DirectionLeft,
     DirectionDown,
     DirectionExit,
-    DirectionNW,
-    DirectionNE,
-    DirectionSE,
-    DirectionSW
+    DirectionHelp
 } Direction;
 
 typedef enum eStatus {
@@ -168,16 +174,18 @@ static const unsigned char * level_names[MAX_LEVEL+1] = {
 };
 
 typedef enum eMainMenu {
-    MainMenuUndefined,
-    MainMenuNewGame,
-    MainMenuLevelSelect,
-    MainMenuCredits,
-    MainMenuCongratulation
+    MainMenuUndefined
+    ,MainMenuNewGame
+    ,MainMenuLevelSelect
+    ,MainMenuHelp
+    ,MainMenuCredits
+    //,MainMenuCongratulation
 } MainMenu;
 
 typedef enum eScreens {
     ScreenUndefined,
     ScreenIntro,
+    ScreenHelp,
     ScreenIngame,
     ScreenNextLevel,
     ScreenDeath,

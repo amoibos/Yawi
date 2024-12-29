@@ -36,7 +36,7 @@ void congratulation_screen(const unsigned char * menu_name) {
         add_animation(CENTER(output) + pos, line);
     }
 
-    init_sprite_position();
+    init_sprite_position(0 );
     add_ball_sprite();
 
     // animation loop
@@ -74,7 +74,7 @@ void death_screen(const unsigned char *menu_name) {
     strcpy(output, TRY_IT);
     print_str(CENTER(output), line, output, 128);
 
-    print_img(  cemetry__tiles__bin, cemetry__tiles__bin_size,
+    print_img_compressed(  cemetry__tiles__bin, cemetry__tiles__bin_size,
                 cemetry__palette__bin, cemetry__palette__bin_size,
                 SCREEN_MAX_RES_X, 96, 0, 8);
 
@@ -220,6 +220,26 @@ void credits_screen(const unsigned char * menu_name) {
     }
 }
 
+void help_screen(const unsigned char * menu_name) {
+    unsigned char output[SCREEN_MAX_X+1];
+    unsigned char line=5;
+
+    current_location = LocationHelp;
+    displayOff();
+    load_font();
+    clear_screen();
+    reset_sprites();
+    displayOn();
+
+    strcpy(output, menu_name);
+    print_str(CENTER(output), TITLE_LINE + 1, output, 0);
+    // animation loop
+    while(!keypressed()) {
+        waitForVBlank();
+    }
+}
+
+
 void intro_screen(char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
     unsigned char line;
@@ -239,7 +259,7 @@ void intro_screen(char * menu_name) {
         //strcpy(output, IN_YEAR);
         //print_str(CENTER(output), line++, output, 128);
 
-        print_img(  city__tiles__bin, city__tiles__bin_size,
+        print_img_compressed(  city__tiles__bin, city__tiles__bin_size,
                     city__palette__bin, city__palette__bin_size,
                     256, 96, 0, 8);
 
@@ -252,7 +272,7 @@ void intro_screen(char * menu_name) {
         displayOn();
         reset_time(1);
 
-        unsigned char option = menu(intro_items, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0);
+        unsigned char option = menu(intro_items, MAX_INTRO_ITEMS, 20, 10, MenuModeCenter, 0);
         switch (option) {
             case (unsigned char) MainMenuNewGame: {
                 gameloop(1, seconds >= DEMO_START_AFTER);
@@ -262,14 +282,19 @@ void intro_screen(char * menu_name) {
                 level_select_screen(LEVEL_SELECT);
                 break;
             }
+            case (unsigned char) MainMenuHelp: {
+                help_screen(HELP);
+                break;
+            }
             case (unsigned char) MainMenuCredits: {
                 credits_screen(CREDITS);
                 break;
             }
+            /*
             case (unsigned char) MainMenuCongratulation: {
                 congratulation_screen(CONGRATULATIONS);
                 break;
-            }
+            }*/
             default: {
                 break;
             }
@@ -277,22 +302,4 @@ void intro_screen(char * menu_name) {
 
 
      } while (1);
-}
-
-void print_img( const unsigned char *tiledata, unsigned int tile_length,
-                const unsigned char *colordata, unsigned int color_length,
-                const unsigned int width, const unsigned int height, const unsigned char left, const unsigned char top) {
-    const unsigned int start_img_tiles = 256;
-
-    //mapROMBank(BANK_GFX);
-    loadTiles(tiledata, start_img_tiles, tile_length);
-    loadPalette(colordata, start_img_tiles, color_length);
-
-    unsigned int tileno = 0;
-    for (unsigned char y=top; y < top + (height >> 3); ++y) {
-        for(unsigned char x=left; x < left + (width >> 3); ++x) {
-            print_tile(x, y, tileno + start_img_tiles);
-            ++tileno;
-        }
-    }
 }
