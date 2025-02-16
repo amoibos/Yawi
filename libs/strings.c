@@ -135,12 +135,14 @@ unsigned char upcase(const unsigned char c) {
 
 }
 
-const unsigned char *strchr(const unsigned char *s, const unsigned char ch) {
-	for (; *s != '\0'; ++s)
-  		if (*s == ch)
-    		return s;
+signed char strchr(const unsigned char *str, const unsigned char ch) {
+	unsigned char result=0;
 
-	return 0;
+    for (; str[result] != '\0'; ++result)
+  		if (str[result] == ch)
+    		return result;
+
+	return -1;
 }
 
 /*

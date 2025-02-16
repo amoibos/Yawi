@@ -8,11 +8,11 @@
 // for pausing the timer and animation
 char timer_enabled;
 // counting passed seconds
-unsigned int seconds;
+unsigned short seconds;
 // helper for counting seconds;
 unsigned char fps;
 //sum of level records
-unsigned int totaltime=0;
+unsigned short totaltime=0;
 //player position
 Location current_location;
 //current level state
@@ -21,7 +21,7 @@ Leveldata level;
 // current animation frame for a sprite
 unsigned char animation_frame;
 // save tile index where the sprite is located
-signed int all_sprites[MAX_SPRITE];
+signed short all_sprites[MAX_SPRITE];
 // update sprite state
 _Bool animation_refresh;
 // current number of sprites

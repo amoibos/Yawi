@@ -58,7 +58,7 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
             }
         }
         
-        unsigned int key = readkey();
+        unsigned short key = readkey();
         if (key != 0)
             user_choice = 1;
         switch (key) {
@@ -112,12 +112,11 @@ unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, 
     
     signed char pos = 0;
     unsigned char idx = 0;
-    unsigned int key;
+    unsigned short key;
     do {
         while (!keypressed) ;
         //slow down key processing
-        for (unsigned char i=0; i < 5; ++i)
-            waitForVBlank();
+        wait(5);
         key = readkey();
         switch(key) {
            case PORT_A_KEY_2: {
@@ -166,37 +165,17 @@ unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, 
     return buffer;
 }
 
-/*
-void print_img( const unsigned char *tiledata, unsigned int tile_length,
-                const unsigned char *colordata, unsigned int color_length,
-                const unsigned int width, const unsigned int height, const unsigned char left, const unsigned char top) {
-    const unsigned int start_img_tiles = 256;
-
-    //mapROMBank(BANK_GFX);
-    loadTiles(tiledata, start_img_tiles, tile_length);
-    loadPalette(colordata, start_img_tiles, color_length);
-
-    unsigned int tileno = 0;
-    for (unsigned char y=top; y < top + (height >> 3); ++y) {
-        for(unsigned char x=left; x < left + (width >> 3); ++x) {
-            print_tile(x, y, tileno + start_img_tiles);
-            ++tileno;
-        }
-    }
-}*/
-
-
-void print_img_compressed( const unsigned char *tiledata, unsigned int tile_length,
-                const unsigned char *colordata, unsigned int color_length,
-                const unsigned int width, const unsigned int height, const unsigned char left, const unsigned char top) {
-    const unsigned int start_img_tiles = 256;
+void print_img_compressed( const unsigned char *tiledata,
+                const unsigned char *colordata, 
+                const unsigned short width, const unsigned char height, const unsigned char left, const unsigned char top) {
+    const unsigned short start_img_tiles = 256;
 
     //mapROMBank(BANK_GFX);
     //loadTiles(tiledata, start_img_tiles, tile_length);
     loadZX7compressedTiles(tiledata, start_img_tiles);
-    loadPalette(colordata, start_img_tiles, color_length);
+    loadZX7compressedBGColors(colordata, start_img_tiles);
 
-    unsigned int tileno = 0;
+    unsigned short tileno = 0;
     for (unsigned char y=top; y < top + (height >> 3); ++y) {
         for(unsigned char x=left; x < left + (width >> 3); ++x) {
             print_tile(x, y, tileno + start_img_tiles);

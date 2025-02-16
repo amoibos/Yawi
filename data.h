@@ -8,8 +8,7 @@
 #define BANK_GFX                    ((3))
 #define BANK_AUDIO                  ((4))
 
-
-#define VERSION_STRING              "0.9"
+#define VERSION_STRING              "0.9.1"
 
 #ifdef DEMO
 #define VERSION                     "DEMO " VERSION_STRING
@@ -17,10 +16,13 @@
 #define VERSION                     VERSION_STRING
 #endif
 
+#define SEARCH_FREE_SLOT            ((0))
+#define SEARCH_OCCUPIED_SLOT        ((1))
+
 // array of positions which store next items
 // that should be investigate if it trigger something
 #define MAX_EXPLOSIVE_ITEM          ((10))
-#define MAX_MOTION_ITEMS            ((10))
+#define MAX_MOTION_ITEMS            ((40))
 #define MAX_TELEPORTER              ((5))
 
 #define TITLE_LINE                  ((0))
@@ -177,36 +179,36 @@ typedef enum eMainMenu {
     MainMenuUndefined
     ,MainMenuNewGame
     ,MainMenuLevelSelect
-    ,MainMenuHelp
+   // ,MainMenuHelp
     ,MainMenuCredits
     //,MainMenuCongratulation
 } MainMenu;
 
 typedef enum eScreens {
-    ScreenUndefined,
-    ScreenIntro,
-    ScreenHelp,
-    ScreenIngame,
-    ScreenNextLevel,
-    ScreenDeath,
-    ScreenCongratulation,
-    ScreenLevelSelect,
-    ScreenCredits
+    ScreenUndefined
+    ,ScreenIntro
+    ,ScreenHelp
+    ,ScreenIngame
+    ,ScreenNextLevel
+    ,ScreenDeath
+    ,ScreenCongratulation
+    ,ScreenLevelSelect
+    ,ScreenCredits
 } Screens;
 
-#define MAX_INTRO_ITEMS ((4))
+#define MAX_INTRO_ITEMS ((3))
 static const unsigned char * intro_items[MAX_INTRO_ITEMS] = {
-    MAIN_MENU_ITEM1,
-    MAIN_MENU_ITEM2,
-    MAIN_MENU_ITEM3,
-    MAIN_MENU_ITEM4
+    MAIN_MENU_ITEM1
+    ,MAIN_MENU_ITEM2
+//    ,MAIN_MENU_ITEM3
+    ,MAIN_MENU_ITEM4
 };
 
 #define CREDIT_NAMES_MAX ((3))
 static const unsigned char * credits_names[CREDIT_NAMES_MAX] = {
-    CREDITS_LINE01,
-    CREDITS_LINE02,
-    CREDITS_LINE03
+    CREDITS_LINE01
+    ,CREDITS_LINE02
+    ,CREDITS_LINE03
 };
 
 typedef struct sSpriteData {

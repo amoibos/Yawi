@@ -81,40 +81,21 @@ call print_exec %compiler% %FLAGS% -c -mz80 libs/console.c
 if not %ERRORLEVEL% == 0 goto error
 
 :COMPILE_MISC
-call print_exec %compiler% %FLAGS% -c -mz80 engine.c
+for %%X in (widgets animation views engine) do (
+call print_exec %compiler% %FLAGS% -c -mz80 %%X.c
 if not %ERRORLEVEL% == 0 goto error
-
-call print_exec %compiler% %FLAGS% -c -mz80 animation.c
-if not %ERRORLEVEL% == 0 goto error
-
-call print_exec %compiler% %FLAGS% -c -mz80 widgets.c
-if not %ERRORLEVEL% == 0 goto error
-
-call print_exec %compiler% %FLAGS% -c -mz80 views.c
-if not %ERRORLEVEL% == 0 goto error
+)
 
 :COMPILE_ASSETS
 call print_phase Compiling assets and string functions..
 
 if %TARGET_PLATFORM% == "WINDOWS" goto COMPILE_HELPERS_WINDOWS
 
-call print_exec %compiler% %FLAGS% -c -mz80 libs/console.c
-if not %ERRORLEVEL% == 0 goto error
 
-call print_exec %compiler% %FLAGS% -c -mz80 libs/strings.c
+for %%X in (libs/console libs/strings assets/font assets/levels assets/images assets/audio) do (
+call print_exec %compiler% %FLAGS% -c -mz80 %%X.c
 if not %ERRORLEVEL% == 0 goto error
-
-call print_exec %compiler% %FLAGS% -c -mz80 assets/font.c
-if not %ERRORLEVEL% == 0 goto error
- 
-call print_exec %compiler% %FLAGS% -c -mz80 assets/levels.c
-if not %ERRORLEVEL% == 0 goto error
-
-call print_exec %compiler% %FLAGS% -c -mz80 assets/images.c
-if not %ERRORLEVEL% == 0 goto error
-
-call print_exec %compiler% %FLAGS% -c -mz80 assets/audio.c
-if not %ERRORLEVEL% == 0 goto error
+)
 
 goto COMPILE_MAIN
 
@@ -125,14 +106,11 @@ call print_phase Compiling helpers for Windows..
 call print_exec %compiler% %FLAGS% -c libs/strings.c
 if not %ERRORLEVEL% == 0 goto error
 
-set command=%compiler% %FLAGS% -c assets/font.c
-call print_exec %command%
-
-set command=%compiler% %FLAGS% -c assets/levels.c
-
+for %%X in (assets/font asset/level) do (
+set command=%compiler% %FLAGS% -c %%X.c
 call print_exec %command%
 if not %ERRORLEVEL% == 0 goto error
-
+)
 set command=%compiler% %FLAGS% -LC:\PDCurses\wincon -lcurses -c libs/SMScompat.c
 call print_exec %command%
 if not %ERRORLEVEL% == 0 goto error

@@ -45,7 +45,7 @@ unsigned char CREDITS_SPRITE[23][4] = {
 //Press a key to continue
 
 void animate_quarterly(Screens screen);
-SpriteData get_sprite_data(signed int data);
+SpriteData get_sprite_data(signed short data);
 
 void init_sprite_position(unsigned char color);
 void add_ball_sprite(void);

@@ -20,37 +20,37 @@ _Bool is_border(const signed char x, const signed char y);
 long get_levelcode(unsigned char level);
 void update_statusline(void);
 void print_title(unsigned char * title);
-void reset_sprites(void);
 void setup_level(void);
-unsigned int get_default_tile(unsigned char x, unsigned char y);
+unsigned short get_default_tile(unsigned char x, unsigned char y);
 _Bool is_pushing_object(Direction dir);
-void wait(unsigned char duration);
-void clear_sprites(void);
-void extend_player_sprite(unsigned char player_figure, unsigned char current_x, unsigned char current_y);
-void add_player_sprite(void);
 void gameloop(unsigned char curr_level, _Bool demo_mode);
-void add_animation(unsigned char x, unsigned char y);
-signed int get_checked_tile(signed char x, signed char y);
+signed short get_checked_tile(signed char x, signed char y);
 void check_for_changes(Position * motion_objects, Position * source);
 void timer(void);
 void print_playtime(void);
 void reset_time(signed char timer_on);
+
+void clear_sprites(void);
+void extend_player_sprite(unsigned char player_figure, unsigned char current_x, unsigned char current_y);
+void add_player_sprite(void);
+void add_animation(unsigned char x, unsigned char y);
+void reset_sprites(void);
 
 extern Leveldata level;
 extern Location current_location;
 
 /* timer functions */
 extern char timer_enabled;
-extern unsigned int seconds;
+extern unsigned short seconds;
 extern unsigned char fps;
-extern unsigned int totaltime;
+extern unsigned short totaltime;
 
 
 /* sprite handling */
-extern SpriteData get_sprite_data(signed int data);
+extern SpriteData get_sprite_data(signed short data);
 extern void animate_quarterly(Screens screen);
 extern unsigned char animation_frame;
-extern signed int all_sprites[MAX_SPRITE];
+extern signed short all_sprites[MAX_SPRITE];
 extern unsigned char sprites_no;
 extern _Bool animation_refresh;
 

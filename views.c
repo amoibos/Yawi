@@ -36,7 +36,7 @@ void congratulation_screen(const unsigned char * menu_name) {
         add_animation(CENTER(output) + pos, line);
     }
 
-    init_sprite_position(0 );
+    init_sprite_position(0);
     add_ball_sprite();
 
     // animation loop
@@ -74,8 +74,8 @@ void death_screen(const unsigned char *menu_name) {
     strcpy(output, TRY_IT);
     print_str(CENTER(output), line, output, 128);
 
-    print_img_compressed(  cemetry__tiles__bin, cemetry__tiles__bin_size,
-                cemetry__palette__bin, cemetry__palette__bin_size,
+    print_img_compressed(  cemetry__tiles__bin,
+                cemetry__palette__bin,
                 SCREEN_MAX_RES_X, 96, 0, 8);
 
     for(unsigned char y=line; y < SCREEN_MAX_Y; ++y)
@@ -108,13 +108,20 @@ void next_level_screen(const unsigned char * menu_name, unsigned char level) {
 
     line = 10;
     strcpy(output, LEVEL);
-    strcat(output, level_names[level-1]);
+    strcat(output, (unsigned char *)level_names[level-1]);
     print_str(offset, line++, output, 128);
 
     strcpy(output, LEVEL_CODE);
     SEGA_itoa(get_levelcode(level), num);
     strcat(output, num);
     print_str(offset, line++, output, 128);
+
+
+    line = 16;
+    output[0] = '\0';
+    SEGA_itoa(totaltime, num);
+    strcat(strcat(strcat(output, PLAY_TIME), num), "s");
+    print_str(0, line++, output, 128);
 
     line = 20;
     strcpy(output, PRESS_TO_CONT);
@@ -136,19 +143,27 @@ void level_select_screen(const unsigned char * menu_name) {
     displayOff();
     load_font();
     clear_screen();
+    
     strcpy(output, menu_name);
     print_str(CENTER(output), TITLE_LINE + 1, output, 128);
+    
     strcpy(output, LEVEL_CODE);
     print_str(offset, line, output, 128);
-    /*
-    input(strlen(output), line, output, SCREEN_MAX_X, InputTypeNumerical);
-    long code = SEGA_atoi(unsigned char * str)
-    for (option=1; option <= MAX_LEVEL; ++option)
-        if (code == get_levelcode(1))
-            gameloop(option, 0);
-    */
     displayOn();
-    option = menu(level_names, MAX_LEVEL+1, 10, 4, MenuModeLeft, 1);
+    
+    input(strlen(output) + offset + 1, line, output, SCREEN_MAX_X, InputTypeNumerical);
+    
+    long code = SEGA_atoi(output);
+    unsigned char last_level = 1;
+    for (option=1; option <= MAX_LEVEL; ++option)
+        if (code == get_levelcode(option)) {
+            last_level = option;
+            break;
+        }
+    
+   
+    
+    option = menu(level_names, last_level, line + 3, 4, MenuModeLeft, 1);
     if (option <= MAX_LEVEL)
         gameloop(option, 0);
 }
@@ -232,9 +247,14 @@ void help_screen(const unsigned char * menu_name) {
     displayOn();
 
     strcpy(output, menu_name);
-    print_str(CENTER(output), TITLE_LINE + 1, output, 0);
+    print_str(CENTER(output), TITLE_LINE + 1, output, 128);
+    // animation loop
     // animation loop
     while(!keypressed()) {
+        if (animation_refresh) {
+            animate_quarterly(ScreenHelp);
+            update_sprites_falling();
+        }
         waitForVBlank();
     }
 }
@@ -259,8 +279,8 @@ void intro_screen(char * menu_name) {
         //strcpy(output, IN_YEAR);
         //print_str(CENTER(output), line++, output, 128);
 
-        print_img_compressed(  city__tiles__bin, city__tiles__bin_size,
-                    city__palette__bin, city__palette__bin_size,
+        print_img_compressed(  city__tiles__bin,
+                    city__palette__bin,
                     256, 96, 0, 8);
 
         line=20;
@@ -272,20 +292,20 @@ void intro_screen(char * menu_name) {
         displayOn();
         reset_time(1);
 
-        unsigned char option = menu(intro_items, MAX_INTRO_ITEMS, 20, 10, MenuModeCenter, 0);
+        unsigned char option = menu(intro_items, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0);
         switch (option) {
             case (unsigned char) MainMenuNewGame: {
-                gameloop(1, seconds >= DEMO_START_AFTER);
+                gameloop(1+1, seconds >= DEMO_START_AFTER);
                 break;
             }
             case (unsigned char) MainMenuLevelSelect: {
                 level_select_screen(LEVEL_SELECT);
                 break;
             }
-            case (unsigned char) MainMenuHelp: {
+            /*case (unsigned char) MainMenuHelp: {
                 help_screen(HELP);
                 break;
-            }
+            }*/
             case (unsigned char) MainMenuCredits: {
                 credits_screen(CREDITS);
                 break;

@@ -110,7 +110,7 @@ char load_leveldata(const unsigned char no) {
 
             //todo: checks if data is too short or too long
             print_tile(x, y, *data);
-            if ((strchr(BARRIER_SYMBOLS, *data) != 0) && !(first_char))
+            if ((strchr(BARRIER_SYMBOLS, *data) != -1) && !(first_char))
                 first_char = *data;
             ++data;
         }
@@ -126,7 +126,7 @@ char load_leveldata(const unsigned char no) {
     return 1;
 }
 
-_Bool is_within(const signed char x, const signed char y) {
+inline _Bool is_within(const signed char x, const signed char y) {
 
     return  (x >= OFFSET_MAP_X) &&
             (y >= OFFSET_MAP_Y) &&
@@ -139,9 +139,9 @@ _Bool is_border(const signed char x, const signed char y) {
     if (!is_within(x, y))
         return 1;
 
-    unsigned int brick = get_default_tile(x, y);
+    unsigned short brick = get_default_tile(x, y);
 
-    return strchr(BARRIER_SYMBOLS, (unsigned char)brick) != 0;
+    return strchr(BARRIER_SYMBOLS, (unsigned char)brick) != -1;
 }
 
 /*
@@ -245,16 +245,6 @@ void timer(void) {
     }
 }
 
-
-void reset_sprites(void) {
-
-    animation_frame = 0;
-    for(unsigned char pos=0; pos < MAX_SPRITE; ++pos)
-        all_sprites[pos] = -1;
-    sprites_no = 0;
-    animation_refresh = 0;
-}
-
 /*
     reset level state, build screen elements
 */
@@ -278,7 +268,7 @@ void setup_level(void) {
 /*
     map based on tile number the direction when gravity is active
 */
-Position fall_direction(unsigned int tile) {
+Position fall_direction(unsigned short tile) {
     Position dir;
 
     switch (tile) {
@@ -344,8 +334,8 @@ Position get_diff_position(Direction dir) {
 }
 
 
-unsigned int get_default_tile(unsigned char x, unsigned char y) {
-    signed int tile=-1;
+unsigned short get_default_tile(unsigned char x, unsigned char y) {
+    signed short tile=-1;
 
     for(unsigned char pos=0; pos < sprites_no; ++pos)
         if (all_sprites[pos] != -1) {
@@ -372,7 +362,7 @@ unsigned int get_default_tile(unsigned char x, unsigned char y) {
 _Bool is_pushing_object(Direction dir) {
     Position diffs;
     Position dest, neighbour;
-    unsigned int item;
+    unsigned short item;
 
     diffs = get_diff_position(dir);
     dest.x = level.x + diffs.x;
@@ -418,15 +408,18 @@ _Bool is_pushing_object(Direction dir) {
 /*
   check if object is already in motion list
 */
-signed char get_first_motion(Position * motion_objects, _Bool exist) {
+signed char get_first_motion(Position * motion_objects, _Bool exist, unsigned char offset) {
 
-    for (unsigned char pos=0; pos < MAX_MOTION_ITEMS; ++pos)
-        if (exist) {
+    if (exist) {
+        for (unsigned char pos=offset; pos < MAX_MOTION_ITEMS; ++pos)
             if (motion_objects[pos].x != -1)
                 return pos;
 
-        } else if (motion_objects[pos].x == -1)
-            return pos;
+    } else {
+        for (unsigned char pos=0; pos < MAX_MOTION_ITEMS; ++pos)
+            if (motion_objects[pos].x == -1)
+                return pos;
+        } 
     return -1;
 }
 
@@ -434,10 +427,12 @@ signed char get_first_motion(Position * motion_objects, _Bool exist) {
   lookup function for active motions
 */
 signed char get_motion_position(Position * motion_objects, Position * movable) {
+    signed char x, y;
 
+    x = movable->x, y = movable->y;  
     for (unsigned char pos=0; pos < MAX_MOTION_ITEMS; ++pos)
-        if ((motion_objects[pos].x == movable->x) &&
-            (motion_objects[pos].y == movable->y))
+        if ((motion_objects[pos].x == x) &&
+            (motion_objects[pos].y == y))
             return pos;
     return -1;
 }
@@ -445,18 +440,17 @@ signed char get_motion_position(Position * motion_objects, Position * movable) {
 /*
     add object to motion list
 */
-signed char add_motion(Position * motion_objects, Position * item) {
+signed char add_motion(Position * motion_objects, Position * item, unsigned char offset) {
     signed char slot;
 
     //check if it is already in this list
     slot = get_motion_position(motion_objects, item);
-    if (slot != -1)
-        return slot;
-
-    slot = get_first_motion(motion_objects, 0);
-    if (slot > -1) {
-        motion_objects[slot].x = item->x;
-        motion_objects[slot].y = item->y;
+    if (slot == -1) {
+        slot = get_first_motion(motion_objects, SEARCH_FREE_SLOT, offset);
+        if (slot > -1) {
+            motion_objects[slot].x = item->x;
+            motion_objects[slot].y = item->y;
+        }
     }
     return slot;
 }
@@ -465,22 +459,10 @@ signed char add_motion(Position * motion_objects, Position * item) {
     end of helper function for moving objects
 */
 
-
-
-/*
-    save pseudo sprite
-*/
-void add_animation(unsigned char x, unsigned char y) {
-
-    if (sprites_no < MAX_SPRITE)
-        all_sprites[sprites_no] = ((signed int)(sprites_no << 10)) | (x << 5) | y;
-    ++sprites_no;
-}
-
 /*
     return tile at given position with respecting borders
 */
-signed int get_checked_tile(signed char x, signed char y) {
+signed short get_checked_tile(signed char x, signed char y) {
 
     if (!is_within(x, y))
         return -1;
@@ -489,11 +471,11 @@ signed int get_checked_tile(signed char x, signed char y) {
 }
 
 
-_Bool destroyable(unsigned char x, unsigned char y) {
+_Bool destroyable(signed char x, signed char y) {
     _Bool ret;
 
-    ret =   is_within(x, y) & 
-            get_default_tile(x, y) != WALL_UNDESTROY_SYMBOL &
+    ret =   is_within(x, y) &&
+            get_default_tile(x, y) != WALL_UNDESTROY_SYMBOL &&
             1;
 
     return ret;    
@@ -502,25 +484,25 @@ _Bool destroyable(unsigned char x, unsigned char y) {
 void gravitation(Position * motion_objects) {
 
     while (level.status != StatusDied) {
-        signed char pos = get_first_motion(motion_objects, 1);
+        signed char pos = get_first_motion(motion_objects, SEARCH_OCCUPIED_SLOT, 0);
         //no motion found then everything is done
         if (pos == -1)
             break;
 
         Position * current_Motion;
         current_Motion = &motion_objects[pos];
-
+        
         Position dest, src;
         src.x = current_Motion->x, src.y = current_Motion->y;
-        signed int falling_item = get_checked_tile(current_Motion->x, current_Motion->y);
-        /*
-            original
-        */
+        signed short falling_item = get_checked_tile(current_Motion->x, current_Motion->y);
         switch (falling_item) {
+            //gravitation platforms
             case PLATFORMU_SYMBOL:  case PLATFORMD_SYMBOL:
             case PLATFORML_SYMBOL:  case PLATFORMR_SYMBOL: 
+            //rockets
             case ROCKETU_SYMBOL:    case ROCKETD_SYMBOL:
             case ROCKETL_SYMBOL:    case ROCKETR_SYMBOL:
+            //stones
             case ROCK_UP_SYMBOL:    case ROCK_DOWN_SYMBOL:
             case ROCK_LEFT_SYMBOL:  case ROCK_RIGHT_SYMBOL: {
                 Position diff;
@@ -530,18 +512,18 @@ void gravitation(Position * motion_objects) {
                 dest.y = current_Motion->y + diff.y;
 
                 //check if falling ends here
-                signed int dest_item = get_checked_tile(dest.x, dest.y);
+                signed short dest_item = get_checked_tile(dest.x, dest.y);
                 if  (
-                    (strchr(BLOCKING_SYMBOLS, dest_item) != 0) ||
-                    (strchr(BARRIER_SYMBOLS, dest_item) != 0) ||
-                    (strchr(EXPLOSIVE_SYMBOLS,falling_item) != 0) ||
+                    (strchr(BLOCKING_SYMBOLS, dest_item)    != -1) ||
+                    (strchr(BARRIER_SYMBOLS, dest_item)     != -1) ||
+                    (strchr(EXPLOSIVE_SYMBOLS,falling_item) != -1) ||
                     (!is_within(dest.x, dest.y))
                     ) {
-                    //reached boundary
-                    current_Motion->x = -1;
-                    print_tile(src.x, src.y, falling_item);
-                    check_for_changes(motion_objects, &src);
-                    continue;
+                        //reached boundary, remove object from list
+                        current_Motion->x = -1;
+                        print_tile(src.x, src.y, falling_item);
+                        check_for_changes(motion_objects, &src);
+                        continue;
                 }
 
                 switch (dest_item) {
@@ -550,10 +532,11 @@ void gravitation(Position * motion_objects) {
                         current_Motion->x = dest.x;
                         current_Motion->y = dest.y;
                         print_tile(dest.x, dest.y, falling_item);
-                        //check_for_changes(motion_objects, dest);
+                        //every step due otherwise the distance it too high
+                        check_for_changes(motion_objects, current_Motion);
                         break;
                     }
-                    case PLAYER1_SYMBOL_LEFT: case PLAYER1_SYMBOL_RIGHT:{
+                    case PLAYER1_SYMBOL_LEFT: case PLAYER1_SYMBOL_RIGHT: { //killed by moving object
                         print_tile(src.x, src.y, EMPTY_SYMBOL);
                         print_tile(dest.x, dest.y, falling_item);
                         PSGPlayNoRepeat(death_psg);
@@ -565,11 +548,11 @@ void gravitation(Position * motion_objects) {
                     case ROCKETD_SYMBOL:
                     case ROCKETL_SYMBOL:
                     case ROCKETR_SYMBOL: {
-                        if (strchr(ROCK_SYMBOLS, falling_item) != 0) {
+                        if (strchr(ROCK_SYMBOLS, falling_item) != -1) {
                             //explosion
                                
                         }
-
+                        //remove object from list
                         current_Motion->x = -1;
                         break;
                     }
@@ -591,40 +574,44 @@ void gravitation(Position * motion_objects) {
 
 void check_for_changes(Position * motion_objects, Position * source) {
     Position motion;
+        
+    for (signed char y=source->y - 1; y <= source->y + 1; ++y)
+        for (signed char x=source->x - 1; x <= source->x + 1; ++x) 
+        {
+            signed short item = get_checked_tile(x, y);
+            if (item == -1) 
+                continue;
 
-    for (signed char y=source->y - 3; y < source->y + 3; ++y)
-        for (signed char x=source->x - 3; x < source->x + 3; ++x) {
-            signed int item = get_checked_tile(x, y);
             switch (item) {
                 case ROCK_UP_SYMBOL: {
                     motion.x = x, motion.y = y;
                     if (get_checked_tile(motion.x, motion.y - 1) == EMPTY_SYMBOL) {
-                        add_motion(motion_objects, &motion);
-                        return;
+                        add_motion(motion_objects, &motion, 0);
+                        //return;
                     }
                     break;
                 }
                 case ROCK_DOWN_SYMBOL: {
                     motion.x = x, motion.y = y;
                     if (get_checked_tile(motion.x, motion.y + 1) == EMPTY_SYMBOL) {
-                        add_motion(motion_objects, &motion);
-                        return;
+                        add_motion(motion_objects, &motion, 10);
+                        //return;
                     }
                     break;
                 }
                 case ROCK_LEFT_SYMBOL: {
                     motion.x = x, motion.y = y;
                     if (get_checked_tile(motion.x - 1, motion.y) == EMPTY_SYMBOL) {
-                        add_motion(motion_objects, &motion);
-                        return;
+                        add_motion(motion_objects, &motion, 20);
+                       // return;
                     }
                     break;
                 }
                 case ROCK_RIGHT_SYMBOL: {
                     motion.x = x, motion.y = y;
                     if (get_checked_tile(motion.x + 1, motion.y) == EMPTY_SYMBOL) {
-                        add_motion(motion_objects, &motion);
-                        return;
+                        add_motion(motion_objects, &motion, 30);
+                       // return;
                     }
                     break;
                 }
@@ -639,31 +626,32 @@ void check_for_changes(Position * motion_objects, Position * source) {
 Direction get_input(_Bool* demo_mode, unsigned char * demo_pos) {
     Direction dir=DirectionUndefined;
 
-    if (getKeysHeld())
-    switch (readkey()) {
-        case PORT_A_KEY_LEFT: {
-            dir = DirectionLeft;
-            break;
-        }
-        case PORT_A_KEY_RIGHT: {
-            dir = DirectionRight;
-            break;
-        }
-        case PORT_A_KEY_UP: {
-            dir = DirectionUp;
-            break;
-        }
-        case PORT_A_KEY_DOWN: {
-            dir = DirectionDown;
-            break;
-        }
-        case PORT_A_KEY_2 | PORT_B_KEY_2: {
-            dir = DirectionExit;
-            break;
-        }
-        default: {
-            dir = DirectionUndefined;
-            break;
+    if (getKeysHeld()) {
+        switch (readkey()) {
+            case PORT_A_KEY_LEFT: {
+                dir = DirectionLeft;
+                break;
+            }
+            case PORT_A_KEY_RIGHT: {
+                dir = DirectionRight;
+                break;
+            }
+            case PORT_A_KEY_UP: {
+                dir = DirectionUp;
+                break;
+            }
+            case PORT_A_KEY_DOWN: {
+                dir = DirectionDown;
+                break;
+            }
+            case PORT_A_KEY_2 | PORT_B_KEY_2: {
+                dir = DirectionExit;
+                break;
+            }
+            default: {
+                dir = DirectionUndefined;
+                break;
+            }
         }
     }
 
@@ -678,59 +666,6 @@ Direction get_input(_Bool* demo_mode, unsigned char * demo_pos) {
 
     return dir;
 }
-
-void wait(unsigned char duration) {
-
-    for(unsigned char wait=0; wait < duration; ++wait) {
-        timer();
-        waitForVBlank();
-    }
-}
-
-void clear_sprites(void) {
-    initSprites();
-    finalizeSprites();
-    waitForVBlank();
-    copySpritestoSAT();
-    waitForVBlank();
-}
-
-void extend_player_sprite(unsigned char player_figure, unsigned char current_x, unsigned char current_y) {
-
-    for(unsigned char pos=0; pos < 4; ++pos) {
-        unsigned char idx;
-
-        idx = (pos << 2) + OFFSET_SPRITE_Y;
-        if  (player_figure == PLAYER1_SYMBOL_LEFT) {
-            SpriteTable[idx] = ((pos % 2 == 0) ? current_y - 1: 0xE0);
-        } else {
-            SpriteTable[idx] = ((pos % 2 == 0) ? 0xE0 : current_y - 1);
-        }
-        SpriteTable[idx + 1] = current_x;
-    }
-
-    finalizeSprites();
-    waitForVBlank();
-    copySpritestoSAT();
-}
-
-void add_player_sprite(void) {
-
-    clear_sprites();
-    SG_loadZX7compressedSpritesTiles(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY/*   * 8*/, 0);
-    SG_loadZX7compressedSpritesTiles(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY/*   * 8*/, 1);
-    SG_loadZX7compressedSpritesTiles(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY/*   * 8*/, 2);
-    SG_loadZX7compressedSpritesTiles(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY/*   * 8*/, 3);
-    //SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY   * 8, 0, 8);
-    //SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_RIGHT_BODY  * 8, 1, 8);
-    //SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_LEFT_REST   * 8, 2, 8);
-    //SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_RIGHT_REST  * 8, 3, 8);
-    addSprite((level.x << 3), (level.y << 3)-1, 0, SG_COLOR_LIGHT_RED);
-    addSprite((level.x << 3), (level.y << 3)-1, 1, SG_COLOR_LIGHT_RED);
-    addSprite((level.x << 3), (level.y << 3)-1, 2, SG_COLOR_GRAY);
-    addSprite((level.x << 3), (level.y << 3)-1, 3, SG_COLOR_GRAY);
-}
-
 
 void gameloop(unsigned char curr_level, _Bool demo_mode) {
     Direction dir, prev_dir;
@@ -753,7 +688,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
         setup_level();
         if (curr_level < 2)
             totaltime = 0;
-        extend_player_sprite(player_figure, (unsigned char) level.x << 3, (unsigned char)level.y << 3);
+        //extend_player_sprite(player_figure, (unsigned char) level.x << 3, (unsigned char)level.y << 3);
         for (char n=0; n < MAX_MOTION_ITEMS; ++n) {
             motion_objects[n].x = -1;
         }
@@ -773,7 +708,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                 wait((prev_dir != dir) ? 10-2 : 2-2);
             }
             if ((prev_dir != DirectionUndefined) && (dir == DirectionUndefined)) {
-                wait(5/*10*/);
+                wait(5);
             }
 
             prev_dir = dir;
@@ -785,23 +720,23 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                 Position dest, neighbour, diffs, source;
                 diffs = get_diff_position(dir);
                 dest.x = diffs.x + level.x, dest.y = diffs.y + level.y;
-                unsigned int item = get_default_tile(dest.x, dest.y);
+                unsigned short item = get_default_tile(dest.x, dest.y);
 
                 // walk against a wall, nothing happen
                 if (is_border(dest.x, dest.y))
                     continue;
 
-                if (strchr(MOVABLE_SYMBOLS, item) != 0) {
+                if (strchr(MOVABLE_SYMBOLS, item) != -1) {
                     if (is_pushing_object(dir)) {
+                        // object is movable but is the place next to free?
                         moved_stone = 1;
                         source.x = level.x; source.y = level.y;
                         neighbour.x = source.x + (diffs.x << 1);
                         neighbour.y = source.y + (diffs.y << 1);
-                        unsigned int pushed = get_default_tile(dest.x, dest.y);
+                        unsigned short pushed = get_default_tile(dest.x, dest.y);
 
-                        
-
-                        if (strchr(PLATFORM_SYMBOLS, item) != 0) {
+                        signed char pos = strchr(PLATFORM_SYMBOLS, item);
+                        if (pos != -1) {
                             switch(dir) {
                                 case DirectionUp: {
                                     print_tile(neighbour.x, neighbour.y, PLATFORMU_SYMBOL);
@@ -822,10 +757,11 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                             }
                             Position motion;
                             motion.x = neighbour.x; motion.y = neighbour.y; 
-                            add_motion(motion_objects, &motion);
-                        } else
+                            add_motion(motion_objects, &motion, pos * 10);
+                        } else {
                             //check_for_changes(motion_objects, source, neighbour);
                             print_tile(neighbour.x, neighbour.y, pushed);
+                        }
 
                     } else //walk against object but way is occupied, nothing happen
                         continue;
@@ -838,7 +774,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                         if ((dest.x = level.teleport[n].x) &&
                             (dest.y = level.teleport[n].y) ) {
                                 // set player nearby teleporter, search right, up, left then down
-                                for (unsigned int dir=DirectionRight; dir <= DirectionDown; ++dir) {
+                                for (unsigned short dir=DirectionRight; dir <= DirectionDown; ++dir) {
                                     diffs = get_diff_position(dir);
 
                                     if (get_default_tile(diffs.x + level.teleport[n].x,
@@ -874,7 +810,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                             setup_level();
                             continue;
                         }
-                    } else //not collected all gold
+                    } else //not all gold collected, continue playing
                         continue;
                 } else {
                     for (unsigned char n=0; n < level.teleports_found; ++n) {
@@ -885,14 +821,17 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                 }
                 print_tile(level.x, level.y, (found) ? TELEPORTER_SYMBOL : EMPTY_SYMBOL);
 
+                /* next player position */
                 level.x = dest.x;
                 level.y = dest.y;
+                
+                /* draw player representation */
                 if (dir == DirectionRight)
                     player_figure = PLAYER1_SYMBOL_RIGHT;
                 else if (dir == DirectionLeft)
                     player_figure = PLAYER1_SYMBOL_LEFT;
                 print_tile(level.x, level.y, player_figure);
-                extend_player_sprite(player_figure, (unsigned char) level.x << 3, (unsigned char)level.y << 3);
+                //extend_player_sprite(player_figure, (unsigned char) level.x << 3, (unsigned char)level.y << 3);
 
                 if (status_refresh) {
                     update_statusline();
@@ -912,4 +851,87 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
         while(!keypressed()) waitForVBlank();
         death_screen(MISSION_FAIL);
     }
+}
+
+void init_sprite_position(unsigned char color) {
+
+    initSprites();
+    for(unsigned char row=0; row < MAX_SPRITE / MAX_SPRITE_PER_LINE; ++row)
+        for(unsigned char column=0; column < MAX_SPRITE_PER_LINE; ++column) {
+            unsigned char pos = row * MAX_SPRITE_PER_LINE + column;
+            unsigned char sprite_pos_x = (column << 6) - 1 + ((row % 2) == 0 ? 0 : MAX_SPRITE_PER_LINE << 3);
+            unsigned char sprite_pos_y = row << 4;
+            unsigned sprite_color;
+
+            if (color == 0)
+                sprite_color = ((pos % 16) < 2 ? 15 : (pos % 16));
+            else
+                sprite_color = color;
+            addSprite(sprite_pos_x, sprite_pos_y, pos, sprite_color);
+    }
+}
+
+
+void clear_sprites(void) {
+    initSprites();
+    finalizeSprites();
+    waitForVBlank();
+    copySpritestoSAT();
+    waitForVBlank();
+}
+
+void extend_player_sprite(unsigned char player_figure, unsigned char current_x, unsigned char current_y) {
+
+    for(unsigned char pos=0; pos < 4; ++pos) {
+        unsigned char idx;
+
+        idx = (pos << 2) + OFFSET_SPRITE_Y;
+        if  (player_figure == PLAYER1_SYMBOL_LEFT) {
+            SpriteTable[idx] = ((pos % 2) ? 0xE0 : current_y - 1);
+        } else {
+            SpriteTable[idx] = ((pos % 2) ? current_y - 1: 0xE0);
+        }
+        SpriteTable[idx + 1] = current_x;
+    }
+
+    finalizeSprites();
+    waitForVBlank();
+    copySpritestoSAT();
+}
+
+void add_player_sprite(void) {
+
+    clear_sprites();
+
+    //SG_loadZX7compressedSpritesTiles(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY/*   * 8*/, 0);
+    //SG_loadZX7compressedSpritesTiles(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY/*   * 8*/, 1);
+    //SG_loadZX7compressedSpritesTiles(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY/*   * 8*/, 2);
+    //SG_loadZX7compressedSpritesTiles(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY/*   * 8*/, 3);
+    //SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY   * 8, 0, 8);
+    //SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_RIGHT_BODY  * 8, 1, 8);
+    //SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_LEFT_REST   * 8, 2, 8);
+    //SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_RIGHT_REST  * 8, 3, 8);
+    addSprite((level.x << 3), (level.y << 3)-1, 0, SG_COLOR_LIGHT_RED);
+    addSprite((level.x << 3), (level.y << 3)-1, 1, SG_COLOR_LIGHT_RED);
+    addSprite((level.x << 3), (level.y << 3)-1, 2, SG_COLOR_GRAY);
+    addSprite((level.x << 3), (level.y << 3)-1, 3, SG_COLOR_GRAY);
+}
+
+/*
+    save pseudo sprite
+*/
+void add_animation(unsigned char x, unsigned char y) {
+
+    if (sprites_no < MAX_SPRITE)
+        all_sprites[sprites_no] = ((signed short)(sprites_no << 10)) | (x << 5) | y;
+    ++sprites_no;
+}
+
+void reset_sprites(void) {
+
+    animation_frame = 0;
+    for(unsigned char pos=0; pos < MAX_SPRITE; ++pos)
+        all_sprites[pos] = -1;
+    sprites_no = 0;
+    animation_refresh = 0;
 }
