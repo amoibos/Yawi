@@ -76,7 +76,7 @@ void death_screen(const unsigned char *menu_name) {
 
     print_img_compressed(  cemetry__tiles__bin,
                 cemetry__palette__bin,
-                SCREEN_MAX_RES_X, 96, 0, 8);
+                SCREEN_MAX_RES_X, 96, 0, 8, EffectNone);
 
     for(unsigned char y=line; y < SCREEN_MAX_Y; ++y)
         print_str(0, y, "                                ", 128);
@@ -281,7 +281,7 @@ void intro_screen(char * menu_name) {
 
         print_img_compressed(  city__tiles__bin,
                     city__palette__bin,
-                    256, 96, 0, 8);
+                    SCREEN_MAX_RES_X, 96, 0, 8, EffectSpiral);
 
         line=20;
         for(unsigned char y=line; y < SCREEN_MAX_Y; ++y)

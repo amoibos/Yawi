@@ -167,19 +167,42 @@ unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, 
 
 void print_img_compressed( const unsigned char *tiledata,
                 const unsigned char *colordata, 
-                const unsigned short width, const unsigned char height, const unsigned char left, const unsigned char top) {
+                const unsigned short width, const unsigned char height, const unsigned char left, const unsigned char top, Effect effect) {
     const unsigned short start_img_tiles = 256;
 
     //mapROMBank(BANK_GFX);
-    //loadTiles(tiledata, start_img_tiles, tile_length);
     loadZX7compressedTiles(tiledata, start_img_tiles);
     loadZX7compressedBGColors(colordata, start_img_tiles);
 
-    unsigned short tileno = 0;
-    for (unsigned char y=top; y < top + (height >> 3); ++y) {
-        for(unsigned char x=left; x < left + (width >> 3); ++x) {
-            print_tile(x, y, tileno + start_img_tiles);
-            ++tileno;
+    unsigned char height8=height>>3, width8=width>>3;
+    unsigned short tileno = 0;        
+    if (effect == EffectSpiral) {
+        displayOn();
+        signed char center_x, center_y;
+        signed char x=0, y=0, x_off=width8>>1, y_off=height8>>1, dx=0, dy=-1, temp;
+        unsigned short longside_squared = (width8 < height8) ? height8 * height8 : width8 * width8;
+        for(unsigned short i=0; i < longside_squared; ++i) {
+            if ((x >= -x_off) && (x <= x_off) && (y >= -y_off) && (y <= y_off)) {
+                center_x = x + x_off, center_y = y + y_off;
+                tileno = center_y * width8 + center_x + start_img_tiles;
+                print_tile(center_x + left, center_y + top, tileno);  
+                wait(1);
+            } 
+            if ((x == y) || ((x < 0) && (x == -y)) || ((x > 0) && (x == 1 - y))) {
+                temp = dx;
+                dx = -dy;
+                dy = temp;    
+            }
+
+            x += dx;
+            y += dy;   
+        }
+    } else { //linear
+        for (unsigned char y=top; y < top + height8; ++y) {
+            for(unsigned char x=left; x < left + width8; ++x) {
+                print_tile(x, y, tileno + start_img_tiles);
+                ++tileno;
+            }
         }
     }
 }

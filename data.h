@@ -107,6 +107,11 @@ typedef enum eStatus {
     StatusCompleted
 } Status;
 
+typedef enum eEffect {
+    EffectNone,
+    EffectSpiral
+} Effect;
+
 typedef struct tPosition {
     signed char x;
     signed char y;
