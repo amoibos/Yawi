@@ -108,7 +108,7 @@ void next_level_screen(const unsigned char * menu_name, unsigned char level) {
 
     line = 10;
     strcpy(output, LEVEL);
-    strcat(output, (unsigned char *)level_names[level-1]);
+    strcat(output, (unsigned char *)LEVEL_NAMES[level-1]);
     print_str(offset, line++, output, 128);
 
     strcpy(output, LEVEL_CODE);
@@ -163,7 +163,7 @@ void level_select_screen(const unsigned char * menu_name) {
     
    
     
-    option = menu(level_names, last_level, line + 3, 4, MenuModeLeft, 1);
+    option = menu(LEVEL_NAMES, last_level, line + 3, 4, MenuModeLeft, 1);
     if (option <= MAX_LEVEL)
         gameloop(option, 0);
 }
@@ -187,7 +187,7 @@ void credits_screen(const unsigned char * menu_name) {
     print_str(CENTER(output), TITLE_LINE + 1, output, 128);
 
     for (unsigned char entry=0; entry < CREDIT_NAMES_MAX; ++entry) {
-        unsigned center = CENTER(strcpy(output, credits_names[entry]));
+        unsigned center = CENTER(strcpy(output, CREDIT_NAMES[entry]));
 
         switch(entry) {
             case 0: {
@@ -292,7 +292,7 @@ void intro_screen(char * menu_name) {
         displayOn();
         reset_time(1);
 
-        unsigned char option = menu(intro_items, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0);
+        unsigned char option = menu(INTRO_ITEMS, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0);
         switch (option) {
             case (unsigned char) MainMenuNewGame: {
                 gameloop(1+1, seconds >= DEMO_START_AFTER);

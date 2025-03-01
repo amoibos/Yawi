@@ -58,7 +58,7 @@
 #define BLOCK_SYMBOL                (('B'))
 
 #define EXPLOSIVE_SYMBOLS           "UVWXB"
-#define ROCK_SYMBOLS                "<>^v"
+#define ARROW_SYMBOLS                "<>^v"
 
 // platforms with gravitation
 #define PLATFORMU_SYMBOL            (('l'))
@@ -76,10 +76,10 @@
 //removable by player
 #define STONE_SYMBOL                ((':'))
 
-#define ROCK_DOWN_SYMBOL            (('v'))
-#define ROCK_UP_SYMBOL              (('^'))
-#define ROCK_LEFT_SYMBOL            (('<'))
-#define ROCK_RIGHT_SYMBOL           (('>'))
+#define ARROW_DOWN_SYMBOL            (('v'))
+#define ARROW_UP_SYMBOL              (('^'))
+#define ARROW_LEFT_SYMBOL            (('<'))
+#define ARROW_RIGHT_SYMBOL           (('>'))
 
 #define EMPTY_SYMBOL                ((' '))
 
@@ -112,11 +112,42 @@ typedef enum eEffect {
     EffectSpiral
 } Effect;
 
-typedef struct tPosition {
+typedef struct sPosition {
     signed char x;
     signed char y;
 } Position;
 
+#define TILE_UNKNOWN                ((-1))
+#define NO_MOTION                   ((-1))
+#define END_STEP                    ((-2))
+#define MOTION_UP_OFFSET            ((00))
+#define MOTION_DOWN_OFFSET          ((10))
+#define MOTION_LEFT_OFFSET          ((20))
+#define MOTION_RIGHT_OFFSET         ((30))
+
+typedef enum eObjectMove {
+    ObjectMoveUndefined=0,
+    ObjectMoveNorth=    0+1,
+    ObjectMoveSouth=    0+1+5,
+    ObjectMoveEast=     0+1+5+5,
+    ObjectMoveWest=     0+1+5+5+5
+} ObjectMove;
+
+#define LUT_CENTER                  {0,  0}
+#define LUT_UP                      {-1, 0}
+#define LUT_DOWN                    {1,  0}
+#define LUT_RIGHT                   {1,  0}
+#define LUT_LEFT                    {-1, 0}
+
+// layout defines offsets of eObjectMove values, stop pair indicate end of check sequence
+static const Position MOTION_CHECKS[] = {
+      {END_STEP, END_STEP}   
+     ,LUT_CENTER,        LUT_DOWN, LUT_LEFT, LUT_RIGHT, {END_STEP, END_STEP}
+     ,LUT_CENTER,LUT_UP,           LUT_LEFT, LUT_RIGHT, {END_STEP, END_STEP}
+     ,LUT_CENTER,LUT_UP, LUT_DOWN, LUT_LEFT,            {END_STEP, END_STEP}
+     ,LUT_CENTER,LUT_UP, LUT_DOWN,           LUT_RIGHT, {END_STEP, END_STEP}
+};
+             
 #define DEMO_START_AFTER            ((90))
 #define COUNTER_STOPPED             ((-1))
 #define DEMO_ABORT                  ((-2))
@@ -124,7 +155,7 @@ typedef struct tPosition {
 #define MAX_MOVE_DELAY              ((5))
 
 #define MAX_STEP_SEQUENCE           ((64))
-static const unsigned char level01_step_sequence[MAX_STEP_SEQUENCE] = { DirectionUp,
+static const unsigned char LEVEL01_STEP_SEQUENCE[MAX_STEP_SEQUENCE] = { DirectionUp,
                                 DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,
                                 DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,
                                 DirectionUp,DirectionUp,
@@ -145,7 +176,7 @@ static const unsigned char level01_step_sequence[MAX_STEP_SEQUENCE] = { Directio
 
 #define MAX_LEVEL_NAME              ((25+1))
 
-typedef struct leveldata_t {
+typedef struct sLeveldata {
     unsigned char name[MAX_LEVEL_NAME];
     unsigned char gold;
     unsigned char max_gold;
@@ -162,7 +193,7 @@ typedef struct leveldata_t {
 #define MAX_LEVEL                   ((12))
 #endif
 
-static const unsigned char * level_names[MAX_LEVEL+1] = {
+static const unsigned char * LEVEL_NAMES[MAX_LEVEL+1] = {
     LEVEL_NAME01,
 #ifndef DEMO
     LEVEL_NAME02,
@@ -181,7 +212,7 @@ static const unsigned char * level_names[MAX_LEVEL+1] = {
 };
 
 typedef enum eMainMenu {
-    MainMenuUndefined
+     MainMenuUndefined
     ,MainMenuNewGame
     ,MainMenuLevelSelect
    // ,MainMenuHelp
@@ -190,7 +221,7 @@ typedef enum eMainMenu {
 } MainMenu;
 
 typedef enum eScreens {
-    ScreenUndefined
+     ScreenUndefined
     ,ScreenIntro
     ,ScreenHelp
     ,ScreenIngame
@@ -202,15 +233,15 @@ typedef enum eScreens {
 } Screens;
 
 #define MAX_INTRO_ITEMS ((3))
-static const unsigned char * intro_items[MAX_INTRO_ITEMS] = {
-    MAIN_MENU_ITEM1
+static const unsigned char * INTRO_ITEMS[MAX_INTRO_ITEMS] = {
+     MAIN_MENU_ITEM1
     ,MAIN_MENU_ITEM2
 //    ,MAIN_MENU_ITEM3
     ,MAIN_MENU_ITEM4
 };
 
 #define CREDIT_NAMES_MAX ((3))
-static const unsigned char * credits_names[CREDIT_NAMES_MAX] = {
+static const unsigned char * CREDIT_NAMES[CREDIT_NAMES_MAX] = {
     CREDITS_LINE01
     ,CREDITS_LINE02
     ,CREDITS_LINE03

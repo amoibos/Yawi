@@ -175,7 +175,8 @@ void print_img_compressed( const unsigned char *tiledata,
     loadZX7compressedBGColors(colordata, start_img_tiles);
 
     unsigned char height8=height>>3, width8=width>>3;
-    unsigned short tileno = 0;        
+    unsigned short tileno = 0;
+    unsigned char aborted = 0;        
     if (effect == EffectSpiral) {
         displayOn();
         signed char center_x, center_y;
@@ -185,8 +186,11 @@ void print_img_compressed( const unsigned char *tiledata,
             if ((x >= -x_off) && (x <= x_off) && (y >= -y_off) && (y <= y_off)) {
                 center_x = x + x_off, center_y = y + y_off;
                 tileno = center_y * width8 + center_x + start_img_tiles;
-                print_tile(center_x + left, center_y + top, tileno);  
-                wait(1);
+                if ((center_y + top < top + height8) && (center_y >= 0))
+                    print_tile(center_x + left, center_y + top, tileno);  
+                if (!aborted) wait(1);
+                if (keypressed())
+                    aborted = 1;
             } 
             if ((x == y) || ((x < 0) && (x == -y)) || ((x > 0) && (x == 1 - y))) {
                 temp = dx;
