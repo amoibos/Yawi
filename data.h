@@ -90,6 +90,8 @@
 // used for rain/ball slideshow
 #define BALL_SYMBOL                 (('\x07'))
 
+#define MAX_INPUT_DIGIT             ((10))
+
 typedef enum eDirection {
     DirectionUndefined,
     DirectionRight,
@@ -120,35 +122,38 @@ typedef struct sPosition {
 #define TILE_UNKNOWN                ((-1))
 #define NO_MOTION                   ((-1))
 #define END_STEP                    ((-2))
+
+// used to priotize search direction
 #define MOTION_UP_OFFSET            ((00))
 #define MOTION_DOWN_OFFSET          ((10))
-#define MOTION_LEFT_OFFSET          ((20))
-#define MOTION_RIGHT_OFFSET         ((30))
+#define MOTION_RIGHT_OFFSET         ((20))
+#define MOTION_LEFT_OFFSET          ((30))
 
 typedef enum eObjectMove {
     ObjectMoveUndefined=0,
-    ObjectMoveNorth=    0+1,
-    ObjectMoveSouth=    0+1+5,
+    ObjectMoveSouth=    0+1,
+    ObjectMoveNorth=    0+1+5,
     ObjectMoveEast=     0+1+5+5,
     ObjectMoveWest=     0+1+5+5+5
 } ObjectMove;
 
 #define LUT_CENTER                  {0,  0}
-#define LUT_UP                      {-1, 0}
-#define LUT_DOWN                    {1,  0}
+#define LUT_UP                      {0, -1}
+#define LUT_DOWN                    {0,  1}
 #define LUT_RIGHT                   {1,  0}
 #define LUT_LEFT                    {-1, 0}
+#define LUT_END                     {END_STEP, END_STEP}
 
 // layout defines offsets of eObjectMove values, stop pair indicate end of check sequence
 static const Position MOTION_CHECKS[] = {
-      {END_STEP, END_STEP}   
-     ,LUT_CENTER,        LUT_DOWN, LUT_LEFT, LUT_RIGHT, {END_STEP, END_STEP}
-     ,LUT_CENTER,LUT_UP,           LUT_LEFT, LUT_RIGHT, {END_STEP, END_STEP}
-     ,LUT_CENTER,LUT_UP, LUT_DOWN, LUT_LEFT,            {END_STEP, END_STEP}
-     ,LUT_CENTER,LUT_UP, LUT_DOWN,           LUT_RIGHT, {END_STEP, END_STEP}
+                                                         LUT_END
+     ,LUT_CENTER, LUT_UP,           LUT_RIGHT, LUT_LEFT, LUT_END
+     ,LUT_CENTER,         LUT_DOWN, LUT_RIGHT, LUT_LEFT, LUT_END
+     ,LUT_CENTER, LUT_UP, LUT_DOWN,            LUT_LEFT, LUT_END
+     ,LUT_CENTER, LUT_UP, LUT_DOWN, LUT_RIGHT,           LUT_END
 };
              
-#define DEMO_START_AFTER            ((90))
+#define DEMO_START_AFTER_S          ((90))
 #define COUNTER_STOPPED             ((-1))
 #define DEMO_ABORT                  ((-2))
 

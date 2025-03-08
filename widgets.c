@@ -1,6 +1,7 @@
 #include "widgets.h"
 
 unsigned char * decrypt(unsigned char * text) {
+    //TODO: to implement 
     return text;
 }
 
@@ -52,7 +53,7 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
         while(!keypressed()) {
             waitForVBlank(); 
             
-            if ((current_location == LocationIntro) && (seconds >= DEMO_START_AFTER) && (user_choice == 0)) {
+            if ((current_location == LocationIntro) && (seconds >= DEMO_START_AFTER_S) && (user_choice == 0)) {
                 selected = 1;
                 break; 
             }
@@ -106,8 +107,8 @@ unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, 
     }
 
     unsigned char set_size = strlen(valid_chars);
-    // garantee null character at the end
-    for (unsigned char c=0; c < size; ++c)
+    // garantee null character at the end, length is size + 1
+    for (unsigned char c=0; c <= size; ++c)
         buffer[c] = 0;
     
     signed char pos = 0;

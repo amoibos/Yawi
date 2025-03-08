@@ -17,7 +17,7 @@ if %TARGET_PLATFORM% == "SC" 		set compiler=sdcc
 
 if %TARGET_PLATFORM% == "SMS" 		set FLAGS=-DPLATFORM_SMS %DEMOFLAG% -DGAME_NAME=\"%output%\"
 if %TARGET_PLATFORM% == "SG"  		set FLAGS=-DPLATFORM_SG %DEMOFLAG% -DGAME_NAME=\"%output%\"
-if %TARGET_PLATFORM% == "SC"  		set FLAGS=-DPLATFORM_SG %DEMOFLAG% -DGAME_NAME=\"%output%\"
+if %TARGET_PLATFORM% == "SC"  		set FLAGS=-DPLATFORM_SG %DEMOFLAG% -DGAME_NAME=\"%output%\" --debug
 if %TARGET_PLATFORM% == "WINDOWS" 	set FLAGS=-g -DPLATFORM_WINDOWS %DEMOFLAG% -DGAME_NAME=\"%output%\" -fno-builtin -Wno-implicit-function-declaration
 
 set linker=ihx2sms

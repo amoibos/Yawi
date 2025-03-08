@@ -166,6 +166,7 @@ void update_statusline(void) {
     unsigned char numstr[10+1];
 
     strcat(strcat(strcpy(output, GOLD), SEGA_itoa(level.gold, numstr)),  " / ");
+
     SEGA_itoa(level.max_gold, numstr);
     strcat(output, numstr);
 
@@ -416,7 +417,7 @@ signed char get_first_motion(Position * motion_objects, _Bool exist, unsigned ch
                 return pos;
 
     } else {
-        for (unsigned char pos=0; pos < MAX_MOTION_ITEMS; ++pos)
+        for (unsigned char pos=offset; pos < MAX_MOTION_ITEMS; ++pos)
             if (motion_objects[pos].x == NO_MOTION)
                 return pos;
         } 
@@ -581,11 +582,7 @@ void check_for_changes(Position * motion_objects, Position * source, ObjectMove 
     Position motion;
     unsigned char i=0;
 
-    clear_line(0);
-    print_num(0, 0, get_checked_tile(source->x, source->y), 128);
-    print_num(5, 0, source->x, 128);print_num(10,0, source->y, 128);
                 
-
     while(1)
     {
         signed char x = MOTION_CHECKS[(unsigned char)move + i].x;
@@ -609,7 +606,6 @@ void check_for_changes(Position * motion_objects, Position * source, ObjectMove 
                 motion.x = x, motion.y = y;
                 if (get_checked_tile(motion.x, motion.y - 1) == EMPTY_SYMBOL) {
                     add_motion(motion_objects, &motion, MOTION_UP_OFFSET);
-                    //return;
                 }
                 break;
             }
@@ -617,7 +613,6 @@ void check_for_changes(Position * motion_objects, Position * source, ObjectMove 
                 motion.x = x, motion.y = y;
                 if (get_checked_tile(motion.x, motion.y + 1) == EMPTY_SYMBOL) {
                     add_motion(motion_objects, &motion, MOTION_DOWN_OFFSET);
-                    //return;
                 }
                 break;
             }
@@ -625,7 +620,6 @@ void check_for_changes(Position * motion_objects, Position * source, ObjectMove 
                 motion.x = x, motion.y = y;
                 if (get_checked_tile(motion.x - 1, motion.y) == EMPTY_SYMBOL) {
                     add_motion(motion_objects, &motion, MOTION_LEFT_OFFSET);
-                   // return;
                 }
                 break;
             }
@@ -633,7 +627,6 @@ void check_for_changes(Position * motion_objects, Position * source, ObjectMove 
                 motion.x = x, motion.y = y;
                 if (get_checked_tile(motion.x + 1, motion.y) == EMPTY_SYMBOL) {
                     add_motion(motion_objects, &motion, MOTION_RIGHT_OFFSET);
-                   // return;
                 }
                 break;
             }
@@ -759,7 +752,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
         if (curr_level < 2)
             totaltime = 0;
         //extend_player_sprite(player_figure, (unsigned char) level.x << 3, (unsigned char)level.y << 3);
-        for (char n=0; n < MAX_MOTION_ITEMS; ++n) {
+        for (unsigned char n=0; n < MAX_MOTION_ITEMS; ++n) {
             motion_objects[n].x = -1;
         }
         current_location = LocationInGame;
@@ -779,7 +772,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                 wait((prev_dir != dir) ? 10-2 : 2-2);
             }
             if ((prev_dir != DirectionUndefined) && (dir == DirectionUndefined)) {
-                wait(5);
+                wait(5+2);
             }
 
             prev_dir = dir;

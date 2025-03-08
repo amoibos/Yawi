@@ -133,7 +133,7 @@ void next_level_screen(const unsigned char * menu_name, unsigned char level) {
     }
 }
 
-void level_select_screen(const unsigned char * menu_name) {
+unsigned char level_select_screen(const unsigned char * menu_name) {
     unsigned char output[SCREEN_MAX_X+1];
     const unsigned char offset=5;
     unsigned char line=5;
@@ -151,7 +151,7 @@ void level_select_screen(const unsigned char * menu_name) {
     print_str(offset, line, output, 128);
     displayOn();
     
-    input(strlen(output) + offset + 1, line, output, SCREEN_MAX_X, InputTypeNumerical);
+    input(strlen(output) + offset + 1, line, output, MAX_INPUT_DIGIT, InputTypeNumerical);
     
     long code = SEGA_atoi(output);
     unsigned char last_level = 1;
@@ -164,8 +164,7 @@ void level_select_screen(const unsigned char * menu_name) {
    
     
     option = menu(LEVEL_NAMES, last_level, line + 3, 4, MenuModeLeft, 1);
-    if (option <= MAX_LEVEL)
-        gameloop(option, 0);
+    return option;
 }
 
 void credits_screen(const unsigned char * menu_name) {
@@ -295,11 +294,12 @@ void intro_screen(char * menu_name) {
         unsigned char option = menu(INTRO_ITEMS, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0);
         switch (option) {
             case (unsigned char) MainMenuNewGame: {
-                gameloop(1+1, seconds >= DEMO_START_AFTER);
+                gameloop(1+1, seconds >= DEMO_START_AFTER_S);
                 break;
             }
             case (unsigned char) MainMenuLevelSelect: {
-                level_select_screen(LEVEL_SELECT);
+                unsigned char select = level_select_screen(LEVEL_SELECT);
+                gameloop(select, 0);
                 break;
             }
             /*case (unsigned char) MainMenuHelp: {

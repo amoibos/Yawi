@@ -31,7 +31,6 @@ void load_ascii_tiles(unsigned short position) {
 void wait(unsigned char duration) {
 
     for(unsigned char wait=0; wait < duration; ++wait) {
- //       timer();
         waitForVBlank();
     }
 }

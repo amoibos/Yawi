@@ -16,7 +16,7 @@
 void congratulation_screen(const unsigned char * menu_name);
 void death_screen(const unsigned char * menu_name);
 void next_level_screen(const unsigned char * menu_name, char level);
-void level_select_screen(const unsigned char * menu_name);
+unsigned char level_select_screen(const unsigned char * menu_name);
 void intro_screen(const unsigned char * menu_name);
 void credits_screen(const unsigned char * menu_name);
 void help_screen(const unsigned char * menu_name);
