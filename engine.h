@@ -11,6 +11,7 @@
 #include "views.h"
 
 #include "localization.h"
+#include "animationdata.h"
 
 void load_font(void);
 
@@ -21,7 +22,7 @@ long get_levelcode(unsigned char level);
 void update_statusline(void);
 void print_title(unsigned char * title);
 void setup_level(void);
-unsigned short get_default_tile(unsigned char x, unsigned char y);
+unsigned short get_default_tile(unsigned char x, unsigned char y, Location location);
 _Bool is_pushing_object(Direction dir);
 inline ObjectMove get_object_move(Direction dir);
 void gameloop(unsigned char curr_level, _Bool demo_mode);
@@ -50,6 +51,7 @@ extern unsigned short totaltime;
 
 
 /* sprite handling */
+extern inline signed short set_sprite_data(unsigned char sprite, unsigned char x, unsigned char y);
 extern SpriteData get_sprite_data(signed short data);
 extern void animate_quarterly(Screens screen);
 extern unsigned char animation_frame;
@@ -59,12 +61,13 @@ extern _Bool animation_refresh;
 
 extern _Bool audio_enabled;
 extern unsigned char previous_fps_seqment;
-extern unsigned char INGAME_SPRITE[5][4];
 
 extern unsigned char SpriteTable[MAX_SPRITE * 4];
 
 extern void init_sprite_position(unsigned char color);
 extern void add_ball_sprite(void);
 extern void update_sprites_falling(void);
+
+
 
 #endif

@@ -8,7 +8,7 @@
 #define BANK_GFX                    ((3))
 #define BANK_AUDIO                  ((4))
 
-#define VERSION_STRING              "0.9.1"
+#define VERSION_STRING              "0.9.2"
 
 #ifdef DEMO
 #define VERSION                     "DEMO " VERSION_STRING
@@ -37,9 +37,11 @@
 
 #define EXIT_SYMBOL                 (('E'))
 #define PLAYER1_SYMBOL_LEFT         (('@'))
+#define PLAYER1_SYMBOL_RIGHT        (('A'))
+
+//use for more colors for player figure 
 #define PLAYER1_SYMBOL_LEFT_BODY    ((PLAYER1_SYMBOL_LEFT + 3))
 #define PLAYER1_SYMBOL_LEFT_REST    ((PLAYER1_SYMBOL_LEFT_BODY + 6))
-#define PLAYER1_SYMBOL_RIGHT        (('A'))
 #define PLAYER1_SYMBOL_RIGHT_BODY   ((PLAYER1_SYMBOL_RIGHT + 3))
 #define PLAYER1_SYMBOL_RIGHT_REST   ((PLAYER1_SYMBOL_RIGHT_BODY + 6))
 
@@ -91,6 +93,16 @@
 #define BALL_SYMBOL                 (('\x07'))
 
 #define MAX_INPUT_DIGIT             ((10))
+#define BORDER_BRICK                ((33))
+
+// for animation in intro screen, offset of 128 required because first tiles are used for image
+#define PLAYER1_SYMBOL_LEFT_SHADOW  (('('))
+#define PLAYER1_SYMBOL_RIGHT_SHADOW ((')'))
+#define PEBBLE_SYMBOL_SHADOW        (('.')) 
+
+#define PEBBLE_SYMBOL_INDEX         ((0))
+#define PLAYER1_SYMBOL_RIGHT_INDEX  ((1))
+#define PLAYER1_SYMBOL_LEFT_INDEX   ((2))
 
 typedef enum eDirection {
     DirectionUndefined,
@@ -290,6 +302,5 @@ typedef enum eInputType {
 #define OFFSET_SPRITE_X             ((1))
 #define OFFSET_SPRITE_TILE          ((2))
 #define OFFSET_SPRITE_ATTR          ((3))
-
 
 #endif

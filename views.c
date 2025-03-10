@@ -145,10 +145,13 @@ unsigned char level_select_screen(const unsigned char * menu_name) {
     clear_screen();
     
     strcpy(output, menu_name);
-    print_str(CENTER(output), TITLE_LINE + 1, output, 128);
+    print_str(CENTER(output), TITLE_LINE + 2, output, 128);
     
     strcpy(output, LEVEL_CODE);
     print_str(offset, line, output, 128);
+    
+    print_window_borders(0, 0, SCREEN_MAX_X, SCREEN_MAX_Y, BORDER_BRICK);
+
     displayOn();
     
     input(strlen(output) + offset + 1, line, output, MAX_INPUT_DIGIT, InputTypeNumerical);
@@ -288,10 +291,18 @@ void intro_screen(char * menu_name) {
 
         strcpy(output, VERSION);
         print_str(SCREEN_MAX_X - strlen(output), SCREEN_MAX_Y - 1, output, 128);
-        displayOn();
+        displayOn();   
         reset_time(1);
-
+        reset_sprites();
+        // draw pebbles and the player figure, register animation
+        for(unsigned char x=0; x < SCREEN_MAX_X; ++x)
+            print_tile(x, 21 - 1, INTRO_SPRITE[0][PEBBLE_SYMBOL_INDEX] + 128);
+        print_tile(0, 21 - 1, INTRO_SPRITE[0][PLAYER1_SYMBOL_RIGHT_INDEX] + 128);
+        add_animation(0, 21 - 1);
+        
+        SetTimerCallback(animate_quarterly);
         unsigned char option = menu(INTRO_ITEMS, MAX_INTRO_ITEMS, 21, 10, MenuModeCenter, 0);
+        SetTimerCallback(0);
         switch (option) {
             case (unsigned char) MainMenuNewGame: {
                 gameloop(1+1, seconds >= DEMO_START_AFTER_S);

@@ -139,7 +139,7 @@ _Bool is_border(const signed char x, const signed char y) {
     if (!is_within(x, y))
         return 1;
 
-    unsigned short brick = get_default_tile(x, y);
+    unsigned short brick = get_default_tile(x, y, LocationInGame);
 
     return strchr(BARRIER_SYMBOLS, (unsigned char)brick) != -1;
 }
@@ -227,6 +227,7 @@ void timer(void) {
     if (timer_enabled) {
         if (++fps == FRAME_RATE) {
             ++seconds;
+            animation_refresh = 1;
             fps = 0;
         }
     }
@@ -335,7 +336,7 @@ Position get_diff_position(Direction dir) {
 }
 
 
-unsigned short get_default_tile(unsigned char x, unsigned char y) {
+unsigned short get_default_tile(unsigned char x, unsigned char y, Location location ) {
     signed short tile=TILE_UNKNOWN;
 
     for(unsigned char pos=0; pos < sprites_no; ++pos)
@@ -346,9 +347,14 @@ unsigned short get_default_tile(unsigned char x, unsigned char y) {
             unsigned char sprite_y = sprite.y;
             signed char sprite_index = sprite.index;
 
+            
             if ((sprite_x == x) && (sprite_y == y)) {
-                tile = INGAME_SPRITE[sprite_index][sprite_index];
-                break;
+                switch(location) {
+                    case LocationInGame: {
+                        tile = INGAME_SPRITE[sprite_index][sprite_index];
+                        break;
+                    }
+                }
             }
         }
 
@@ -468,7 +474,7 @@ signed short get_checked_tile(signed char x, signed char y) {
     if (!is_within(x, y))
         return -1;
 
-    return get_default_tile(x, y);
+    return get_default_tile(x, y, LocationInGame);
 }
 
 
@@ -476,7 +482,7 @@ _Bool destroyable(signed char x, signed char y) {
     _Bool ret;
 
     ret =   is_within(x, y) &&
-            get_default_tile(x, y) != WALL_UNDESTROY_SYMBOL &&
+            get_default_tile(x, y, LocationInGame) != WALL_UNDESTROY_SYMBOL &&
             1;
 
     return ret;    
@@ -772,7 +778,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                 wait((prev_dir != dir) ? 10-2 : 2-2);
             }
             if ((prev_dir != DirectionUndefined) && (dir == DirectionUndefined)) {
-                wait(5+2);
+                wait(5);
             }
 
             prev_dir = dir;
@@ -787,7 +793,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                 diffs = get_diff_position(dir);
                 dest.x = diffs.x + level.x;
                 dest.y = diffs.y + level.y;
-                unsigned short item = get_default_tile(dest.x, dest.y);
+                unsigned short item = get_default_tile(dest.x, dest.y, LocationInGame);
 
                 // walk against a wall, nothing happen
                 if (is_border(dest.x, dest.y))
@@ -803,7 +809,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                         movable_dst.x = movable_src.x + diffs.x;
                         movable_dst.y = movable_src.y + diffs.y;
 
-                        unsigned short pushed = get_default_tile(dest.x, dest.y);
+                        unsigned short pushed = get_default_tile(dest.x, dest.y, LocationInGame);
                         ObjectMove object_moved=ObjectMoveUndefined; 
                         object_moved = get_object_move(dir);
 
@@ -834,7 +840,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                                     diffs = get_diff_position(dir);
 
                                     if (get_default_tile(diffs.x + level.teleport[n].x,
-                                                 diffs.y + level.teleport[n].y) == EMPTY_SYMBOL) {
+                                                 diffs.y + level.teleport[n].y, LocationInGame) == EMPTY_SYMBOL) {
                                         found = (n + 1) % level.teleports_found;
                                         dest.x = level.teleport[found].x + diffs.x;
                                         dest.y = level.teleport[found].y + diffs.y;
@@ -973,10 +979,16 @@ void add_player_sprite(void) {
 /*
     save pseudo sprite
 */
+
+inline signed short set_sprite_data(unsigned char sprite, unsigned char x, unsigned char y) {
+
+    return ((signed short)(sprite << 10)) | (x << 5) | y;
+}
+
 void add_animation(unsigned char x, unsigned char y) {
 
     if (sprites_no < MAX_SPRITE)
-        all_sprites[sprites_no] = ((signed short)(sprites_no << 10)) | (x << 5) | y;
+        all_sprites[sprites_no] = set_sprite_data(sprites_no, x, y);
     ++sprites_no;
 }
 
@@ -984,7 +996,7 @@ void reset_sprites(void) {
 
     animation_frame = 0;
     for(unsigned char pos=0; pos < MAX_SPRITE; ++pos)
-        all_sprites[pos] = -1;
+        all_sprites[pos] = NO_MOTION;
     sprites_no = 0;
     animation_refresh = 0;
 }

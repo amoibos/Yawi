@@ -2,45 +2,7 @@
 #define ANIMATION_H
 
 #include "engine.h"
-
-unsigned char INGAME_SPRITE[5][4] = {
-		/*EXIT*/	 {69, 70, 71, 72}
-		/*Y*/		,{89, 97, 119, 105}
-		/*a*/		,{97, 119, 105, 89}
-		/*w*/		,{119, 105, 89, 97}
-		/*i*/		,{105, 89, 97, 119}
-};
-
-unsigned char DEATH_SPRITE[1][4] = {
-		/*#3*/		 {3, 4, 5, 4}
-};
-
-
-unsigned char CREDITS_SPRITE[23][4] = {
-		/*P*/	 	 {80,  0, 80,  0}
-		/*r*/		,{114, 0, 114, 0}
-		/*e*/		,{101, 0, 101, 0}
-		/*s*/		,{115, 0, 115, 0}
-		/*s*/		,{115, 0, 115, 0}
-		/* */	 	,{32,  0, 32,  0}
-		/*a*/		,{97,  0, 97,  0}
-		/* */		,{32,  0, 32,  0}
-		/*k*/		,{107, 0, 107, 0}
-		/*e*/		,{101, 0, 101, 0}
-		/*y*/		,{121, 0, 121, 0}
-		/* */	 	,{32,  0, 32,  0}
-		/*t*/		,{116, 0, 116, 0}
-		/*o*/		,{111, 0, 111, 0}
-		/* */		,{32,  0, 32,  0}
-		/*c*/		,{99,  0, 99,  0}
-		/*o*/	 	,{111, 0, 111, 0}
-		/*n*/		,{110, 0, 110, 0}
-		/*t*/		,{116, 0, 116, 0}
-		/*i*/		,{105, 0, 105, 0}
-		/*n*/		,{110, 0, 110, 0}
-		/*u*/	 	,{117, 0, 117, 0}
-		/*e*/		,{101, 0, 101, 0}
-};
+#include "animationdata.h"
 
 //Press a key to continue
 
@@ -50,5 +12,9 @@ SpriteData get_sprite_data(signed short data);
 void init_sprite_position(unsigned char color);
 void add_ball_sprite(void);
 void update_sprites_falling(void);
+
+//extern unsigned char INTRO_SPRITE[1][3];
+//extern unsigned char CREDITS_SPRITE[23][4];
+//extern unsigned char DEATH_SPRITE[1][4];
 
 #endif

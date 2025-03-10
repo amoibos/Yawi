@@ -1,8 +1,5 @@
 #include "animation.h"
 
-#define NDEBUG 1
-
-
 SpriteData get_sprite_data(signed short data) {
 	SpriteData retval = {0, 0, -1};
 
@@ -18,53 +15,55 @@ void animate_quarterly(Screens screen) {
 	animation_frame = (animation_frame + 1)  % 4;
 	for(unsigned char pos=0; pos < sprites_no; ++pos)
 
-		if (all_sprites[pos] != -1) {
+		if (all_sprites[pos] != NO_MOTION) {
 			SpriteData sprite;
 			sprite = get_sprite_data(all_sprites[pos]);
-            unsigned char sprite_x = sprite.x;
-            unsigned char sprite_y = sprite.y;
-            signed char sprite_index = sprite.index;
-
-#ifdef DEBUG
-			print_num(0, 0, sprite_x, 128);
-			print_num(5, 0, sprite_y, 128);
-			print_num(10, 0, sprite_index, 128);
-			print_num(15, 0, all_sprites[pos], 128);
-			print_num(20, 0, animation_frame, 128);
-#endif
+			unsigned char right_figure = INTRO_SPRITE[sprite.index][PLAYER1_SYMBOL_RIGHT_INDEX] + 128; 
 
 			switch(screen) {
 				case ScreenIntro: {
+					//get current player figure and overwrite current position
+					unsigned short player = get_tile(sprite.x, sprite.y) % 256;
+					print_tile(sprite.x, sprite.y, 128);
+					
+					if (sprite.x == SCREEN_MAX_X - 1) {
+						return; 	
+					}
+					
+					if (player == right_figure) 
+						++sprite.x;
+
+					// save player position and draw player figure
+					all_sprites[pos] = set_sprite_data(sprite.index, sprite.x, sprite.y);
+					print_tile(sprite.x, sprite.y, player);
 					break;
 				}
 				case ScreenCredits: {
-					print_tile(sprite_x, sprite_y, CREDITS_SPRITE[sprite_index][animation_frame] + 128);
+					print_tile(sprite.x, sprite.y, CREDITS_SPRITE[sprite.index][animation_frame] + 128);
 					break;
 				}
 				case ScreenNextLevel: {
 					break;
 				}
 				case ScreenCongratulation: {
-					print_tile(sprite_x, sprite_y, CREDITS_SPRITE[sprite_index][animation_frame] + 128);
+					print_tile(sprite.x, sprite.y, CREDITS_SPRITE[sprite.index][animation_frame] + 128);
 					break;
 				}
 				case ScreenLevelSelect: {
 					break;
 				}
 				case ScreenIngame: {
-					//print_num(25, 0, INGAME_SPRITE[sprite_index][animation_frame], 128);
-					print_tile(sprite_x, sprite_y, INGAME_SPRITE[sprite_index][animation_frame]);
+					print_tile(sprite.x, sprite.y, INGAME_SPRITE[sprite.index][animation_frame]);
 					break;
 				}
 				case ScreenDeath: {
-					//print_num(25, 0, DEATH_SPRITE[sprite_index][animation_frame], 128);
-					print_tile(sprite_x, sprite_y, DEATH_SPRITE[sprite_index][animation_frame]);
+					print_tile(sprite.x, sprite.y, DEATH_SPRITE[sprite.index][animation_frame]);
 					break;
 					}
 				default:
 					break;
 			}
-			//waitForVBlank();
+			
 		}
 		waitForVBlank();
 }

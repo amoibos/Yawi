@@ -7,6 +7,7 @@
 #include "assets/images.h"
 #include "engine.h"
 #include "widgets.h"
+#include "animationdata.h"
 
 #include "PSGlib/PSGlib.h"
 #include "assets/audio.h"
@@ -20,4 +21,5 @@ unsigned char level_select_screen(const unsigned char * menu_name);
 void intro_screen(const unsigned char * menu_name);
 void credits_screen(const unsigned char * menu_name);
 void help_screen(const unsigned char * menu_name);
+
 #endif

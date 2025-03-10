@@ -13,9 +13,15 @@ unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, 
 void print_img_compressed(	const unsigned char *tiledata,
 				const unsigned char *colordata,
 				const unsigned short width, const unsigned char height, const unsigned char left, const unsigned char top, Effect effect);
+void print_window_borders(unsigned char left, unsigned char top, unsigned char width, unsigned char height, unsigned short tileno);
+
 extern char timer_enabled;
 extern unsigned short seconds;
 extern unsigned char fps;
+extern _Bool animation_refresh; 
 extern Location current_location;
+
+
+extern void SetTimerCallback(void (*theHandlerFunction)(Screens)) __z88dk_fastcall;
 
 #endif

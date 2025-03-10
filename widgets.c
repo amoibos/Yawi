@@ -5,6 +5,12 @@ unsigned char * decrypt(unsigned char * text) {
     return text;
 }
 
+void (*timer_callback)(Screens);
+
+void SetTimerCallback (void (*theHandlerFunction)(Screens)) __z88dk_fastcall {
+    timer_callback=theHandlerFunction;
+}
+
 unsigned char menu(unsigned char **items, unsigned char amount, unsigned char start_line, unsigned char offset, 
                     MenuMode mode, _Bool ShowNumbers) {
     unsigned char output[SCREEN_MAX_X+1];
@@ -56,6 +62,10 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
             if ((current_location == LocationIntro) && (seconds >= DEMO_START_AFTER_S) && (user_choice == 0)) {
                 selected = 1;
                 break; 
+            } else if (current_location == LocationIntro) {
+                if (animation_refresh && timer_callback) {
+                    timer_callback(current_location);
+                }
             }
         }
         
@@ -115,9 +125,7 @@ unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, 
     unsigned char idx = 0;
     unsigned short key;
     do {
-        while (!keypressed) ;
-        //slow down key processing
-        wait(5);
+        while (!keypressed()) ;
         key = readkey();
         switch(key) {
            case PORT_A_KEY_2: {
@@ -159,8 +167,8 @@ unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, 
                 break;
             }
         }
-        
         print_str(x, y, buffer, 128);
+        while (keypressed()) ;
     } while (key != (PORT_A_KEY_1 | PORT_A_KEY_2));
 
     return buffer;
@@ -210,4 +218,23 @@ void print_img_compressed( const unsigned char *tiledata,
             }
         }
     }
+}
+
+void print_window_borders(unsigned char left, unsigned char top, unsigned char width, unsigned char height, unsigned short tileno) {
+
+   for (unsigned char x=left; x < left + width; ++x) {
+        if (x >= SCREEN_MAX_X)
+            continue;
+
+        print_tile(x, top, tileno);
+        print_tile(x, top + height - 1, tileno);
+    }
+    for (unsigned char y=top; y < top + height; ++y) {
+        if (y >= SCREEN_MAX_Y)
+            continue;
+
+        print_tile(left, y, tileno);
+        print_tile(left + width - 1, y, tileno);
+    }
+
 }
