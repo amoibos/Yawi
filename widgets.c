@@ -223,20 +223,16 @@ void print_img_compressed( const unsigned char *tiledata,
 }
 
 void print_window_borders(unsigned char left, unsigned char top, unsigned char width, unsigned char height, unsigned short tileno) {
-
-   for (unsigned char x=left; x < left + width; ++x) {
-        if (x >= TEXTCONSOLE_MAX_X)
-            continue;
-
+    unsigned max_x = (left + width < TEXTCONSOLE_MAX_X) ? left + width : TEXTCONSOLE_MAX_X;
+    unsigned max_y = (top + height < TEXTCONSOLE_MAX_Y) ? top + height : TEXTCONSOLE_MAX_Y;
+    
+    for (unsigned char x=left; x < max_x; ++x) {
         print_tile(x, top, tileno);
-        print_tile(x, top + height - 1, tileno);
+        print_tile(x, max_y - 1, tileno);
     }
-    for (unsigned char y=top; y < top + height; ++y) {
-        if (y >= SCREEN_MAX_Y)
-            continue;
 
+    for (unsigned char y=top; y < max_y; ++y) {
         print_tile(left, y, tileno);
-        print_tile(left + width - 1, y, tileno);
+        print_tile(max_x - 1, y, tileno);
     }
-
 }

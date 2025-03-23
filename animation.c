@@ -18,24 +18,21 @@ void animate_quarterly(Screens screen) {
 		if (all_sprites[pos] != NO_MOTION) {
 			SpriteData sprite;
 			sprite = get_sprite_data(all_sprites[pos]);
-			unsigned char right_figure = INTRO_SPRITE[sprite.index][PLAYER1_SYMBOL_RIGHT_INDEX] + 128; 
 
 			switch(screen) {
 				case ScreenIntro: {
 					//get current player figure and overwrite current position
-					unsigned short player = get_tile(sprite.x, sprite.y) % 256;
-					print_tile(sprite.x, sprite.y, 128);
+					print_tile(sprite.x, sprite.y, INTRO_EMPTY);
 					
 					if (sprite.x == TEXTCONSOLE_MAX_X - 1) {
 						return; 	
 					}
 					
-					if (player == right_figure) 
-						++sprite.x;
+					++sprite.x;
 
 					// save player position and draw player figure
 					all_sprites[pos] = set_sprite_data(sprite.index, sprite.x, sprite.y);
-					print_tile(sprite.x, sprite.y, player);
+					print_tile(sprite.x, sprite.y, (sprite.x % INTRO_FIGURE_FRAMES) + INTRO_FIGURE + 128);
 					break;
 				}
 				case ScreenCredits: {

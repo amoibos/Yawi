@@ -104,6 +104,10 @@
 #define PLAYER1_SYMBOL_RIGHT_INDEX  ((1))
 #define PLAYER1_SYMBOL_LEFT_INDEX   ((2))
 
+#define INTRO_FIGURE                (('#'))
+#define INTRO_FIGURE_FRAMES         ((3))
+#define INTRO_EMPTY                 ((128))
+
 typedef enum eDirection {
     DirectionUndefined,
     DirectionRight,
