@@ -148,8 +148,11 @@ unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, 
                 print_str(x, y, buffer, offset);
                 
                 buffer[curr_input_pos] = 0;
-                if (curr_input_pos > 0)
+                if (curr_input_pos > 0) {
                     --curr_input_pos;
+                    curr_set_pos = buffer[curr_input_pos] - '0';
+                } else
+                    curr_set_pos = 0;
                 break;
             }
             case PORT_A_KEY_RIGHT: {
