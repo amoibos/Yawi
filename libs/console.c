@@ -3,8 +3,8 @@
 #if defined(PLATFORM_SG) || defined(PLATFORM_SC) || defined(PLATFORM_SMS)
 void clear_screen(void)
 {
-    for(unsigned short y=0; y < SCREEN_MAX_Y; ++y)
-        for(unsigned short x=0; x < SCREEN_MAX_X; ++x)
+    for(unsigned short y=0; y < TEXTCONSOLE_MAX_Y; ++y)
+        for(unsigned short x=0; x < TEXTCONSOLE_MAX_X; ++x)
         {
             setNextTileatXY(x, y);
             setTile(' ');    
@@ -14,7 +14,7 @@ void clear_screen(void)
 
 void clear_line(unsigned char line)
 {
-    for(unsigned char x = 0; x < SCREEN_MAX_X; ++x)
+    for(unsigned char x = 0; x < TEXTCONSOLE_MAX_X; ++x)
     {
         setNextTileatXY(x, line);
         setTile(EMPTY_SYMBOL);       
@@ -43,7 +43,7 @@ void print_tile(unsigned char x, unsigned char y, unsigned short tileno) {
 
 void print_str(unsigned char x, unsigned char y, char *str, short offset) {
     for(; *str; ++str) {
-        if (x >= SCREEN_MAX_X)
+        if (x >= TEXTCONSOLE_MAX_X)
             ++y, x=0;
         print_tile(x++, y, *str + offset);
     }
@@ -57,7 +57,7 @@ void print_num(unsigned char x, unsigned char y, long num, short offset) {
     SEGA_itoa(num, buffer);
     
     for(; *str; ++str) {
-        if (x >= SCREEN_MAX_X)
+        if (x >= TEXTCONSOLE_MAX_X)
             ++y, x=0;
         print_tile(x++, y, *str + offset);
     }

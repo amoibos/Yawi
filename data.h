@@ -276,20 +276,6 @@ typedef enum eMenuMode {
     MenuModeLeft
 } MenuMode;
 
-typedef enum eInputType {
-    InputTypeUndefined,
-    InputTypeNumerical,
-    InputTypeNumericalExtended,
-    InputTypeAlphaNumerical
-} InputType;
-
-#define NUMERIC                     "0123456789"
-#define EXTENDED_NUMERIC NUMERIC    "+-."
-#define ALPHA_NUMERIC               "ABCDEFGHIJKLMNOPQRSTUVWXYZ"\
-                                    "abcdefghijklmnopqrstuvwxyz"\
-                                    EXTENDED_NUMERIC
-
-
 #define MAX_LEVELCODE_FACTOR        ((5))
 
 #define MAX_SPRITE                  ((32))

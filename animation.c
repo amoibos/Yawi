@@ -26,7 +26,7 @@ void animate_quarterly(Screens screen) {
 					unsigned short player = get_tile(sprite.x, sprite.y) % 256;
 					print_tile(sprite.x, sprite.y, 128);
 					
-					if (sprite.x == SCREEN_MAX_X - 1) {
+					if (sprite.x == TEXTCONSOLE_MAX_X - 1) {
 						return; 	
 					}
 					
@@ -79,7 +79,7 @@ void update_sprites_falling(void) {
         unsigned char tile =    SpriteTable[idx + OFFSET_SPRITE_TILE];
         unsigned char attr =    SpriteTable[idx + OFFSET_SPRITE_ATTR];
 
-        if (SpriteTable[idx +  OFFSET_SPRITE_Y] < (SCREEN_MAX_RES_Y))
+        if (SpriteTable[idx +  OFFSET_SPRITE_Y] < (SCREEN_MAX_Y))
             SpriteTable[idx +  OFFSET_SPRITE_Y] += 1;
 
 

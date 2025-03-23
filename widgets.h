@@ -6,6 +6,19 @@
 #include "location.h"
 #include "data.h"
 
+typedef enum eInputType {
+    InputTypeUndefined,
+    InputTypeNumerical,
+    InputTypeNumericalExtended,
+    InputTypeAlphaNumerical
+} InputType;
+
+#define NUMERIC                     "0123456789"
+#define EXTENDED_NUMERIC NUMERIC    "+-."
+#define ALPHA_NUMERIC               "ABCDEFGHIJKLMNOPQRSTUVWXYZ"\
+                                    "abcdefghijklmnopqrstuvwxyz"\
+                                    EXTENDED_NUMERIC
+
 
 unsigned char menu(unsigned char **items, unsigned char amount, unsigned char start_line, unsigned char offset, 
 			MenuMode mode, _Bool ShowNumbers);

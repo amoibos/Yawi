@@ -3,7 +3,7 @@
 #include "localization.h"
 
 void congratulation_screen(const unsigned char * menu_name) {
-    unsigned char output[SCREEN_MAX_X+1];
+    unsigned char output[TEXTCONSOLE_MAX_X+1];
     unsigned char num[5+1];
     unsigned char line=1;
 
@@ -57,7 +57,7 @@ void congratulation_screen(const unsigned char * menu_name) {
 }
 
 void death_screen(const unsigned char *menu_name) {
-    unsigned char output[SCREEN_MAX_X+1];
+    unsigned char output[TEXTCONSOLE_MAX_X+1];
     unsigned char line=20;
 
     current_location = LocationDeathscreen;
@@ -76,7 +76,7 @@ void death_screen(const unsigned char *menu_name) {
 
     print_img_compressed(  cemetry__tiles__bin,
                 cemetry__palette__bin,
-                SCREEN_MAX_RES_X, 96, 0, 8, EffectNone);
+                SCREEN_MAX_X, 96, 0, 8, EffectNone);
 
     for(unsigned char y=line; y < SCREEN_MAX_Y; ++y)
         print_str(0, y, "                                ", 128);
@@ -92,7 +92,7 @@ void death_screen(const unsigned char *menu_name) {
 }
 
 void next_level_screen(const unsigned char * menu_name, unsigned char level) {
-    unsigned char output[SCREEN_MAX_X+1];
+    unsigned char output[TEXTCONSOLE_MAX_X+1];
     unsigned char num[10+1];
     unsigned char line=2;
     const unsigned char offset=5;
@@ -134,7 +134,7 @@ void next_level_screen(const unsigned char * menu_name, unsigned char level) {
 }
 
 unsigned char level_select_screen(const unsigned char * menu_name) {
-    unsigned char output[SCREEN_MAX_X+1];
+    unsigned char output[TEXTCONSOLE_MAX_X+1];
     const unsigned char offset=5;
     unsigned char line=5;
     char option;
@@ -150,7 +150,7 @@ unsigned char level_select_screen(const unsigned char * menu_name) {
     strcpy(output, LEVEL_CODE);
     print_str(offset, line, output, 128);
     
-    print_window_borders(0, 0, SCREEN_MAX_X, SCREEN_MAX_Y, BORDER_BRICK);
+    print_window_borders(0, 0, TEXTCONSOLE_MAX_X, SCREEN_MAX_Y, BORDER_BRICK);
 
     displayOn();
     
@@ -171,7 +171,7 @@ unsigned char level_select_screen(const unsigned char * menu_name) {
 }
 
 void credits_screen(const unsigned char * menu_name) {
-    unsigned char output[SCREEN_MAX_X+1];
+    unsigned char output[TEXTCONSOLE_MAX_X+1];
     unsigned char line=5;
 
     current_location = LocationCredits;
@@ -238,7 +238,7 @@ void credits_screen(const unsigned char * menu_name) {
 }
 
 void help_screen(const unsigned char * menu_name) {
-    unsigned char output[SCREEN_MAX_X+1];
+    unsigned char output[TEXTCONSOLE_MAX_X+1];
     unsigned char line=5;
 
     current_location = LocationHelp;
@@ -263,7 +263,7 @@ void help_screen(const unsigned char * menu_name) {
 
 
 void intro_screen(char * menu_name) {
-    unsigned char output[SCREEN_MAX_X+1];
+    unsigned char output[TEXTCONSOLE_MAX_X+1];
     unsigned char line;
 
     do {
@@ -281,21 +281,25 @@ void intro_screen(char * menu_name) {
         //strcpy(output, IN_YEAR);
         //print_str(CENTER(output), line++, output, 128);
 
+        // tile #32 is already used for graphics, overwrite with 128  + 32
+        line=8;
+        for(unsigned char y=line; y < TEXTCONSOLE_MAX_Y; ++y)
+            print_str(0, y, "                                ", 128);
+            
+        
         print_img_compressed(  city__tiles__bin,
                     city__palette__bin,
-                    SCREEN_MAX_RES_X, 96, 0, 8, EffectSpiral);
+                    SCREEN_MAX_X, 96, 0, 8, EffectSpiral);
 
-        line=20;
-        for(unsigned char y=line; y < SCREEN_MAX_Y; ++y)
-            print_str(0, y, "                                ", 128);
+        
 
         strcpy(output, VERSION);
-        print_str(SCREEN_MAX_X - strlen(output), SCREEN_MAX_Y - 1, output, 128);
+        print_str(TEXTCONSOLE_MAX_X - strlen(output), TEXTCONSOLE_MAX_Y - 1, output, 128);
         displayOn();   
         reset_time(1);
         reset_sprites();
         // draw pebbles and the player figure, register animation
-        for(unsigned char x=0; x < SCREEN_MAX_X; ++x)
+        for(unsigned char x=0; x < TEXTCONSOLE_MAX_X; ++x)
             print_tile(x, 21 - 1, INTRO_SPRITE[0][PEBBLE_SYMBOL_INDEX] + 128);
         print_tile(0, 21 - 1, INTRO_SPRITE[0][PLAYER1_SYMBOL_RIGHT_INDEX] + 128);
         add_animation(0, 21 - 1);

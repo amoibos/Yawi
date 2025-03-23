@@ -13,7 +13,7 @@ void SetTimerCallback (void (*theHandlerFunction)(Screens)) __z88dk_fastcall {
 
 unsigned char menu(unsigned char **items, unsigned char amount, unsigned char start_line, unsigned char offset, 
                     MenuMode mode, _Bool ShowNumbers) {
-    unsigned char output[SCREEN_MAX_X+1];
+    unsigned char output[TEXTCONSOLE_MAX_X+1];
     unsigned char num[3+1];
     unsigned char option=0;
     signed char previous=-1;
@@ -40,7 +40,7 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
                 to_upper(output);
 
             if (mode == MenuModeCenter)
-                offset =  (SCREEN_MAX_X >> 1) - (strlen(output) >> 1);
+                offset =  (TEXTCONSOLE_MAX_X >> 1) - (strlen(output) >> 1);
             else if (mode == MenuModeLeft)
                 ;      
 
@@ -120,12 +120,14 @@ unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, 
     // garantee null character at the end, length is size + 1
     for (unsigned char c=0; c <= size; ++c)
         buffer[c] = 0;
-    
+    buffer[0] = valid_chars[0];
+
     signed char pos = 0;
     unsigned char idx = 0;
     unsigned short key;
     do {
-        while (!keypressed()) ;
+        print_str(x, y, buffer, 128);
+        while (!keypressed()) wait(1);
         key = readkey();
         switch(key) {
            case PORT_A_KEY_2: {
@@ -168,7 +170,7 @@ unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, 
             }
         }
         print_str(x, y, buffer, 128);
-        while (keypressed()) ;
+        while (keyreleased()) wait(1);
     } while (key != (PORT_A_KEY_1 | PORT_A_KEY_2));
 
     return buffer;
@@ -223,7 +225,7 @@ void print_img_compressed( const unsigned char *tiledata,
 void print_window_borders(unsigned char left, unsigned char top, unsigned char width, unsigned char height, unsigned short tileno) {
 
    for (unsigned char x=left; x < left + width; ++x) {
-        if (x >= SCREEN_MAX_X)
+        if (x >= TEXTCONSOLE_MAX_X)
             continue;
 
         print_tile(x, top, tileno);

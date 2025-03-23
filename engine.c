@@ -91,7 +91,7 @@ char load_leveldata(const unsigned char no) {
     level.teleports_found = 0;
     unsigned char first_char=0;
     for(unsigned char y=OFFSET_MAP_Y; y < LEVEL_HEIGHT + OFFSET_MAP_Y; ++y) {
-        for(unsigned char x=OFFSET_MAP_X; x < SCREEN_MAX_X + OFFSET_MAP_X; ++x) {
+        for(unsigned char x=OFFSET_MAP_X; x < TEXTCONSOLE_MAX_X + OFFSET_MAP_X; ++x) {
             // skip control characters,
             while (*data < ' ') data++;
             if (*data == PLAYER1_SYMBOL_LEFT) {
@@ -116,8 +116,8 @@ char load_leveldata(const unsigned char no) {
         }
     }
 
-    //save 2 * SCREEN_MAX_X data in every map
-    for (unsigned char x=OFFSET_MAP_X; x < SCREEN_MAX_X + OFFSET_MAP_X; ++x) {
+    //save 2 * TEXTCONSOLE_MAX_X data in every map
+    for (unsigned char x=OFFSET_MAP_X; x < TEXTCONSOLE_MAX_X + OFFSET_MAP_X; ++x) {
         print_tile(x, OFFSET_MAP_Y - 1, first_char);
         print_tile(x, LEVEL_HEIGHT + OFFSET_MAP_Y, first_char);
     }
@@ -130,7 +130,7 @@ inline _Bool is_within(const signed char x, const signed char y) {
 
     return  (x >= OFFSET_MAP_X) &&
             (y >= OFFSET_MAP_Y) &&
-            (x < SCREEN_MAX_X) &&
+            (x < TEXTCONSOLE_MAX_X) &&
             (y < LEVEL_HEIGHT + OFFSET_MAP_Y);
 }
 
@@ -162,7 +162,7 @@ long get_levelcode(unsigned char level) {
     printing status line
 */
 void update_statusline(void) {
-    unsigned char output[SCREEN_MAX_X+1];
+    unsigned char output[TEXTCONSOLE_MAX_X+1];
     unsigned char numstr[10+1];
 
     strcat(strcat(strcpy(output, GOLD), SEGA_itoa(level.gold, numstr)),  " / ");
@@ -179,7 +179,7 @@ void update_statusline(void) {
     showing game title during playing
 */
 void print_title(unsigned char * title) {
-    unsigned char output[SCREEN_MAX_X+1];
+    unsigned char output[TEXTCONSOLE_MAX_X+1];
 
     clear_line(TITLE_LINE);
     strcpy(output, title);
@@ -204,7 +204,7 @@ void print_playtime(void) {
     unsigned char output[5];
 
     if (current_location == LocationInGame) {
-        print_str(SCREEN_MAX_X - strlen(output), INFO_LINE, strcat(SEGA_itoa(seconds, output), "s"), 0);
+        print_str(TEXTCONSOLE_MAX_X - strlen(output), INFO_LINE, strcat(SEGA_itoa(seconds, output), "s"), 0);
     }
 }
 
@@ -251,7 +251,7 @@ void timer(void) {
     reset level state, build screen elements
 */
 void setup_level(void) {
-    unsigned char output[SCREEN_MAX_X+1];
+    unsigned char output[TEXTCONSOLE_MAX_X+1];
 
     //level.x = level.start_x;
     //level.y = level.start_y;

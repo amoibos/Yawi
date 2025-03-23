@@ -12,7 +12,7 @@
 #include "PSGlib/PSGlib.h"
 #include "assets/audio.h"
 
-#define CENTER(x) ((SCREEN_MAX_X >> 1) - (strlen(x) >> 1))
+#define CENTER(x) ((TEXTCONSOLE_MAX_X >> 1) - (strlen(x) >> 1))
 
 void congratulation_screen(const unsigned char * menu_name);
 void death_screen(const unsigned char * menu_name);

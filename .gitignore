@@ -8,3 +8,5 @@
 Yawi.S*
 *.rel
 /*.zip
+/*.adb
+/*.cdb

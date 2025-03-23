@@ -14,11 +14,12 @@
 #include "../libs/strings.h"
 
 
-#define SCREEN_MAX_RES_Y    ((192))
-#define SCREEN_MAX_RES_X    ((256))
+#define SCREEN_MAX_X    ((256))
+#define SCREEN_MAX_Y    ((192))
 
-#define SCREEN_MAX_Y        ((24))
-#define SCREEN_MAX_X        ((32))
+#define TEXTCONSOLE_MAX_X        ((32))
+#define TEXTCONSOLE_MAX_Y        ((24))
+
 
 void clear_screen(void);
 void clear_line(unsigned char line);
@@ -45,6 +46,7 @@ void load_ascii_tiles(unsigned short position);
 #define displayOff SMS_displayOff
 #define get_tile SMS_getTileatXY
 #define keypressed SMS_getKeysPressed
+#define keyreleased SMS_getKeysReleased
 #define readkey SMS_getKeysStatus
 #define waitForVBlank SMS_waitForVBlank
 #define setFrameInterruptHandler SMS_setFrameInterruptHandler
@@ -63,6 +65,7 @@ void load_ascii_tiles(unsigned short position);
 #define displayOff SG_displayOff
 #define get_tile SG_getTileatXY
 #define keypressed SG_getKeysPressed
+#define keyreleased SG_getKeysReleased
 #define readkey SG_getKeysStatus
 #define waitForVBlank SG_waitForVBlank
 #define setFrameInterruptHandler SG_setFrameInterruptHandler
