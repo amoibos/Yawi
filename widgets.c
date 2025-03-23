@@ -97,7 +97,7 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
     return option + 1;
 }
 
-unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, unsigned char size, InputType input_type) {
+unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, unsigned char size, InputType input_type, unsigned short offset) {
     const unsigned char * valid_chars;
 
     //mapROMBank(BANK_FONT);
@@ -122,46 +122,41 @@ unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, 
         buffer[c] = 0;
     buffer[0] = valid_chars[0];
 
-    signed char pos = 0;
-    unsigned char idx = 0;
+    signed char curr_set_pos = 0;
+    unsigned char curr_input_pos = 0;
     unsigned short key;
     do {
-        print_str(x, y, buffer, 128);
+        print_str(x, y, buffer, offset);
         while (!keypressed()) wait(1);
         key = readkey();
         switch(key) {
-           case PORT_A_KEY_2: {
-                pos = (pos + 1) % set_size;
-                buffer[idx] = valid_chars[pos];
+           case PORT_A_KEY_DOWN: {
+                curr_set_pos = (curr_set_pos + 1) % set_size;
+                buffer[curr_input_pos] = valid_chars[curr_set_pos];
                 break;
             }
             case PORT_A_KEY_UP: {
-                pos -= 10;
-                if (pos < 0)
-                    pos += set_size;
-                
-                buffer[idx] = valid_chars[pos];
-                break;
-            }
-            case PORT_A_KEY_DOWN: {
-                pos = (pos + 10) % set_size;
-                buffer[idx] = valid_chars[pos];
+                if (curr_set_pos == 0)
+                    curr_set_pos = set_size;
+                curr_set_pos = (curr_set_pos - 1) % set_size;
+                buffer[curr_input_pos] = valid_chars[curr_set_pos];
                 break;
             }
             case PORT_A_KEY_LEFT: {
-                if (idx > 0) {
-                    //show changed output on screen
-                    buffer[idx] = ' ';
-                    print_str(x, y, buffer, 128);
-                    buffer[idx--] = 0;  
-                }
+                //remove last input but overwrite screen first
+                buffer[curr_input_pos] = ' ';
+                print_str(x, y, buffer, offset);
+                
+                buffer[curr_input_pos] = 0;
+                if (curr_input_pos > 0)
+                    --curr_input_pos;
                 break;
             }
             case PORT_A_KEY_RIGHT: {
-                if (idx < size - 1) {
-                    ++idx;
-                    pos = 1;
-                    buffer[idx] = valid_chars[pos];
+                if (curr_input_pos < size - 1) {
+                    buffer[curr_input_pos] = valid_chars[curr_set_pos];
+                    curr_set_pos = 0;
+                    buffer[++curr_input_pos] = valid_chars[curr_set_pos];
                 }
                 break;
             }
@@ -169,8 +164,9 @@ unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, 
                 break;
             }
         }
-        print_str(x, y, buffer, 128);
-        while (keyreleased()) wait(1);
+        print_str(x, y, buffer, offset);
+        wait(10);
+        //while (keyreleased()) wait(1);
     } while (key != (PORT_A_KEY_1 | PORT_A_KEY_2));
 
     return buffer;
