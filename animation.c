@@ -54,9 +54,10 @@ void animate_quarterly(Screens screen) {
 					break;
 				}
 				case ScreenDeath: {
+					//TODO: V motion
 					print_tile(sprite.x, sprite.y, DEATH_SPRITE[sprite.index][animation_frame]);
 					break;
-					}
+				}
 				default:
 					break;
 			}

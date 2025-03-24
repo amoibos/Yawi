@@ -78,7 +78,7 @@ void death_screen(const unsigned char *menu_name) {
                 cemetry__palette__bin,
                 SCREEN_MAX_X, 96, 0, 8, EffectNone);
 
-    for(unsigned char y=line; y < SCREEN_MAX_Y; ++y)
+    for(unsigned char y=line; y < TEXTCONSOLE_MAX_Y; ++y)
         print_str(0, y, "                                ", 128);
 
     print_str(CENTER(output), line + 2, output, 128);
@@ -121,7 +121,7 @@ void next_level_screen(const unsigned char * menu_name, unsigned char level) {
     output[0] = '\0';
     SEGA_itoa(totaltime, num);
     strcat(strcat(strcat(output, PLAY_TIME), num), "s");
-    print_str(0, line++, output, 128);
+    print_str(offset, line++, output, 128);
 
     line = 20;
     strcpy(output, PRESS_TO_CONT);
@@ -150,7 +150,7 @@ unsigned char level_select_screen(const unsigned char * menu_name) {
     strcpy(output, LEVEL_CODE);
     print_str(offset, line, output, 128);
     
-    print_window_borders(0, 0, TEXTCONSOLE_MAX_X, SCREEN_MAX_Y, BORDER_BRICK);
+    print_window_borders(0, 0, TEXTCONSOLE_MAX_X, TEXTCONSOLE_MAX_Y, BORDER_BRICK);
 
     displayOn();
     
@@ -309,7 +309,7 @@ void intro_screen(char * menu_name) {
         SetTimerCallback(0);
         switch (option) {
             case (unsigned char) MainMenuNewGame: {
-                gameloop(1+1, seconds >= DEMO_START_AFTER_S);
+                gameloop(1, seconds >= DEMO_START_AFTER_S);
                 break;
             }
             case (unsigned char) MainMenuLevelSelect: {
