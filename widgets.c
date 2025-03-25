@@ -70,6 +70,7 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
         }
         
         unsigned short key = readkey();
+
         if (key != 0)
             user_choice = 1;
         switch (key) {

@@ -108,6 +108,9 @@
 #define INTRO_FIGURE_FRAMES         ((3))
 #define INTRO_EMPTY                 ((128))
 
+#define MAX_KEYS                     ((1))    
+
+
 typedef enum eDirection {
     DirectionUndefined,
     DirectionRight,

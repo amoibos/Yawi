@@ -67,6 +67,9 @@ void load_ascii_tiles(unsigned short position);
 #define keypressed SG_getKeysPressed
 #define keyreleased SG_getKeysReleased
 #define readkey SG_getKeysStatus
+#define scanKeyboardJoypad	SG_scanKeyboardJoypad
+#define getKeyboardJoypadPressed SG_getKeyboardJoypadPressed
+#define getKeyboardJoypadStatus SG_getKeyboardJoypadStatus
 #define waitForVBlank SG_waitForVBlank
 #define setFrameInterruptHandler SG_setFrameInterruptHandler
 #define initSprites SG_initSprites

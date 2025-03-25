@@ -666,35 +666,40 @@ inline Direction get_Direction(Position *pos) {
 
 Direction get_input(_Bool* demo_mode, unsigned char * demo_pos) {
     Direction dir=DirectionUndefined;
-
-    if (getKeysHeld()) {
-        switch (readkey()) {
-            case PORT_A_KEY_LEFT: {
-                dir = DirectionLeft;
-                break;
-            }
-            case PORT_A_KEY_RIGHT: {
-                dir = DirectionRight;
-                break;
-            }
-            case PORT_A_KEY_UP: {
-                dir = DirectionUp;
-                break;
-            }
-            case PORT_A_KEY_DOWN: {
-                dir = DirectionDown;
-                break;
-            }
-            case PORT_A_KEY_2 | PORT_B_KEY_2: {
-                dir = DirectionExit;
-                break;
-            }
-            default: {
-                dir = DirectionUndefined;
-                break;
-            }
+    unsigned int button;
+   
+    button = getKeyboardJoypadStatus();
+    scanKeyboardJoypad();
+    if (getKeysHeld())
+        button = readkey();
+    
+    switch (button) {
+        case PORT_A_KEY_LEFT: {
+            dir = DirectionLeft;
+            break;
+        }
+        case PORT_A_KEY_RIGHT: {
+            dir = DirectionRight;
+            break;
+        }
+        case PORT_A_KEY_UP: {
+            dir = DirectionUp;
+            break;
+        }
+        case PORT_A_KEY_DOWN: {
+            dir = DirectionDown;
+            break;
+        }
+        case PORT_A_KEY_2 | PORT_B_KEY_2: {
+            dir = DirectionExit;
+            break;
+        }
+        default: {
+            dir = DirectionUndefined;
+            break;
         }
     }
+    
 
     // used for demo mode
     if (*demo_mode) {
