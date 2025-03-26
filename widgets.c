@@ -112,6 +112,17 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
     return option + 1;
 }
 
+_Bool pressed_anything(void) {
+
+    unsigned int button=0;
+    scanKeyboardJoypad();
+    button = getKeyboardJoypadStatus();
+    if (!button && getKeysHeld())
+        button = readkey();
+     
+    return button;
+}
+
 unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, unsigned char size, InputType input_type, unsigned short offset) {
     const unsigned char * valid_chars;
 
@@ -235,8 +246,7 @@ void print_img_compressed( const unsigned char *tiledata,
                     print_tile(center_x + left, center_y + top, tileno);  
                 if (!aborted) wait(1);
                 
-                scanKeyboardJoypad();
-                if (getKeyboardJoypadPressed() || keypressed())
+                if (pressed_anything())
                     aborted = 1;
             } 
             if ((x == y) || ((x < 0) && (x == -y)) || ((x > 0) && (x == 1 - y))) {

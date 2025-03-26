@@ -8,7 +8,7 @@
 #define BANK_GFX                    ((3))
 #define BANK_AUDIO                  ((4))
 
-#define VERSION_STRING              "0.9.2"
+#define VERSION_STRING              "0.9.3"
 
 #ifdef DEMO
 #define VERSION                     "DEMO " VERSION_STRING

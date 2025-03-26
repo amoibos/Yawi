@@ -912,7 +912,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
         congratulation_screen(CONGRATULATIONS);
     else if (level.status == StatusDied) {
         print_title(GAME_NAME GAME_OVER);
-        while(!keypressed()) waitForVBlank();
+        while(!pressed_anything()) waitForVBlank();
         death_screen(MISSION_FAIL);
     }
 }

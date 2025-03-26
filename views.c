@@ -40,7 +40,7 @@ void congratulation_screen(const unsigned char * menu_name) {
     add_ball_sprite();
 
     // animation loop
-    while(!keypressed()) {
+    while(!pressed_anything()) {
 
         if (animation_refresh) {
             animate_quarterly(ScreenCongratulation);
@@ -84,7 +84,7 @@ void death_screen(const unsigned char *menu_name) {
     print_str(CENTER(output), line + 2, output, 128);
 
     //animation loop and waiting for key pressed
-    while(!keypressed()) {
+    while(!pressed_anything()) {
         if (animation_refresh)
             animate_quarterly(ScreenDeath);
         waitForVBlank();
@@ -127,7 +127,7 @@ void next_level_screen(const unsigned char * menu_name, unsigned char level) {
     strcpy(output, PRESS_TO_CONT);
     print_str(CENTER(output), line, output, 128);
 
-    while(!keypressed()) {
+    while(!pressed_anything()) {
         PSGFrame();
         waitForVBlank();
     }
@@ -209,12 +209,13 @@ void credits_screen(const unsigned char * menu_name) {
 
         for (unsigned char pos=0; pos < strlen(output); ++pos) {
             print_tile(center++, line + entry, 128 + output[pos]);
-            for (unsigned char wait=0; (wait < 10) && (!keypressed()); ++wait)
+            for (unsigned char wait=0; (wait < 10) && (!pressed_anything()); ++wait)
                 waitForVBlank();
         }
         ++line;
     }
 
+    wait(5);
     line = 20;
     strcpy(output, PRESS_TO_CONT);
     print_str(CENTER(output), line, output, 128);
@@ -225,7 +226,7 @@ void credits_screen(const unsigned char * menu_name) {
     }
 
     // animation loop
-    while(!keypressed()) {
+    while(!pressed_anything()) {
         if (animation_refresh)
             animate_quarterly(ScreenCredits);
         waitForVBlank();
@@ -252,7 +253,7 @@ void help_screen(const unsigned char * menu_name) {
     print_str(CENTER(output), TITLE_LINE + 1, output, 128);
     // animation loop
     // animation loop
-    while(!keypressed()) {
+    while(!pressed_anything()) {
         if (animation_refresh) {
             animate_quarterly(ScreenHelp);
             update_sprites_falling();
