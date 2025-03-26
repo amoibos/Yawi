@@ -56,9 +56,17 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
             }   
         }
 
-        while(!keypressed()) {
-            waitForVBlank(); 
-            
+        _Bool keyboard_input=0;
+        while(1) {
+            scanKeyboardJoypad();
+            if (getKeyboardJoypadPressed()) {
+                keyboard_input = 1;
+                break;
+            }
+            if (keypressed())  {
+                keyboard_input = 0;
+                break;
+            }
             if ((current_location == LocationIntro) && (seconds >= DEMO_START_AFTER_S) && (user_choice == 0)) {
                 selected = 1;
                 break; 
@@ -67,10 +75,16 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
                     timer_callback(current_location);
                 }
             }
+            
+            wait(1); 
         }
         
-        unsigned short key = readkey();
-
+        unsigned int key=0;
+        if (keyboard_input) 
+            key = getKeyboardJoypadStatus();
+        else
+            key = readkey();
+       
         if (key != 0)
             user_choice = 1;
         switch (key) {
@@ -125,11 +139,29 @@ unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, 
 
     signed char curr_set_pos = 0;
     unsigned char curr_input_pos = 0;
-    unsigned short key;
+    unsigned int key=0;
+    _Bool keyboard_input=0;
     do {
         print_str(x, y, buffer, offset);
-        while (!keypressed()) wait(1);
-        key = readkey();
+        while(1) {
+            if (keypressed())  {
+                keyboard_input = 0;
+                break;
+            }
+            scanKeyboardJoypad();
+            if (getKeyboardJoypadPressed()) {
+                keyboard_input = 1;
+                break;
+            }
+            wait(1);
+        }
+        
+        unsigned int key=0;
+        if (keyboard_input) 
+            key = getKeyboardJoypadStatus();
+        else
+            key = readkey();
+
         switch(key) {
            case PORT_A_KEY_DOWN: {
                 curr_set_pos = (curr_set_pos + 1) % set_size;
@@ -171,7 +203,9 @@ unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, 
         print_str(x, y, buffer, offset);
         wait(10);
         //while (keyreleased()) wait(1);
-    } while (key != (PORT_A_KEY_1 | PORT_A_KEY_2));
+        if (key == (PORT_A_KEY_1 | PORT_A_KEY_2))
+            break;
+    } while(1);
 
     return buffer;
 }
@@ -200,7 +234,9 @@ void print_img_compressed( const unsigned char *tiledata,
                 if ((center_y + top < top + height8) && (center_y >= 0))
                     print_tile(center_x + left, center_y + top, tileno);  
                 if (!aborted) wait(1);
-                if (keypressed())
+                
+                scanKeyboardJoypad();
+                if (getKeyboardJoypadPressed() || keypressed())
                     aborted = 1;
             } 
             if ((x == y) || ((x < 0) && (x == -y)) || ((x > 0) && (x == 1 - y))) {
