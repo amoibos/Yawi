@@ -667,9 +667,9 @@ inline Direction get_Direction(Position *pos) {
 Direction get_input(_Bool* demo_mode, unsigned char * demo_pos) {
     Direction dir=DirectionUndefined;
     unsigned int button;
-   
-    button = getKeyboardJoypadStatus();
+
     scanKeyboardJoypad();
+    button = getKeyboardJoypadStatus();
     if (getKeysHeld())
         button = readkey();
     
