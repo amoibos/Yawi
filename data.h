@@ -3,12 +3,7 @@
 
 #include "localization.h"
 
-#define BANK_FONT                   ((1))
-#define BANK_LEVELS                 ((2))
-#define BANK_GFX                    ((3))
-#define BANK_AUDIO                  ((4))
-
-#define VERSION_STRING              "0.9.3"
+#define VERSION_STRING              "0.9.4"
 
 #ifdef DEMO
 #define VERSION                     "DEMO " VERSION_STRING
@@ -110,6 +105,39 @@
 
 #define MAX_KEYS                     ((1))    
 
+ typedef enum eScreens {
+     ScreenUndefined
+    ,ScreenIntro
+    ,ScreenHelp
+    ,ScreenIngame
+    ,ScreenNextLevel
+    ,ScreenDeath
+    ,ScreenCongratulation
+    ,ScreenLevelSelect
+    ,ScreenCredits
+} Screens;
+
+typedef enum eStatus {
+    StatusUndefinied,
+    StatusAlive,
+    StatusDied,
+    StatusCompleted
+} Status;
+
+typedef struct sPosition {
+    signed char x;
+    signed char y;
+} Position;
+
+#define TILE_UNKNOWN                ((-1))
+#define NO_MOTION                   ((-1))
+#define END_STEP                    ((-2))
+             
+#define DEMO_START_AFTER_S          ((90))
+#define COUNTER_STOPPED             ((-1))
+#define DEMO_ABORT                  ((-2))
+
+#define MAX_MOVE_DELAY              ((5))
 
 typedef enum eDirection {
     DirectionUndefined,
@@ -120,63 +148,6 @@ typedef enum eDirection {
     DirectionExit,
     DirectionHelp
 } Direction;
-
-typedef enum eStatus {
-    StatusUndefinied,
-    StatusAlive,
-    StatusDied,
-    StatusCompleted
-} Status;
-
-typedef enum eEffect {
-    EffectNone,
-    EffectSpiral
-} Effect;
-
-typedef struct sPosition {
-    signed char x;
-    signed char y;
-} Position;
-
-#define TILE_UNKNOWN                ((-1))
-#define NO_MOTION                   ((-1))
-#define END_STEP                    ((-2))
-
-// used to priotize search direction
-#define MOTION_UP_OFFSET            ((00))
-#define MOTION_DOWN_OFFSET          ((10))
-#define MOTION_RIGHT_OFFSET         ((20))
-#define MOTION_LEFT_OFFSET          ((30))
-
-typedef enum eObjectMove {
-    ObjectMoveUndefined=0,
-    ObjectMoveSouth=    0+1,
-    ObjectMoveNorth=    0+1+5,
-    ObjectMoveEast=     0+1+5+5,
-    ObjectMoveWest=     0+1+5+5+5
-} ObjectMove;
-
-#define LUT_CENTER                  {0,  0}
-#define LUT_UP                      {0, -1}
-#define LUT_DOWN                    {0,  1}
-#define LUT_RIGHT                   {1,  0}
-#define LUT_LEFT                    {-1, 0}
-#define LUT_END                     {END_STEP, END_STEP}
-
-// layout defines offsets of eObjectMove values, stop pair indicate end of check sequence
-static const Position MOTION_CHECKS[] = {
-                                                         LUT_END
-     ,LUT_CENTER, LUT_UP,           LUT_RIGHT, LUT_LEFT, LUT_END
-     ,LUT_CENTER,         LUT_DOWN, LUT_RIGHT, LUT_LEFT, LUT_END
-     ,LUT_CENTER, LUT_UP, LUT_DOWN,            LUT_LEFT, LUT_END
-     ,LUT_CENTER, LUT_UP, LUT_DOWN, LUT_RIGHT,           LUT_END
-};
-             
-#define DEMO_START_AFTER_S          ((90))
-#define COUNTER_STOPPED             ((-1))
-#define DEMO_ABORT                  ((-2))
-
-#define MAX_MOVE_DELAY              ((5))
 
 #define MAX_STEP_SEQUENCE           ((64))
 static const unsigned char LEVEL01_STEP_SEQUENCE[MAX_STEP_SEQUENCE] = { DirectionUp,
@@ -211,77 +182,11 @@ typedef struct sLeveldata {
     unsigned char teleports_found;
 } Leveldata;
 
-#ifdef DEMO
-#define MAX_LEVEL                   ((1))
-#else
-#define MAX_LEVEL                   ((12))
-#endif
-
-static const unsigned char * LEVEL_NAMES[MAX_LEVEL+1] = {
-    LEVEL_NAME01,
-#ifndef DEMO
-    LEVEL_NAME02,
-    LEVEL_NAME03,
-    LEVEL_NAME04,
-    LEVEL_NAME05,
-    LEVEL_NAME06,
-    LEVEL_NAME07,
-    LEVEL_NAME08,
-    LEVEL_NAME09,
-    LEVEL_NAME10,
-    LEVEL_NAME11,
-    LEVEL_NAME12,
-#endif
-    ".."
-};
-
-typedef enum eMainMenu {
-     MainMenuUndefined
-    ,MainMenuNewGame
-    ,MainMenuLevelSelect
-   // ,MainMenuHelp
-    ,MainMenuCredits
-    //,MainMenuCongratulation
-} MainMenu;
-
-typedef enum eScreens {
-     ScreenUndefined
-    ,ScreenIntro
-    ,ScreenHelp
-    ,ScreenIngame
-    ,ScreenNextLevel
-    ,ScreenDeath
-    ,ScreenCongratulation
-    ,ScreenLevelSelect
-    ,ScreenCredits
-} Screens;
-
-#define MAX_INTRO_ITEMS ((3))
-static const unsigned char * INTRO_ITEMS[MAX_INTRO_ITEMS] = {
-     MAIN_MENU_ITEM1
-    ,MAIN_MENU_ITEM2
-//    ,MAIN_MENU_ITEM3
-    ,MAIN_MENU_ITEM4
-};
-
-#define CREDIT_NAMES_MAX ((3))
-static const unsigned char * CREDIT_NAMES[CREDIT_NAMES_MAX] = {
-    CREDITS_LINE01
-    ,CREDITS_LINE02
-    ,CREDITS_LINE03
-};
-
 typedef struct sSpriteData {
     unsigned char x;
     unsigned char y;
     signed char index;
 } SpriteData;
-
-typedef enum eMenuMode {
-    MenuModeUndefined,
-    MenuModeCenter,
-    MenuModeLeft
-} MenuMode;
 
 #define MAX_LEVELCODE_FACTOR        ((5))
 

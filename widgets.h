@@ -6,6 +6,17 @@
 #include "location.h"
 #include "data.h"
 
+typedef enum eMenuMode {
+    MenuModeUndefined,
+    MenuModeCenter,
+    MenuModeLeft
+} MenuMode;
+
+typedef enum eEffect {
+    EffectNone,
+    EffectSpiral
+} Effect;
+
 typedef enum eInputType {
     InputTypeUndefined,
     InputTypeNumerical,

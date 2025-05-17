@@ -2,7 +2,6 @@
 
 void load_font(void) {
 
-    //mapROMBank(BANK_FONT);
     load_ascii_tiles(0);
     load_ascii_tiles(256);
     load_ascii_tiles(512);
@@ -15,7 +14,6 @@ char load_leveldata(const unsigned char no) {
         return 0;
     }
 
-    //mapROMBank(BANK_LEVELS);
     reset_sprites();
     switch (no) {
         case  1: {
@@ -122,7 +120,6 @@ char load_leveldata(const unsigned char no) {
         print_tile(x, LEVEL_HEIGHT + OFFSET_MAP_Y, first_char);
     }
 
-    //mapROMBank(BANK_FONT);
     return 1;
 }
 
@@ -667,7 +664,7 @@ inline Direction get_Direction(Position *pos) {
 Direction get_input(_Bool* demo_mode, unsigned char * demo_pos) {
     Direction dir=DirectionUndefined;
     unsigned int button;
-
+   
     scanKeyboardJoypad();
     button = getKeyboardJoypadStatus();
     if (getKeysHeld())

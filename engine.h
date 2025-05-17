@@ -5,13 +5,42 @@
 #include "libs/strings.h"
 #include "assets/levels.h"
 
-
 #include "location.h"
 #include "data.h"
 #include "views.h"
 
 #include "localization.h"
 #include "animationdata.h"
+
+// used to priotize search direction
+#define MOTION_UP_OFFSET            ((00))
+#define MOTION_DOWN_OFFSET          ((10))
+#define MOTION_RIGHT_OFFSET         ((20))
+#define MOTION_LEFT_OFFSET          ((30))
+
+typedef enum eObjectMove {
+    ObjectMoveUndefined=0,
+    ObjectMoveSouth=    0+1,
+    ObjectMoveNorth=    0+1+5,
+    ObjectMoveEast=     0+1+5+5,
+    ObjectMoveWest=     0+1+5+5+5
+} ObjectMove;
+
+#define LUT_CENTER                  {0,  0}
+#define LUT_UP                      {0, -1}
+#define LUT_DOWN                    {0,  1}
+#define LUT_RIGHT                   {1,  0}
+#define LUT_LEFT                    {-1, 0}
+#define LUT_END                     {END_STEP, END_STEP}
+
+// layout defines offsets of eObjectMove values, stop pair indicate end of check sequence
+static const Position MOTION_CHECKS[] = {
+                                                         LUT_END
+     ,LUT_CENTER, LUT_UP,           LUT_RIGHT, LUT_LEFT, LUT_END
+     ,LUT_CENTER,         LUT_DOWN, LUT_RIGHT, LUT_LEFT, LUT_END
+     ,LUT_CENTER, LUT_UP, LUT_DOWN,            LUT_LEFT, LUT_END
+     ,LUT_CENTER, LUT_UP, LUT_DOWN, LUT_RIGHT,           LUT_END
+};
 
 void load_font(void);
 
@@ -48,7 +77,6 @@ extern char timer_enabled;
 extern unsigned short seconds;
 extern unsigned char fps;
 extern unsigned short totaltime;
-
 
 /* sprite handling */
 extern inline signed short set_sprite_data(unsigned char sprite, unsigned char x, unsigned char y);
