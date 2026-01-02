@@ -1,6 +1,6 @@
-* Sound Support over PSGlib
 * Savegame SRAM Support(missing in SGlib)
-* Input for level codes(require input emulation)
-* Bankswitching Support(missing SGlib)
 * Splash Fullscreen for intro windows
 * Better artworks for tiles and images
+* Implement bomb mechanic
+* More levels playable
+* fix controls when use keyboard(no fast)

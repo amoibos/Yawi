@@ -6,31 +6,34 @@
 
 
 // for pausing the timer and animation
-char timer_enabled;
+extern char timer_enabled;
 // counting passed seconds
-unsigned short seconds;
+extern unsigned short seconds;
 // helper for counting seconds;
-unsigned char fps;
+extern unsigned char fps;
 //sum of level records
-unsigned short totaltime=0;
+extern unsigned short totaltime;
 //player position
-Location current_location;
+extern Location current_location;
 //current level state
-Leveldata level;
+extern Leveldata level;
 
 // current animation frame for a sprite
-unsigned char animation_frame;
+extern unsigned char animation_frame;
 // save tile index where the sprite is located
-signed short all_sprites[MAX_SPRITE];
+extern signed short all_sprites[MAX_SPRITE];
 // update sprite state
-_Bool animation_refresh;
+extern _Bool animation_refresh;
 // current number of sprites
-unsigned char sprites_no;
+extern unsigned char sprites_no;
 
-_Bool audio_enabled=1;
-unsigned char previous_fps_seqment=0;
+extern _Bool audio_enabled;
+extern unsigned char previous_fps_seqment;
 
 //typedef void (*funcptr)(Screens screen);
 //void (funcptr) timer_callback;
+
+extern signed char xvel;
+extern signed char yvel;
 
 #endif

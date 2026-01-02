@@ -20,7 +20,6 @@ unsigned char menu(unsigned char **items, unsigned char amount, unsigned char st
     unsigned char selected = 0;
     _Bool user_choice = 0;
     
-    //mapROMBank(BANK_FONT);
     while(!selected) {
         char line = start_line; 
         
@@ -126,7 +125,6 @@ _Bool pressed_anything(void) {
 unsigned char * input(unsigned char x, unsigned char y, unsigned char * buffer, unsigned char size, InputType input_type, unsigned short offset) {
     const unsigned char * valid_chars;
 
-    //mapROMBank(BANK_FONT);
     switch(input_type) {
         case InputTypeNumerical: {
             valid_chars = NUMERIC;
@@ -226,11 +224,10 @@ void print_img_compressed( const unsigned char *tiledata,
                 const unsigned short width, const unsigned char height, const unsigned char left, const unsigned char top, Effect effect) {
     const unsigned short start_img_tiles = 256;
 
-    //mapROMBank(BANK_GFX);
     loadZX7compressedTiles(tiledata, start_img_tiles);
     loadZX7compressedBGColors(colordata, start_img_tiles);
 
-    unsigned char height8=height>>3, width8=width>>3;
+    signed char height8=height>>3, width8=width>>3;
     unsigned short tileno = 0;
     unsigned char aborted = 0;        
     if (effect == EffectSpiral) {
@@ -242,7 +239,7 @@ void print_img_compressed( const unsigned char *tiledata,
             if ((x >= -x_off) && (x <= x_off) && (y >= -y_off) && (y <= y_off)) {
                 center_x = x + x_off, center_y = y + y_off;
                 tileno = center_y * width8 + center_x + start_img_tiles;
-                if ((center_y + top < top + height8) && (center_y >= 0))
+                if ((center_y < height8) && (center_y >= 0))
                     print_tile(center_x + left, center_y + top, tileno);  
                 if (!aborted) wait(1);
                 

@@ -42,14 +42,14 @@ from dataclasses import dataclass
 #import cProfile
 from functools import cache
 
-__VERSION__ = "0.8.2"
+__VERSION__ = "0.8.5"
 
 # 32 x 24 tiles filling a screen where a tile 8x8 tile dimension
 # for the SG the color depth is 1bit = 2 colors per tile line
 PAL_COLORS = 1  # in bits
 MAX_X = 256
 MAX_Y = 192
-# transparence has no color thats why -1
+# transparence has no color thats why one color less
 MAX_COLORS = 16 - 1
 
 TILE_WIDTH = 8
@@ -61,11 +61,15 @@ MAX_LEN = 256**2
 TILE_EXT = ".bin"
 PALETTE_EXT = ".bin"
 
+ALLOWED_CHARS = "123456789ABCDEFabcdef"
+
 # first index of color palette is in the VDP TMS9918 always transparent
-SG_COLOR_PALETTE = ((0xFFFF, 0xFFFF, 0xFFFF), (0x00, 0x00, 0x00), (0x21, 0xC8, 0x42), (0x5E, 0xDC, 0x78),
-                    (0x54, 0x55, 0xED), (0x7D, 0x76, 0xFC), (0xD4, 0x52, 0x4D), (0x42, 0xEB, 0xF5),
-                    (0xFC, 0x55, 0x54), (0xFF, 0x79, 0x78), (0xD4, 0xC1, 0x54), (0xE6, 0xCE, 0x80),
-                    (0x21, 0xB0, 0x3B), (0xC9, 0x5B, 0xBA), (0xCC, 0xCC, 0xCC), (0xFF, 0xFF, 0xFF))
+SG_COLOR_PALETTE = ((0xFFFF, 0xFFFF, 0xFFFF), 
+                    (0x00, 0x00, 0x00), (0x21, 0xC8, 0x42), (0x5E, 0xDC, 0x78),
+                    (0x54, 0x55, 0xED), (0x7D, 0x76, 0xFC), (0xD4, 0x52, 0x4D), 
+                    (0x42, 0xEB, 0xF5), (0xFC, 0x55, 0x54), (0xFF, 0x79, 0x78),
+                    (0xD4, 0xC1, 0x54), (0xE6, 0xCE, 0x80), (0x21, 0xB0, 0x3B), 
+                    (0xC9, 0x5B, 0xBA), (0xCC, 0xCC, 0xCC), (0xFF, 0xFF, 0xFF))
 
 
 @dataclass
@@ -252,8 +256,9 @@ def convert(output_name, options):
     with Image.open(output_name) as img:
         if preview:
             preview_img = img.copy()
+            preview_img.putpalette([])
         width, height = img.size
-        #import pdb; pdb.set_trace()
+
         color_cnt = len(img.getcolors(width * height))
 
         # do not use transparency color
@@ -275,21 +280,38 @@ def convert(output_name, options):
         # translate color information to corresponding index of color palette
         color_index = {(0, 0, 0): 0}
 
-        for idx, color in enumerate(img.getcolors()):
-            #import pdb; pdb.set_trace()
-            index = SG_COLOR_PALETTE.index(nearest_color(SG_COLOR_PALETTE, color[-1]))
-            # do not use transparent as black, overwrite transparent palette index
-            if index == 0:
-                index = 1
-                print(f"remove transparence: replaced color {color[-1]} from palette index 0 with 1")
-            # allow specifying transparent palette index, useful for sprites
-            # background tiles could have transparence which leads to backdrop color
-            if index == transparent_color:
-                index = 0
-                print(f"transparence correction: replaced color {color[-1]} from palette index {transparent_color} with 0")
+        if options["palette"]:
+            for idx, color in enumerate(img.getcolors()):
+                try:
+                    char = options["palette"][idx].upper()
+                    index = -1
+                    if char in "0123456789":
+                        index = ord(char) - ord('0')
+                    elif char in "ABCDEF":
+                        index = ord(char) - ord("A")
+                except IndexError:
+                    if warn:
+                        print(f"[info]: color index {index} out of bounds")
+                   
+                    index = 0
 
-            color_index[color[-1]] = index
+                color_index[color[-1]] = index + 1
+        else:
+            for idx, color in enumerate(img.getcolors()):
+                #import pdb; pdb.set_trace()
+                index = SG_COLOR_PALETTE.index(nearest_color(SG_COLOR_PALETTE, color[-1]))
+                # do not use transparent as black, overwrite transparent palette index
+                if index == 0:
+                    index = 1
+                    print(f"remove transparence: replaced color {color[-1]} from palette index 0 with 1")
+                # allow specifying transparent palette index, useful for sprites
+                # background tiles could have transparence which leads to backdrop color
+                if index == transparent_color:
+                    index = 0
+                    print(f"transparence correction: replaced color {color[-1]} from palette index {transparent_color} with 0")
 
+                color_index[color[-1]] = index
+        
         filename = path.splitext(output_name)[0]
         # write tiles data
         palette_container = []
@@ -325,7 +347,7 @@ def convert(output_name, options):
                             colors = sorted(colors_in_line.items(), key=lambda x: x[0] if transparent_color else x[-1])
 
                         #if tile_x == 9 and tile_y == 0:
-                        #    import pdb; pdb.set_trace()
+                        #    breakpoint()
 
                         # we need a second color when there line is complete transparent and background color when there is filled by another color
                         if transparent_color and len(colors) == 1:
@@ -344,7 +366,7 @@ def convert(output_name, options):
                         background = colors[-1][0]
 
                         #if tile_x == 7 and tile_y == 0:
-                        #    import pdb; pdb.set_trace()
+                        #    breakpoint()
 
                         val = 0
                         for column in range(TILE_WIDTH):
@@ -375,7 +397,7 @@ def convert(output_name, options):
                 print(f"palette data: {len(palette_container)} bytes, compressed: {len(data)} bytes, compression ratio: {len(data) / len(palette_container) * 100:.2f}%")
             for color_data in data:
                 palette_writer.write(struct.pack('B', color_data))
-
+                
             #breakpoint()
             data = tile_container if not compress else compress_data(tile_container, optimize(tile_container))
             if compress:
@@ -397,19 +419,41 @@ def main():
     parser.add_argument("--preview", help="switch for show image after color conversion",  action="store_true")
     parser.add_argument("--warn", help="show warnings",  action="store_true")
     parser.add_argument("--compress", help="compress ZX7",  action="store_true")
+    parser.add_argument("--palette", help="use given palette for color conversion", type=str)
+    parser.add_argument("--dithering", help="dithering to avoid color clashes", action="store_true")
+
     args = parser.parse_args()
-    if  args. transparent:
+    if args.transparent:
         if args.transparent < 1 or args.transparent > MAX_COLORS:
             print('color index out of range', file=sys.stderr)
             exit(-1)
 
+    if args.palette:
+        used_index_amount = len(set(args.palette)) 
+        if used_index_amount > MAX_COLORS:
+            print(f"too many characters, allowed char set is {ALLOWED_CHARS}", file=sys.stderr)
+            exit(-3)
+        if used_index_amount < MAX_COLORS and args.warn:
+            print(f"{used_index_amount} colors defined, lesser than TMS9918 uses", file=sys.stderr)
+            
+        for char in args.palette:
+            try:
+                ALLOWED_CHARS.index(char)
+            except ValueError:
+                print(f"invalid characters in given palette, allowed characters are {ALLOWED_CHARS}", file=sys.stderr)
+                exit(-4)
 
     transparent_color = args.transparent if args.transparent else None
-    options = {"transparent_color": transparent_color, "preview": args.preview, "warn": args.warn, "compress": args.compress}
+    options = { "transparent_color": transparent_color 
+                ,"preview": args.preview
+                ,"warn": args.warn
+                ,"compress": args.compress
+                ,"palette": args.palette
+                ,"dithering": args.dithering}
     if path.exists(args.filename):
         process(args.filename, options)
     else:
-        print("file %s doesn't exist" % (sys.argv[1]), file=sys.stderr)
+        print(f"file {sys.argv[1]} doesn't exist", file=sys.stderr)
         exit(-2)
 
 if __name__ == '__main__':

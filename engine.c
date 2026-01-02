@@ -1,92 +1,39 @@
 #include "engine.h"
 
+//for acceleration of character movement
+signed short xvel=0;
+signed short yvel=0;
+
+signed short xpos[2] = {0, 0};
+signed short ypos[2] = {0, 0};
+
+
 void load_font(void) {
 
-    //mapROMBank(BANK_FONT);
-    load_ascii_tiles(0);
-    load_ascii_tiles(256);
-    load_ascii_tiles(512);
+    for(unsigned char n=0; n <= 2; n++) 
+        load_ascii_tiles(n << 8);
 }
 
 char load_leveldata(const unsigned char no) {
     const unsigned char * data;
-
-    if ( (no < 1) || (no > MAX_LEVEL)) {
-        return 0;
-    }
-
-    //mapROMBank(BANK_LEVELS);
-    reset_sprites();
-    switch (no) {
-        case  1: {
-            data = level01_dat;
-            strcpy(level.name, LEVEL_NAMES[no - 1]);
-            break;
-        }
+    const unsigned char * levels[] = {  level01_dat
 #ifndef DEMO
-        case  2: {
-            data = level02_dat;
-            strcpy(level.name, LEVEL_NAMES[no - 1]);
-            break;
-        }
-        case  3: {
-            data = level03_dat;
-            strcpy(level.name, LEVEL_NAMES[no - 1]);
-            break;
-        }
-        case  4: {
-            data = level04_dat;
-            strcpy(level.name, LEVEL_NAMES[no - 1]);
-            break;
-        }
-        case  5: {
-            data = level05_dat;
-            strcpy(level.name, LEVEL_NAMES[no - 1]);
-            break;
-        }
-        case  6: {
-            data = level06_dat;
-            strcpy(level.name, LEVEL_NAMES[no - 1]);
-            break;
-        }
-        case  7: {
-            data = level07_dat;
-            strcpy(level.name, LEVEL_NAMES[no - 1]);
-            break;
-        }
-        case  8: {
-            data = level08_dat;
-            strcpy(level.name, LEVEL_NAMES[no - 1]);
-            break;
-        }
-        case  9: {
-            data = level09_dat;
-            strcpy(level.name, LEVEL_NAMES[no - 1]);
-            break;
-        }
-        case 10: {
-            data = level10_dat;
-            strcpy(level.name, LEVEL_NAMES[no - 1]);
-            break;
-        }
-        case 11: {
-            data = level11_dat;
-            strcpy(level.name, LEVEL_NAMES[no - 1]);
-            break;
-        }
-        case 12: {
-            data = level12_dat;
-            strcpy(level.name, LEVEL_NAMES[no - 1]);
-            break;
-        }
+                                        , level02_dat, level03_dat, level04_dat, 
+                                        level05_dat, level06_dat, level07_dat, level08_dat, 
+                                        level09_dat, level10_dat, level11_dat, level12_dat
 #endif
-       default: {
-            data = level01_dat;
-            strcpy(level.name, LEVEL_NAMES[1]);
-            break;
-        }
-    }
+                                    };
+    unsigned char loc_no=no;
 
+    if ( (no < 1) || (no > MAX_LEVEL))
+        return 0;
+
+    
+    loc_no = no;
+    data = levels[loc_no - 1];
+    strcpy(level.name, LEVEL_NAMES[loc_no - 1]);
+
+    reset_sprites();
     level.max_gold = 0;
     level.teleports_found = 0;
     unsigned char first_char=0;
@@ -122,7 +69,6 @@ char load_leveldata(const unsigned char no) {
         print_tile(x, LEVEL_HEIGHT + OFFSET_MAP_Y, first_char);
     }
 
-    //mapROMBank(BANK_FONT);
     return 1;
 }
 
@@ -248,6 +194,19 @@ void timer(void) {
 }
 
 /*
+    setup acceleration for controls
+*/
+inline void reset_movement(void) {
+    xvel = 0;
+    yvel = 0;
+    xpos[0] = 0;
+    xpos[1] = 0;
+    ypos[0] = 0;
+    ypos[1] = 0;
+}
+
+
+/*
     reset level state, build screen elements
 */
 void setup_level(void) {
@@ -265,6 +224,7 @@ void setup_level(void) {
     print_str(0, STATUS_LINE, strcat(strcpy(output, LEVEL), level.name), 128);
     update_statusline();
     reset_time(1);
+    reset_movement();
 }
 
 /*
@@ -548,7 +508,8 @@ void gravitation(Position * motion_objects) {
                         //check_for_changes(motion_objects, current_Motion, object_moved);
                         break;
                     }
-                    case PLAYER1_SYMBOL_LEFT: case PLAYER1_SYMBOL_RIGHT: { //killed by moving object
+                    case PLAYER1_SYMBOL_LEFT: case PLAYER1_SYMBOL_RIGHT:
+                    case PLAYER1_SYMBOL_LEFT_ALT: case PLAYER1_SYMBOL_RIGHT_ALT: { //killed by moving object
                         print_tile(src.x, src.y, EMPTY_SYMBOL);
                         print_tile(dest.x, dest.y, falling_item);
                         PSGPlayNoRepeat(death_psg);
@@ -675,19 +636,70 @@ Direction get_input(_Bool* demo_mode, unsigned char * demo_pos) {
     
     switch (button) {
         case PORT_A_KEY_LEFT: {
-            dir = DirectionLeft;
+            if (xpos[1] > 0) {
+                xpos[1] = -GEAR_STEP + 1;
+                xvel = 0;
+            }
+
+            xvel -= ACCEL_STEP;
+            if (xvel <= -MAX_SPEED)
+                xvel = -MAX_SPEED;
+            
+            signed short old_xpos = xpos[0] + xvel;
+            if (old_xpos < -255) {
+                --xpos[1];
+            }
             break;
         }
         case PORT_A_KEY_RIGHT: {
-            dir = DirectionRight;
+            if (xpos[1] < 0) {
+                xpos[1] = GEAR_STEP - 1;
+                xvel = 0;
+            }
+
+            xvel += ACCEL_STEP;
+            if (xvel >= MAX_SPEED)
+                xvel = MAX_SPEED;
+            
+            signed short old_xpos = xpos[0] + xvel;
+            if (old_xpos > 255) {
+                ++xpos[1];
+            }
+            
             break;
         }
         case PORT_A_KEY_UP: {
-            dir = DirectionUp;
+            if (ypos[1] > 0) {
+                ypos[1] = -GEAR_STEP + 1;
+                yvel = 0;    
+            }
+
+            yvel -= ACCEL_STEP;
+            if (yvel <= -MAX_SPEED)
+                yvel = -MAX_SPEED;
+            
+            signed short old_ypos = ypos[0] + yvel;
+            if (old_ypos < -255) {
+                --ypos[1];
+            }
+            
             break;
         }
         case PORT_A_KEY_DOWN: {
-            dir = DirectionDown;
+            if (ypos[1] < 0) {
+                ypos[1] = GEAR_STEP - 1;
+                yvel = 0;
+            }
+
+            yvel += ACCEL_STEP;
+            if (yvel >= MAX_SPEED)
+                yvel = MAX_SPEED;
+            
+            signed short old_ypos = ypos[0] + yvel;
+            if (old_ypos > 255) {
+                ++ypos[1];
+            }
+            
             break;
         }
         case PORT_A_KEY_2 | PORT_B_KEY_2: {
@@ -695,11 +707,32 @@ Direction get_input(_Bool* demo_mode, unsigned char * demo_pos) {
             break;
         }
         default: {
-            dir = DirectionUndefined;
+            xvel = 0;
+            yvel = 0;
+            xpos[1] = 0;
+            ypos[1] = 0;
+            xpos[0] = 0;
+            ypos[0] = 0;
             break;
         }
     }
     
+    ypos[0] += yvel;
+    xpos[0] += xvel;
+            
+    if (ypos[1] >= GEAR_STEP) {
+        ypos[1] -= GEAR_STEP;
+        dir = DirectionDown;
+    } else if (ypos[1] <= -GEAR_STEP) {
+        ypos[1] += GEAR_STEP;
+        dir = DirectionUp;
+    } else  if (xpos[1] >= GEAR_STEP) {
+        xpos[1] -= GEAR_STEP;
+        dir = DirectionRight;
+    } else if (xpos[1] <= -GEAR_STEP) {
+        xpos[1] += GEAR_STEP;
+        dir = DirectionLeft;
+    }
 
     // used for demo mode
     if (*demo_mode) {
@@ -742,7 +775,7 @@ inline ObjectMove get_object_move(Direction dir) {
 }
 
 void gameloop(unsigned char curr_level, _Bool demo_mode) {
-    Direction dir, prev_dir;
+    Direction dir;
     unsigned char found;
     _Bool moved_stone=0;
     unsigned char demo_pos=0;
@@ -752,17 +785,15 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
 
     // history of all objects which were activated by user action like releasing stones
     Position motion_objects[MAX_MOTION_ITEMS];
-    dir = prev_dir = DirectionUndefined;
+    dir = DirectionUndefined;
 
     load_font();
     clear_screen();
 
-    //add_player_sprite();
     if (load_leveldata(curr_level)) {
         setup_level();
         if (curr_level < 2)
             totaltime = 0;
-        //extend_player_sprite(player_figure, (unsigned char) level.x << 3, (unsigned char)level.y << 3);
         for (unsigned char n=0; n < MAX_MOTION_ITEMS; ++n) {
             motion_objects[n].x = -1;
         }
@@ -779,14 +810,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
             }
 
             dir = get_input(&demo_mode, &demo_pos);
-            if (dir != DirectionUndefined) {
-                wait((prev_dir != dir) ? 10-2 : 2-2);
-            }
-            if ((prev_dir != DirectionUndefined) && (dir == DirectionUndefined)) {
-                wait(5);
-            }
 
-            prev_dir = dir;
             if (dir == DirectionExit)
                 break;
 
@@ -894,16 +918,17 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                 level.y = dest.y;
                 
                 /* draw player representation */
-                if (dir == DirectionRight)
-                    player_figure = PLAYER1_SYMBOL_RIGHT;
-                else if (dir == DirectionLeft)
-                    player_figure = PLAYER1_SYMBOL_LEFT;
+                if (dir == DirectionRight) 
+                    player_figure = (player_figure == PLAYER1_SYMBOL_RIGHT) ? PLAYER1_SYMBOL_RIGHT_ALT : PLAYER1_SYMBOL_RIGHT;
+                else
+                    player_figure = (player_figure == PLAYER1_SYMBOL_LEFT) ? PLAYER1_SYMBOL_LEFT_ALT : PLAYER1_SYMBOL_LEFT;
+                
                 print_tile(level.x, level.y, player_figure);
-                //extend_player_sprite(player_figure, (unsigned char) level.x << 3, (unsigned char)level.y << 3);
-
+                
                 check_for_changes(motion_objects, &prev_position, player_moved);
                 gravitation(motion_objects);
             }
+            //waitForVBlank();
         }
     }
 
@@ -935,50 +960,12 @@ void init_sprite_position(unsigned char color) {
     }
 }
 
-
 void clear_sprites(void) {
     initSprites();
     finalizeSprites();
     waitForVBlank();
     copySpritestoSAT();
     waitForVBlank();
-}
-
-void extend_player_sprite(unsigned char player_figure, unsigned char current_x, unsigned char current_y) {
-
-    for(unsigned char pos=0; pos < 4; ++pos) {
-        unsigned char idx;
-
-        idx = (pos << 2) + OFFSET_SPRITE_Y;
-        if  (player_figure == PLAYER1_SYMBOL_LEFT) {
-            SpriteTable[idx] = ((pos % 2) ? 0xE0 : current_y - 1);
-        } else {
-            SpriteTable[idx] = ((pos % 2) ? current_y - 1: 0xE0);
-        }
-        SpriteTable[idx + 1] = current_x;
-    }
-
-    finalizeSprites();
-    waitForVBlank();
-    copySpritestoSAT();
-}
-
-void add_player_sprite(void) {
-
-    clear_sprites();
-
-    //SG_loadZX7compressedSpritesTiles(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY/*   * 8*/, 0);
-    //SG_loadZX7compressedSpritesTiles(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY/*   * 8*/, 1);
-    //SG_loadZX7compressedSpritesTiles(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY/*   * 8*/, 2);
-    //SG_loadZX7compressedSpritesTiles(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY/*   * 8*/, 3);
-    //SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_LEFT_BODY   * 8, 0, 8);
-    //SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_RIGHT_BODY  * 8, 1, 8);
-    //SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_LEFT_REST   * 8, 2, 8);
-    //SG_loadSpritePatterns(font__tiles__bin + PLAYER1_SYMBOL_RIGHT_REST  * 8, 3, 8);
-    addSprite((level.x << 3), (level.y << 3)-1, 0, SG_COLOR_LIGHT_RED);
-    addSprite((level.x << 3), (level.y << 3)-1, 1, SG_COLOR_LIGHT_RED);
-    addSprite((level.x << 3), (level.y << 3)-1, 2, SG_COLOR_GRAY);
-    addSprite((level.x << 3), (level.y << 3)-1, 3, SG_COLOR_GRAY);
 }
 
 /*
