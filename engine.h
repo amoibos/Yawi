@@ -13,7 +13,7 @@
 #include "animationdata.h"
 
 #define MAX_SPEED                   ((120))
-#define ACCEL_STEP                  ((8))
+#define ACCEL_STEP                  ((4))
 #define GEAR_STEP                   ((8))
 
 // used to priotize search direction
@@ -51,7 +51,7 @@ void load_font(void);
 char load_leveldata(const unsigned char no);
 _Bool in_field(const signed char x, const signed char y);
 _Bool is_border(const signed char x, const signed char y);
-long get_levelcode(unsigned char level);
+unsigned int get_levelcode(unsigned char level);
 void update_statusline(void);
 void print_title(unsigned char * title);
 void setup_level(void);

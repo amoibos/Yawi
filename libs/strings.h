@@ -1,8 +1,8 @@
 #ifndef STRINGS_H
 #define STRINGS_H
 
-unsigned char* SEGA_itoa(long value, unsigned char * sp);
-long SEGA_atoi(const unsigned char * str);
+unsigned char* SEGA_itoa(unsigned int value, unsigned char * sp);
+unsigned int SEGA_atoi(const unsigned char * str);
 //float atof(char* arr);
 //char* ftoa(float value, int decimals, char* buf);
 

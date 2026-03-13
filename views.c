@@ -156,7 +156,7 @@ unsigned char level_select_screen(const unsigned char * menu_name) {
     
     input(strlen(output) + offset + 1, line, output, MAX_INPUT_DIGIT, InputTypeNumerical, 128);
     
-    long code = SEGA_atoi(output);
+    unsigned int code = SEGA_atoi(output);
     unsigned char last_level = 1;
     for (option=1; option <= MAX_LEVEL; ++option)
         if (code == get_levelcode(option)) {

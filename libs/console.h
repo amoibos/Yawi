@@ -84,6 +84,6 @@ void wait(unsigned char duration);
 
 void print_tile(unsigned char x, unsigned char y, unsigned short tileno);
 void print_str(unsigned char x, unsigned char y, char *str, short offset);
-void print_num(unsigned char x, unsigned char y, long num, short offset);
+void print_num(unsigned char x, unsigned char y, unsigned int num, short offset);
 
 #endif

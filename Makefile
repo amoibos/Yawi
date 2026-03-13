@@ -53,16 +53,19 @@ all: $(EXTRA) $(OUTPUT).ihx
 ifeq ($(OS),Windows_NT)
 
 assets:
-	@for %%d in ($(ASSETS)) do ( \
+	@for %%d in (font images audio) do ( \
 	    $(RES2SRC) assets\%%d assets\%%d &&\
 	    $(COMPILER) $(FLAGS) -c -mz80 assets\%%d.c && \
 	    move %%d.rel assets \
 	)
+	python tools\encode_levels.py
+	$(COMPILER) $(FLAGS) -c -mz80 assets\levels.c -o assets\levels.rel
 
 else
 
 assets:
-	@for dir in $(ASSETS); do $(RES2SRC) assets/$$dir; done
+	@for dir in font images audio; do $(RES2SRC) assets/$$dir; done
+	python3 tools/encode_levels.py
 
 endif
 

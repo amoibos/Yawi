@@ -40,16 +40,13 @@ signed char strpos(const unsigned char * search, const unsigned char * content, 
 }
 */
 
-unsigned char* SEGA_itoa(long value, unsigned char * sp) {
-    long q, r;
+unsigned char* SEGA_itoa(unsigned int value, unsigned char * sp) {
+    unsigned int q, r;
     unsigned char *start;
-    unsigned char t, sign = value < 0;
+    unsigned char t;
     unsigned char *dest = sp;
 
     start = sp;
-
-    if (sign)
-        value *= -1;
 
     do {
         q = value / 10;
@@ -62,8 +59,6 @@ unsigned char* SEGA_itoa(long value, unsigned char * sp) {
 
         *sp++ = '0' + r;
     } while(value);
-    if (sign)
-        *sp++ = '-';
 
     *sp-- = '\0';
 
@@ -76,17 +71,14 @@ unsigned char* SEGA_itoa(long value, unsigned char * sp) {
     return dest;
 }
 
-long SEGA_atoi(const unsigned char * str) {
-	long k = 0;
-    unsigned char start;
-
-    start = *str;
+unsigned int SEGA_atoi(const unsigned char * str) {
+	unsigned int k = 0;
 	while (*str)
 	{
 		k = (k << 3) + (k << 1) + (*str) - '0';
 		++str;
 	}
-	return k * ((start == '-') ? -1 : 1);
+	return k;
 }
 
 unsigned char* strcat(unsigned char * dest, const unsigned char * src) {

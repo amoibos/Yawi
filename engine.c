@@ -37,29 +37,41 @@ char load_leveldata(const unsigned char no) {
     level.max_gold = 0;
     level.teleports_found = 0;
     unsigned char first_char=0;
+    unsigned char rle_remaining=0;
     for(unsigned char y=OFFSET_MAP_Y; y < LEVEL_HEIGHT + OFFSET_MAP_Y; ++y) {
         for(unsigned char x=OFFSET_MAP_X; x < TEXTCONSOLE_MAX_X + OFFSET_MAP_X; ++x) {
-            // skip control characters,
-            while (*data < ' ') data++;
-            if (*data == PLAYER1_SYMBOL_LEFT) {
+            unsigned char tile;
+            if (rle_remaining) {
+                tile = 0x20;
+                --rle_remaining;
+            } else {
+                while (*data < 0x20) data++;
+                if (*data & 0x80) {
+                    rle_remaining = (*data & 0x7F) - 1;
+                    ++data;
+                    tile = 0x20;
+                } else {
+                    tile = *data++;
+                }
+            }
+
+            if (tile == PLAYER1_SYMBOL_LEFT) {
                 level.x = x;
                 level.y = y;
-            } else if (*data == GOLD_SYMBOL) {
+            } else if (tile == GOLD_SYMBOL) {
                 level.max_gold++;
-            } else if ((*data == TELEPORTER_SYMBOL) &&
-                       (level.teleports_found < MAX_TELEPORTER) ) {
+            } else if ((tile == TELEPORTER_SYMBOL) &&
+                       (level.teleports_found < MAX_TELEPORTER)) {
                 level.teleport[level.teleports_found].x = x;
                 level.teleport[level.teleports_found].y = y;
                 ++level.teleports_found;
-            } else if (*data == EXIT_SYMBOL) {
+            } else if (tile == EXIT_SYMBOL) {
                 add_animation(x, y);
             }
 
-            //todo: checks if data is too short or too long
-            print_tile(x, y, *data);
-            if ((strchr(BARRIER_SYMBOLS, *data) != -1) && !(first_char))
-                first_char = *data;
-            ++data;
+            print_tile(x, y, tile);
+            if ((strchr(BARRIER_SYMBOLS, tile) != -1) && !(first_char))
+                first_char = tile;
         }
     }
 
@@ -93,14 +105,14 @@ _Bool is_border(const signed char x, const signed char y) {
 /*
     compute level select code
 */
-long get_levelcode(unsigned char level) {
-    long code=0;
+unsigned int get_levelcode(unsigned char level) {
+    unsigned int code=0;
 
     signed char factors[MAX_LEVELCODE_FACTOR] = {2, 3, 5, -2, 4};
 
     for(char idx=0; idx < strlen(LEVEL_NAMES[level - 1]); ++idx)
         code += LEVEL_NAMES[level-1][idx] * factors[idx % MAX_LEVELCODE_FACTOR] * 10;
-    return code * ((code < 0) ? -1 : 1);
+    return code;
 }
 
 
@@ -628,23 +640,25 @@ inline Direction get_Direction(Position *pos) {
 Direction get_input(_Bool* demo_mode, unsigned char * demo_pos) {
     Direction dir=DirectionUndefined;
     unsigned int button;
-   
+    static unsigned int prev_button = 0;
+
     scanKeyboardJoypad();
     button = getKeyboardJoypadStatus();
     if (getKeysHeld())
         button = readkey();
-    
+
     switch (button) {
         case PORT_A_KEY_LEFT: {
-            if (xpos[1] > 0) {
-                xpos[1] = -GEAR_STEP + 1;
+            if (prev_button != PORT_A_KEY_LEFT) {
                 xvel = 0;
+                xpos[0] = 0;
+                xpos[1] = 0;
             }
 
             xvel -= ACCEL_STEP;
             if (xvel <= -MAX_SPEED)
                 xvel = -MAX_SPEED;
-            
+
             signed short old_xpos = xpos[0] + xvel;
             if (old_xpos < -255) {
                 --xpos[1];
@@ -652,54 +666,57 @@ Direction get_input(_Bool* demo_mode, unsigned char * demo_pos) {
             break;
         }
         case PORT_A_KEY_RIGHT: {
-            if (xpos[1] < 0) {
-                xpos[1] = GEAR_STEP - 1;
+            if (prev_button != PORT_A_KEY_RIGHT) {
                 xvel = 0;
+                xpos[0] = 0;
+                xpos[1] = 0;
             }
 
             xvel += ACCEL_STEP;
             if (xvel >= MAX_SPEED)
                 xvel = MAX_SPEED;
-            
+
             signed short old_xpos = xpos[0] + xvel;
             if (old_xpos > 255) {
                 ++xpos[1];
             }
-            
+
             break;
         }
         case PORT_A_KEY_UP: {
-            if (ypos[1] > 0) {
-                ypos[1] = -GEAR_STEP + 1;
-                yvel = 0;    
+            if (prev_button != PORT_A_KEY_UP) {
+                yvel = 0;
+                ypos[0] = 0;
+                ypos[1] = 0;
             }
 
             yvel -= ACCEL_STEP;
             if (yvel <= -MAX_SPEED)
                 yvel = -MAX_SPEED;
-            
+
             signed short old_ypos = ypos[0] + yvel;
             if (old_ypos < -255) {
                 --ypos[1];
             }
-            
+
             break;
         }
         case PORT_A_KEY_DOWN: {
-            if (ypos[1] < 0) {
-                ypos[1] = GEAR_STEP - 1;
+            if (prev_button != PORT_A_KEY_DOWN) {
                 yvel = 0;
+                ypos[0] = 0;
+                ypos[1] = 0;
             }
 
             yvel += ACCEL_STEP;
             if (yvel >= MAX_SPEED)
                 yvel = MAX_SPEED;
-            
+
             signed short old_ypos = ypos[0] + yvel;
             if (old_ypos > 255) {
                 ++ypos[1];
             }
-            
+
             break;
         }
         case PORT_A_KEY_2 | PORT_B_KEY_2: {
@@ -719,7 +736,12 @@ Direction get_input(_Bool* demo_mode, unsigned char * demo_pos) {
     
     ypos[0] += yvel;
     xpos[0] += xvel;
-            
+
+    if (xpos[0] < -255) xpos[0] += 256;
+    else if (xpos[0] > 255) xpos[0] -= 256;
+    if (ypos[0] < -255) ypos[0] += 256;
+    else if (ypos[0] > 255) ypos[0] -= 256;
+
     if (ypos[1] >= GEAR_STEP) {
         ypos[1] -= GEAR_STEP;
         dir = DirectionDown;
@@ -743,6 +765,7 @@ Direction get_input(_Bool* demo_mode, unsigned char * demo_pos) {
             dir = LEVEL01_STEP_SEQUENCE[(*demo_pos)++]; //max demo sequence reached
     }
 
+    prev_button = button;
     return dir;
 }
 
