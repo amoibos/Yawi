@@ -109,8 +109,9 @@ unsigned int get_levelcode(unsigned char level) {
     unsigned int code=0;
 
     signed char factors[MAX_LEVELCODE_FACTOR] = {2, 3, 5, -2, 4};
+    unsigned char len = strlen(LEVEL_NAMES[level - 1]);
 
-    for(char idx=0; idx < strlen(LEVEL_NAMES[level - 1]); ++idx)
+    for(char idx=0; idx < len; ++idx)
         code += LEVEL_NAMES[level-1][idx] * factors[idx % MAX_LEVELCODE_FACTOR] * 10;
     return code;
 }
@@ -159,10 +160,12 @@ void print_title(unsigned char * title) {
     displaying play time
 */
 void print_playtime(void) {
-    unsigned char output[5];
+    unsigned char output[7];
 
     if (current_location == LocationInGame) {
-        print_str(TEXTCONSOLE_MAX_X - strlen(output), INFO_LINE, strcat(SEGA_itoa(seconds, output), "s"), 0);
+        SEGA_itoa(seconds, output);
+        strcat(output, "s");
+        print_str(TEXTCONSOLE_MAX_X - strlen(output), INFO_LINE, output, 0);
     }
 }
 
@@ -802,7 +805,6 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
     unsigned char found;
     _Bool moved_stone=0;
     unsigned char demo_pos=0;
-    unsigned char delay=MAX_MOVE_DELAY;
     unsigned char player_figure = PLAYER1_SYMBOL_LEFT;
     Position prev_position;
 

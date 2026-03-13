@@ -4,7 +4,7 @@ OUTPUT := $(lastword $(subst /, ,$(subst \, ,$(CURDIR))))
 MAINENTRY := main
 
 COMPILER := sdcc
-FLAGS := -DPLATFORM_SG -DGAME_NAME=\"$(OUTPUT)\" --debug
+FLAGS := -DPLATFORM_SG -DGAME_NAME=\"$(OUTPUT)\" --opt-code-size
 LINK := ihx2sms
 ROMEXT := $(TARGET_PLATFORM)
 
