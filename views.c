@@ -2,6 +2,28 @@
 #include "libs/strings.h"
 #include "localization.h"
 
+const unsigned char * LEVEL_NAMES[] = {
+    LEVEL_NAME01,
+#ifndef DEMO
+    LEVEL_NAME02, LEVEL_NAME03, LEVEL_NAME04,
+    LEVEL_NAME05, LEVEL_NAME06, LEVEL_NAME07, LEVEL_NAME08,
+    LEVEL_NAME09, LEVEL_NAME10, LEVEL_NAME11, LEVEL_NAME12,
+#endif
+    ".."
+};
+
+static const unsigned char * INTRO_ITEMS[MAX_INTRO_ITEMS] = {
+     MAIN_MENU_ITEM1
+    ,MAIN_MENU_ITEM2
+    ,MAIN_MENU_ITEM4
+};
+
+static const unsigned char * CREDIT_NAMES[CREDIT_NAMES_MAX] = {
+    CREDITS_LINE01
+    ,CREDITS_LINE02
+    ,CREDITS_LINE03
+};
+
 void congratulation_screen(const unsigned char * menu_name) {
     unsigned char output[TEXTCONSOLE_MAX_X+1];
     unsigned char num[5+1];

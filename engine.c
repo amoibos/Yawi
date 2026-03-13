@@ -1,5 +1,73 @@
 #include "engine.h"
 
+// layout defines offsets of eObjectMove values, stop pair indicate end of check sequence
+static const Position MOTION_CHECKS[] = {
+                                                         {END_STEP, END_STEP}
+     ,{0,0}, {0,-1},        {1,0}, {-1,0}, {END_STEP, END_STEP}
+     ,{0,0},        {0,1},  {1,0}, {-1,0}, {END_STEP, END_STEP}
+     ,{0,0}, {0,-1}, {0,1},         {-1,0}, {END_STEP, END_STEP}
+     ,{0,0}, {0,-1}, {0,1}, {1,0},          {END_STEP, END_STEP}
+};
+
+const unsigned char LEVEL01_STEP_SEQUENCE[MAX_STEP_SEQUENCE] = { DirectionUp,
+                                DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,
+                                DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,
+                                DirectionUp,DirectionUp,
+                                DirectionRight,DirectionRight,DirectionRight,
+                                DirectionDown,DirectionDown,
+                                DirectionUp,DirectionUp,DirectionUp,
+                                DirectionLeft,
+                                DirectionUp,
+                                DirectionLeft,DirectionLeft,DirectionLeft,DirectionLeft,DirectionLeft,DirectionLeft,
+                                DirectionUp,DirectionUp,DirectionUp,
+                                DirectionLeft,DirectionLeft,
+                                DirectionUp,DirectionUp,
+                                DirectionLeft,DirectionLeft,
+                                DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,
+                                DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,
+                                DirectionLeft,DirectionLeft,DirectionLeft
+                            };
+
+static _Bool is_barrier(unsigned short c) {
+    switch(c) {
+        case '+': case '|': case '-': case '%': case '~': return 1;
+        default: return 0;
+    }
+}
+static _Bool is_blocking(unsigned short c) {
+    switch(c) {
+        case '<': case '>': case '^': case 'v':
+        case ':': case '$': case 'l': case 'm': case 'n': case 'o': return 1;
+        default: return 0;
+    }
+}
+static _Bool is_explosive(unsigned short c) {
+    switch(c) {
+        case 'U': case 'V': case 'W': case 'X': case 'B': return 1;
+        default: return 0;
+    }
+}
+static _Bool is_arrow(unsigned short c) {
+    switch(c) {
+        case '<': case '>': case '^': case 'v': return 1;
+        default: return 0;
+    }
+}
+static _Bool is_movable(unsigned short c) {
+    switch(c) {
+        case '<': case '>': case '^': case 'v':
+        case 'B': case 'U': case 'V': case 'W': case 'X':
+        case 'l': case 'm': case 'n': case 'o': return 1;
+        default: return 0;
+    }
+}
+static _Bool is_platform(unsigned short c) {
+    switch(c) {
+        case 'l': case 'm': case 'n': case 'o': return 1;
+        default: return 0;
+    }
+}
+
 //for acceleration of character movement
 signed short xvel=0;
 signed short yvel=0;
@@ -70,7 +138,7 @@ char load_leveldata(const unsigned char no) {
             }
 
             print_tile(x, y, tile);
-            if ((strchr(BARRIER_SYMBOLS, tile) != -1) && !(first_char))
+            if (is_barrier(tile) && !(first_char))
                 first_char = tile;
         }
     }
@@ -99,7 +167,7 @@ _Bool is_border(const signed char x, const signed char y) {
 
     unsigned short brick = get_default_tile(x, y, LocationInGame);
 
-    return strchr(BARRIER_SYMBOLS, (unsigned char)brick) != -1;
+    return is_barrier((unsigned char)brick);
 }
 
 /*
@@ -499,9 +567,9 @@ void gravitation(Position * motion_objects) {
                 //check if falling ends here
                 signed short dest_item = get_checked_tile(dest.x, dest.y);
                 if  (
-                    (strchr(BLOCKING_SYMBOLS, dest_item)    != -1) ||
-                    (strchr(BARRIER_SYMBOLS, dest_item)     != -1) ||
-                    (strchr(EXPLOSIVE_SYMBOLS,falling_item) != -1) ||
+                    is_blocking(dest_item)      ||
+                    is_barrier(dest_item)       ||
+                    is_explosive(falling_item)  ||
                     (!is_within(dest.x, dest.y))
                     ) {
                         //reached boundary, remove object from list
@@ -536,7 +604,7 @@ void gravitation(Position * motion_objects) {
                     case ROCKETD_SYMBOL:
                     case ROCKETL_SYMBOL:
                     case ROCKETR_SYMBOL: {
-                        if (strchr(ARROW_SYMBOLS, falling_item) != -1) {
+                        if (is_arrow(falling_item)) {
                             //explosion
                                
                         }
@@ -855,7 +923,7 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                 if (is_border(dest.x, dest.y))
                     continue;
 
-                if (strchr(MOVABLE_SYMBOLS, item) != -1) {
+                if (is_movable(item)) {
                     if (is_pushing_object(dir)) {
                         // object is movable but is the place next to free?
                         moved_stone = 1;
@@ -869,14 +937,12 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
                         ObjectMove object_moved=ObjectMoveUndefined; 
                         object_moved = get_object_move(dir);
 
-                        signed char pos = strchr(PLATFORM_SYMBOLS, item);
-                        if (pos != -1) {
+                        if (is_platform(item)) {
                             if ((dir > DirectionUndefined) && (dir < DirectionExit)) {
-                                signed short tile_platform = PLATFORM_SYMBOLS[pos];
-                                print_tile(movable_dst.x, movable_dst.y, tile_platform);
+                                print_tile(movable_dst.x, movable_dst.y, item);
                             }
                         } else {
-                            print_tile(movable_dst.x, movable_dst.y, pushed);    
+                            print_tile(movable_dst.x, movable_dst.y, pushed);
                         }
                         check_for_changes(motion_objects, &movable_dst, object_moved);
                         

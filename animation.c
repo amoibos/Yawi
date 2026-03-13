@@ -1,5 +1,20 @@
 #include "animation.h"
 
+const unsigned char INGAME_SPRITE[5][4] = {
+    {69,70,71,72},{89,97,119,105},{97,119,105,89},{119,105,89,97},{105,89,97,119}
+};
+const unsigned char DEATH_SPRITE[1][4] = { {3,4,5,4} };
+const unsigned char INTRO_SPRITE[1][3] = {
+    {PEBBLE_SYMBOL_SHADOW, PLAYER1_SYMBOL_RIGHT_SHADOW, PLAYER1_SYMBOL_LEFT_SHADOW}
+};
+const unsigned char CREDITS_SPRITE[23][4] = {
+    {80,0,80,0},{114,0,114,0},{101,0,101,0},{115,0,115,0},{115,0,115,0},
+    {32,0,32,0},{97,0,97,0},{32,0,32,0},{107,0,107,0},{101,0,101,0},
+    {121,0,121,0},{32,0,32,0},{116,0,116,0},{111,0,111,0},{32,0,32,0},
+    {99,0,99,0},{111,0,111,0},{110,0,110,0},{116,0,116,0},{105,0,105,0},
+    {110,0,110,0},{117,0,117,0},{101,0,101,0}
+};
+
 SpriteData get_sprite_data(signed short data) {
 	SpriteData retval = {0, 0, -1};
 

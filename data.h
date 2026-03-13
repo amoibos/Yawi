@@ -3,7 +3,7 @@
 
 #include "localization.h"
 
-#define VERSION_STRING              "0.9.5"
+#define VERSION_STRING              "0.9.6"
 
 #ifdef DEMO
 #define VERSION                     "DEMO " VERSION_STRING
@@ -152,24 +152,7 @@ typedef enum eDirection {
 } Direction;
 
 #define MAX_STEP_SEQUENCE           ((64))
-static const unsigned char LEVEL01_STEP_SEQUENCE[MAX_STEP_SEQUENCE] = { DirectionUp,
-                                DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,
-                                DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,
-                                DirectionUp,DirectionUp,
-                                DirectionRight,DirectionRight,DirectionRight,
-                                DirectionDown,DirectionDown,
-                                DirectionUp,DirectionUp,DirectionUp,
-                                DirectionLeft,
-                                DirectionUp,
-                                DirectionLeft,DirectionLeft,DirectionLeft,DirectionLeft,DirectionLeft,DirectionLeft,
-                                DirectionUp,DirectionUp,DirectionUp,
-                                DirectionLeft,DirectionLeft,
-                                DirectionUp,DirectionUp,
-                                DirectionLeft,DirectionLeft,
-                                DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,DirectionDown,
-                                DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,DirectionRight,
-                                DirectionLeft,DirectionLeft,DirectionLeft
-                            };
+extern const unsigned char LEVEL01_STEP_SEQUENCE[MAX_STEP_SEQUENCE];
 
 #define MAX_LEVEL_NAME              ((25+1))
 

@@ -37,14 +37,6 @@ typedef enum eObjectMove {
 #define LUT_LEFT                    {-1, 0}
 #define LUT_END                     {END_STEP, END_STEP}
 
-// layout defines offsets of eObjectMove values, stop pair indicate end of check sequence
-static const Position MOTION_CHECKS[] = {
-                                                         LUT_END
-     ,LUT_CENTER, LUT_UP,           LUT_RIGHT, LUT_LEFT, LUT_END
-     ,LUT_CENTER,         LUT_DOWN, LUT_RIGHT, LUT_LEFT, LUT_END
-     ,LUT_CENTER, LUT_UP, LUT_DOWN,            LUT_LEFT, LUT_END
-     ,LUT_CENTER, LUT_UP, LUT_DOWN, LUT_RIGHT,           LUT_END
-};
 
 void load_font(void);
 

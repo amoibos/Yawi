@@ -15,7 +15,7 @@ unsigned char strlen(const unsigned char* str);
 //signed char strpos(unsigned char* search, unsigned char * content, unsigned char start);
 unsigned char* strcpy(unsigned char* dest, const unsigned char* src);
 
-signed char strchr(const unsigned char *str, unsigned char ch);
+//signed char strchr(const unsigned char *str, unsigned char ch);
 
 //unsigned char upcase(const unsigned char c);
 //unsigned char is_alpha(const unsigned char mark);

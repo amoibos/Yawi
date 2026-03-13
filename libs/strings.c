@@ -126,7 +126,7 @@ unsigned char upcase(const unsigned char c) {
         return c;
 
 }
-
+/*
 signed char strchr(const unsigned char *str, const unsigned char ch) {
 	unsigned char result=0;
 
@@ -135,7 +135,7 @@ signed char strchr(const unsigned char *str, const unsigned char ch) {
     		return result;
 
 	return -1;
-}
+} */
 
 /*
 unsigned char is_alpha(const unsigned char mark) {
