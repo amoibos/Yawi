@@ -3,8 +3,8 @@
 #if defined(PLATFORM_SG) || defined(PLATFORM_SC) || defined(PLATFORM_SMS)
 void clear_screen(void)
 {
-    for(unsigned short y=0; y < TEXTCONSOLE_MAX_Y; ++y)
-        for(unsigned short x=0; x < TEXTCONSOLE_MAX_X; ++x)
+    for(unsigned char y=0; y < TEXTCONSOLE_MAX_Y; ++y)
+        for(unsigned char x=0; x < TEXTCONSOLE_MAX_X; ++x)
         {
             setNextTileatXY(x, y);
             setTile(' ');    
