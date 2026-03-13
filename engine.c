@@ -810,11 +810,13 @@ void gameloop(unsigned char curr_level, _Bool demo_mode) {
     Position motion_objects[MAX_MOTION_ITEMS];
     dir = DirectionUndefined;
 
+    displayOff();
     load_font();
     clear_screen();
 
     if (load_leveldata(curr_level)) {
         setup_level();
+        displayOn();
         if (curr_level < 2)
             totaltime = 0;
         for (unsigned char n=0; n < MAX_MOTION_ITEMS; ++n) {
